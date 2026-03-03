@@ -1,0 +1,42 @@
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import type { ReactNode } from "react";
+import { getCurrentUser } from "./services/auth";
+import type { Role } from "./types/auth";
+import Login from "./components/Login";
+import Layout from "./components/Layout";
+import DashboardHome from "./components/DashboardHome";
+import GradesPage from "./components/grades/GradesPage";
+import AttendancePage from "./components/attendance/AttendancePage";
+import TimetablePage from "./components/timetable/TimetablePage";
+import MessagesPage from "./components/messages/MessagesPage";
+import HomeworkPage from "./components/homework/HomeworkPage";
+import EventsPage from "./components/events/EventsPage";
+import ProfilePage from "./components/profile/ProfilePage";
+
+const RoleGuard = ({ allow, children }: { allow: Role[]; children: ReactNode }) => {
+  const user = getCurrentUser();
+  if (!user) return <Navigate to="/" replace />;
+  if (!allow.includes(user.role)) return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+};
+
+export default function App() {
+  return (
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/dashboard" element={<Layout />}>
+          <Route index element={<DashboardHome />} />
+          <Route path="grades" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><GradesPage /></RoleGuard>} />
+          <Route path="attendance" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><AttendancePage /></RoleGuard>} />
+          <Route path="timetable" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><TimetablePage /></RoleGuard>} />
+          <Route path="messages" element={<MessagesPage />} />
+          <Route path="homework" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><HomeworkPage /></RoleGuard>} />
+          <Route path="events" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><EventsPage /></RoleGuard>} />
+          <Route path="profile" element={<ProfilePage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}

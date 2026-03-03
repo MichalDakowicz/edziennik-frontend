@@ -30,7 +30,7 @@ export default function TimetableGrid({ days, hours, entries, zajecia, subjects 
   return (
     <div className="overflow-x-auto">
       <table className="min-w-[700px] w-full border border-border/50 rounded-xl overflow-hidden text-sm">
-        <thead className="bg-secondary">
+        <thead className="bg-card/50">
           <tr>
             <th className="p-3 text-left">Godzina</th>
             {dayColumns.map((day) => (

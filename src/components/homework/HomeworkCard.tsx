@@ -11,7 +11,7 @@ export default function HomeworkCard({ item, subject, teacher }: { item: Homewor
   const dueVariant = isOverdue ? "danger" : diffDays <= 2 ? "warning" : "neutral";
 
   return (
-    <div className="bg-secondary border border-border/50 rounded-xl p-4 space-y-2">
+    <div className="bg-card/50 border border-border/50 rounded-xl p-4 space-y-2">
       <div className="flex items-center gap-2 flex-wrap">
         <Badge variant="info">{subject?.nazwa ?? subject?.Nazwa ?? `#${item.przedmiot}`}</Badge>
         <Badge variant={dueVariant}>Termin: {formatDate(item.termin)}</Badge>

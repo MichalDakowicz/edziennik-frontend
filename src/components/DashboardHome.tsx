@@ -20,7 +20,6 @@ import { Card } from "./ui/Card";
 import { Spinner } from "./ui/Spinner";
 import { ErrorState } from "./ui/ErrorState";
 import { formatGradeValue, computeWeightedAverage, getGradeColor } from "../utils/gradeUtils";
-import { formatDate } from "../utils/dateUtils";
 
 export default function DashboardHome() {
   const user = getCurrentUser();
@@ -85,15 +84,13 @@ export default function DashboardHome() {
   const statusMap = new Map((studentData.attendanceStatuses || []).map((s: any) => [s.id, s.Wartosc]));
 
   const absentCount = studentData.attendance?.filter((record: any) => {
-    const statusText = statusMap.get(record.status)?.toLowerCase() || "";
+    const statusText = (String(statusMap.get(record.status)) || "").toLowerCase();
     return statusText.includes("nieobecn") || statusText.includes("uspraw");
   }).length ?? 0;
 
   const recentGrades = [...(studentData.grades || [])].sort((a, b) => Date.parse(b.data_wystawienia) - Date.parse(a.data_wystawienia)).slice(0, 5);
   const weighted = computeWeightedAverage(studentData.grades || []);
   const unreadMessages = studentData.inbox?.filter((message: any) => !message.przeczytana).slice(0, 3) || [];
-  const upcomingHomework = [...(studentData.homework || [])].filter((item) => Date.parse(item.termin) >= Date.now()).sort((a, b) => Date.parse(a.termin) - Date.parse(b.termin)).slice(0, 3);
-  const upcomingEvents = [...(studentData.events || [])].filter((item) => Date.parse(item.data) >= Date.now()).sort((a, b) => Date.parse(a.data) - Date.parse(b.data)).slice(0, 3);
 
   const attendancePercentage = attendanceCount ? ((attendanceCount - absentCount) / attendanceCount) * 100 : 100;
   const attendanceColor = attendancePercentage >= 90 ? "text-emerald-400" : attendancePercentage >= 75 ? "text-yellow-400" : "text-red-400";
@@ -115,15 +112,14 @@ export default function DashboardHome() {
   const getSubjectName = (zajeciaId: number) => {
     const zajecia = zajeciaMap.get(zajeciaId);
     if (!zajecia) return "Nieznany przedmiot";
-    const subject = przedmiotMap.get(zajecia.przedmiot);
-    return subject ? subject.nazwa : "Nieznany przedmiot";
+    const subject = przedmiotMap.get((zajecia as any).przedmiot);
+    return subject ? (subject as any).nazwa : "Nieznany przedmiot";
   };
   
   const getGradeSubjectName = (subjectId: number) => {
       const subject = przedmiotMap.get(subjectId);
-      return subject ? subject.nazwa : "Nieznany przedmiot";
+      return subject ? (subject as any).nazwa : "Nieznany przedmiot";
   };
-
   const todayLessons = (studentData.entries || [])
     .filter((entry: any) => targetDayId && (entry.dzien_tygodnia ?? entry.DzienTygodnia) === targetDayId)
     .map((entry: any) => {
@@ -143,7 +139,7 @@ export default function DashboardHome() {
     <div className="space-y-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-foreground tracking-tight">Witaj, {user.firstName}!</h2>
-        <span className="text-muted-foreground text-sm bg-secondary px-3 py-1 rounded-full border border-border/40">
+        <span className="text-muted-foreground text-sm bg-card/50 px-3 py-1 rounded-full border border-border/40">
           {new Date().toLocaleDateString("pl-PL", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </span>
       </div>
@@ -165,7 +161,7 @@ export default function DashboardHome() {
             {nextLesson ? (
                <div className="flex justify-between items-center group">
                  <span className="truncate mr-2 group-hover:text-primary transition-colors">{getSubjectName(nextLesson.zajecia)}</span>
-                 <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-md shrink-0 font-mono tracking-wide">{nextLesson.hour?.CzasOd?.substring(0, 5)}</span>
+                 <span className="text-xs text-muted-foreground bg-card/50 px-2 py-1 rounded-md shrink-0 font-mono tracking-wide">{nextLesson.hour?.CzasOd?.substring(0, 5)}</span>
                </div>
              ) : (
                 <span className="text-muted-foreground text-sm italic">Brak kolejnych lekcji</span>
@@ -189,7 +185,7 @@ export default function DashboardHome() {
           <div className="bg-card/50 border border-border/40 rounded-xl overflow-hidden">
             <div className="divide-y divide-border/30">
               {recentGrades.length ? recentGrades.map((grade: any) => (
-                <div key={grade.id} className="flex items-center justify-between p-3 hover:bg-secondary/30 transition-colors">
+                <div key={grade.id} className="flex items-center justify-between p-3 hover:bg-card/50/30 transition-colors">
                   <div className="flex-1 font-medium text-sm text-foreground truncate mr-2">{getGradeSubjectName(grade.przedmiot)}</div>
                   <div className={`flex shrink-0 w-8 h-8 rounded-lg text-sm font-bold border items-center justify-center ${getGradeColor(grade.wartosc)}`}>
                     {formatGradeValue(grade.wartosc)}

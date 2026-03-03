@@ -65,7 +65,7 @@ export default function EventsPage() {
                 const open = expanded.includes(event.id);
                 const subject = subjects.find((s) => s.id === event.przedmiot);
                 return (
-                  <div key={event.id} className="bg-secondary border border-border/50 rounded-xl p-4">
+                  <div key={event.id} className="bg-card/50 border border-border/50 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold">{event.tytul}</h3>
                       {subject ? <Badge variant="info">{subject.nazwa ?? subject.Nazwa}</Badge> : null}

@@ -15,7 +15,7 @@ export default function MessageList({
   return (
     <div className="space-y-2">
       {messages.map((message) => (
-        <button key={message.id} className="w-full text-left bg-secondary border border-border/50 rounded-xl p-4 hover:border-border/50" onClick={() => onOpen(message)}>
+        <button key={message.id} className="w-full text-left bg-card/50 border border-border/50 rounded-xl p-4 hover:border-border/50" onClick={() => onOpen(message)}>
           <div className="flex justify-between items-start gap-3">
             <div className="flex gap-2">
               <span className={`inline-block w-2.5 h-2.5 rounded-full mt-1 ${message.przeczytana ? "bg-zinc-500" : "bg-blue-400"}`} />

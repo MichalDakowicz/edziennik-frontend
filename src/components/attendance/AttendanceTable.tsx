@@ -17,7 +17,7 @@ export default function AttendanceTable({
   return (
     <div className="overflow-x-auto border border-border/50 rounded-xl">
       <table className="min-w-full text-sm">
-        <thead className="bg-secondary">
+        <thead className="bg-card/50">
           <tr>
             <th className="text-left p-3">Data</th>
             <th className="text-left p-3">Godzina lekcyjna</th>

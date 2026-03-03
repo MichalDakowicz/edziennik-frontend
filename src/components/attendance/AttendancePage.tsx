@@ -76,10 +76,6 @@ export default function AttendancePage() {
     })
     .sort((a, b) => Date.parse(b.Data) - Date.parse(a.Data));
 
-  const presentCount = attendance.filter((record) => {
-    const name = resolveStatusName(record.status).toLowerCase();
-    return name.includes("obecn") || name.includes("zwoln");
-  }).length;
   const absences = attendance.filter((record) => {
     const name = resolveStatusName(record.status).toLowerCase();
     return name.includes("nieobecn") || name.includes("uspraw");
@@ -93,7 +89,7 @@ export default function AttendancePage() {
       <AttendanceStats percentage={percentage} absences={absences} lates={lates} />
 
       {monthlyData.length >= 2 ? (
-        <div className="bg-secondary border border-border/50 rounded-xl p-4 h-80">
+        <div className="bg-card/50 border border-border/50 rounded-xl p-4 h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthlyData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
@@ -129,7 +125,7 @@ export default function AttendancePage() {
         </div>
       ) : null}
 
-      <div className="bg-secondary border border-border/50 rounded-xl p-4 space-y-3">
+      <div className="bg-card/50 border border-border/50 rounded-xl p-4 space-y-3">
         <div className="flex flex-wrap gap-2">
           {statusFilters.map((status) => (
             <button key={status} className={selectedStatus === status ? "btn-primary" : "btn-ghost"} onClick={() => setSelectedStatus(status)}>

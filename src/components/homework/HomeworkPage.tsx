@@ -45,7 +45,7 @@ export default function HomeworkPage() {
   return (
     <div className="space-y-4">
       <h1 className="page-title">Prace domowe</h1>
-      <div className="bg-secondary border border-border/50 rounded-xl p-4 flex flex-wrap gap-3">
+      <div className="bg-card/50 border border-border/50 rounded-xl p-4 flex flex-wrap gap-3">
         <label className="text-sm text-muted-foreground">
           Przedmiot
           <select className="input-base mt-1" value={subjectId} onChange={(event) => setSubjectId(event.target.value === "all" ? "all" : Number(event.target.value))}>

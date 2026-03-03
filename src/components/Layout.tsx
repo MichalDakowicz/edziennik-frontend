@@ -6,7 +6,19 @@ import {
     useLocation,
     useNavigate,
 } from "react-router-dom";
-import { Menu, X, LogOut } from "lucide-react";
+import { 
+    Menu, 
+    X, 
+    LogOut, 
+    LayoutDashboard, 
+    GraduationCap, 
+    UserCheck, 
+    CalendarDays, 
+    BookOpen, 
+    Calendar, 
+    Mail, 
+    User 
+} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "../services/auth";
 import { getInboxMessages, getLuckyNumber } from "../services/api";
@@ -17,6 +29,7 @@ import { cn } from "../utils/cn";
 type NavItem = {
     label: string;
     to: string;
+    icon: React.ElementType;
     student?: boolean;
     parent?: boolean;
     teacher?: boolean;
@@ -26,38 +39,50 @@ const navItems: NavItem[] = [
     {
         label: "Pulpit",
         to: "/dashboard",
+        icon: LayoutDashboard,
         student: true,
         parent: true,
         teacher: true,
     },
-    { label: "Oceny", to: "/dashboard/grades", student: true, parent: true },
+    { 
+        label: "Oceny", 
+        to: "/dashboard/grades", 
+        icon: GraduationCap, 
+        student: true, 
+        parent: true 
+    },
     {
         label: "Obecność",
         to: "/dashboard/attendance",
+        icon: UserCheck,
         student: true,
         parent: true,
     },
     {
         label: "Plan lekcji",
         to: "/dashboard/timetable",
+        icon: CalendarDays,
         student: true,
         parent: true,
     },
     {
         label: "Prace domowe",
         to: "/dashboard/homework",
+        icon: BookOpen,
         student: true,
         parent: true,
     },
     {
         label: "Terminarz",
         to: "/dashboard/events",
+        icon: Calendar,
         student: true,
         parent: false,
     },
     {
         label: "Wiadomości",
         to: "/dashboard/messages",
+        icon: Mail,
         student: true,
         parent: true,
         teacher: true,
@@ -65,6 +90,7 @@ const navItems: NavItem[] = [
     {
         label: "Profil",
         to: "/dashboard/profile",
+        icon: User,
         student: true,
         parent: true,
         teacher: true,
@@ -181,7 +207,10 @@ export default function Layout() {
                                     )}
                                     onClick={() => setMobileOpen(false)}
                                 >
-                                    <span>{item.label}</span>
+                                    <div className="flex items-center gap-3">
+                                        <item.icon size={18} />
+                                        <span>{item.label}</span>
+                                    </div>
                                     {item.to === "/dashboard/messages" &&
                                     unreadCount > 0 ? (
                                         <Badge

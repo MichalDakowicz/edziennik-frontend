@@ -36,7 +36,7 @@ export const Modal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
       <div
         ref={contentRef}
-        className={`bg-secondary border border-border/50 rounded-xl shadow-xl w-full max-h-[90vh] flex flex-col ${className}`}
+        className={`bg-card/50 border border-border/50 rounded-xl shadow-xl w-full max-h-[90vh] flex flex-col ${className}`}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="p-6 border-b border-border/50">

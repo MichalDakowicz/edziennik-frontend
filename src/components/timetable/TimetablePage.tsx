@@ -57,6 +57,8 @@ export default function TimetablePage() {
   if (query.isPending) return <Spinner />;
   if (query.isError) return <ErrorState message={query.error.message} />;
 
+  if (!data) return <Spinner />;
+
   const classDisplay = data.klasa.numer && data.klasa.nazwa ? `${data.klasa.numer} ${data.klasa.nazwa}` : data.klasa.nazwa ?? `#${data.klasa.id}`;
 
   return (
@@ -64,7 +66,7 @@ export default function TimetablePage() {
       <h1 className="page-title">Plan lekcji</h1>
       <p className="text-muted-foreground">Klasa: {classDisplay}</p>
       <TimetableGrid days={data.days} hours={data.hours} entries={data.entries} zajecia={data.zajecia} subjects={data.subjects} />
-      <div className="bg-secondary border border-border/50 rounded-xl p-4">
+      <div className="bg-card/50 border border-border/50 rounded-xl p-4">
         <h2 className="section-title mb-3">Dzisiaj</h2>
         {todayLessons.length ? (
           <ul className="space-y-2">

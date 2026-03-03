@@ -28,3 +28,4 @@ Thumbs.db
 .eslintcache
 
 edziennik-archive
+*.cache

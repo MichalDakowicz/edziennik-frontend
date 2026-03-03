@@ -22,12 +22,10 @@ export default function EventsPage() {
   });
   const subjectsQuery = useQuery({ queryKey: keys.subjects(), queryFn: getSubjects });
 
-  if (!classId) return <ErrorState message="Brak przypisanej klasy" />;
-  if ([eventsQuery, subjectsQuery].some((q) => q.isPending)) return <Spinner />;
-  const firstError = [eventsQuery, subjectsQuery].find((q) => q.isError);
-  if (firstError?.isError) return <ErrorState message={firstError.error.message} />;
+  const events = useMemo(() => {
+    return [...(eventsQuery.data ?? [])].sort((a, b) => Date.parse(a.data) - Date.parse(b.data));
+  }, [eventsQuery.data]);
 
-  const events = [...(eventsQuery.data ?? [])].sort((a, b) => Date.parse(a.data) - Date.parse(b.data));
   const subjects = subjectsQuery.data ?? [];
 
   const grouped = useMemo(() => {
@@ -42,6 +40,11 @@ export default function EventsPage() {
   }, [events]);
 
   const past = events.filter((event) => Date.parse(event.data) < Date.now());
+
+  if (!classId) return <ErrorState message="Brak przypisanej klasy" />;
+  if ([eventsQuery, subjectsQuery].some((q) => q.isPending)) return <Spinner />;
+  const firstError = [eventsQuery, subjectsQuery].find((q) => q.isError);
+  if (firstError?.isError) return <ErrorState message={firstError.error.message} />;
 
   return (
     <div className="space-y-4">

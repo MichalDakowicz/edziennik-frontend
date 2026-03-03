@@ -22,11 +22,6 @@ export default function HomeworkPage() {
   const subjectsQuery = useQuery({ queryKey: keys.subjects(), queryFn: getSubjects });
   const teachersQuery = useQuery({ queryKey: keys.teachers(), queryFn: getTeachers });
 
-  if (!classId) return <ErrorState message="Brak przypisanej klasy" />;
-  if ([homeworkQuery, subjectsQuery, teachersQuery].some((q) => q.isPending)) return <Spinner />;
-  const firstError = [homeworkQuery, subjectsQuery, teachersQuery].find((q) => q.isError);
-  if (firstError?.isError) return <ErrorState message={firstError.error.message} />;
-
   const homework = homeworkQuery.data ?? [];
   const subjects = subjectsQuery.data ?? [];
   const teachers = teachersQuery.data ?? [];
@@ -41,6 +36,11 @@ export default function HomeworkPage() {
     () => [...homework].filter((item) => Date.parse(item.termin) < Date.now()).sort((a, b) => Date.parse(b.termin) - Date.parse(a.termin)),
     [homework],
   );
+
+  if (!classId) return <ErrorState message="Brak przypisanej klasy" />;
+  if ([homeworkQuery, subjectsQuery, teachersQuery].some((q) => q.isPending)) return <Spinner />;
+  const firstError = [homeworkQuery, subjectsQuery, teachersQuery].find((q) => q.isError);
+  if (firstError?.isError) return <ErrorState message={firstError.error.message} />;
 
   return (
     <div className="space-y-4">

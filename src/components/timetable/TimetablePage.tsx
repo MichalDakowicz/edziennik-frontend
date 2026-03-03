@@ -29,16 +29,14 @@ export default function TimetablePage() {
     },
   });
 
-  if (!classId) return <ErrorState message="Brak przypisanej klasy" />;
-  if (query.isPending) return <Spinner />;
-  if (query.isError) return <ErrorState message={query.error.message} />;
-
   const data = query.data;
-  const today = new Date();
-  const dayNum = today.getDay() === 0 ? 7 : today.getDay();
-  const todayDay = data.days.find((d) => d.Numer === dayNum);
 
   const todayLessons = useMemo(() => {
+    if (!data) return [];
+    const today = new Date();
+    const dayNum = today.getDay() === 0 ? 7 : today.getDay();
+    const todayDay = data.days.find((d) => d.Numer === dayNum);
+
     if (!todayDay) return [];
     return data.entries
       .filter((entry) => (entry.dzien_tygodnia ?? entry.DzienTygodnia) === todayDay.id)
@@ -53,7 +51,11 @@ export default function TimetablePage() {
           hour: hour ? `${hour.CzasOd.slice(0, 5)}-${hour.CzasDo.slice(0, 5)}` : "",
         };
       });
-  }, [data.days, data.entries, data.hours, data.subjects, data.zajecia, todayDay]);
+  }, [data]);
+
+  if (!classId) return <ErrorState message="Brak przypisanej klasy" />;
+  if (query.isPending) return <Spinner />;
+  if (query.isError) return <ErrorState message={query.error.message} />;
 
   const classDisplay = data.klasa.numer && data.klasa.nazwa ? `${data.klasa.numer} ${data.klasa.nazwa}` : data.klasa.nazwa ?? `#${data.klasa.id}`;
 

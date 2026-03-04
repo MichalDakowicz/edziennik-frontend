@@ -56,13 +56,13 @@ export default function AttendancePage() {
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
       const entry = map.get(key) ?? { month: key, obecność: 0, nieobecność: 0, spóźnienie: 0 };
       const name = resolveStatusName(record.status).toLowerCase();
-      if (name.includes("nieobecn") || name.includes("uspraw")) entry.nieobecność += 1;
+      if (name.includes("nieobecn")) entry.nieobecność += 1;
       else if (name.includes("spóźn") || name.includes("spozn")) entry.spóźnienie += 1;
       else entry.obecność += 1;
       map.set(key, entry);
     });
-    return [...map.values()];
-  }, [attendance]);
+    return [...map.values()].sort((a, b) => a.month.localeCompare(b.month));
+  }, [attendance, statusMap]);
 
   if (!studentId) return <ErrorState message="Brak przypisanego ucznia" />;
   if ([attendanceQuery, statusesQuery, hoursQuery].some((q) => q.isPending)) return <Spinner />;
@@ -72,16 +72,25 @@ export default function AttendancePage() {
   const filtered = attendance
     .filter((record) => {
       if (selectedStatus === "Wszystkie") return true;
-      return resolveStatusName(record.status).toLowerCase().includes(selectedStatus.toLowerCase().slice(0, 5));
+      const statusName = resolveStatusName(record.status).toLowerCase();
+      if (selectedStatus === "Obecność") return !statusName.includes("nieobecn") && !statusName.includes("spóźn") && !statusName.includes("spozn");
+      if (selectedStatus === "Nieobecność") return statusName.includes("nieobecn");
+      if (selectedStatus === "Spóźnienie") return statusName.includes("spóźn") || statusName.includes("spozn");
+      if (selectedStatus === "Usprawiedliwienie") return statusName.includes("uspraw");
+      if (selectedStatus === "Zwolnienie") return statusName.includes("zwoln");
+      return true;
     })
     .sort((a, b) => Date.parse(b.Data) - Date.parse(a.Data));
 
   const absences = attendance.filter((record) => {
     const name = resolveStatusName(record.status).toLowerCase();
-    return name.includes("nieobecn") || name.includes("uspraw");
+    return name.includes("nieobecn");
   }).length;
-  const lates = attendance.filter((record) => resolveStatusName(record.status).toLowerCase().includes("spóźn") || resolveStatusName(record.status).toLowerCase().includes("spozn")).length;
-  const percentage = attendance.length ? ((attendance.length - absences) / attendance.length) * 100 : 100;
+  const lates = attendance.filter((record) => {
+    const name = resolveStatusName(record.status).toLowerCase();
+    return name.includes("spóźn") || name.includes("spozn");
+  }).length;
+  const percentage = attendance.length ? ((attendance.length - absences - lates) / attendance.length) * 100 : 100;
 
   return (
     <div className="space-y-4">
@@ -118,6 +127,7 @@ export default function AttendancePage() {
                 }}
               />
               <Legend wrapperStyle={{ paddingTop: "20px" }} />
+              <Bar dataKey="obecność" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
               <Bar dataKey="nieobecność" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={40} />
               <Bar dataKey="spóźnienie" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={40} />
             </BarChart>

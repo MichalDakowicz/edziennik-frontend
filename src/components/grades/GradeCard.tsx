@@ -1,5 +1,5 @@
 import type { Grade } from "../../types/api";
-import { computeWeightedAverage, formatGradeValue, getGradeColor } from "../../utils/gradeUtils";
+import { computeWeightedAverage, formatGradeValue, getGradeColor, getSuggestedGrade } from "../../utils/gradeUtils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/Table";
 
 interface GradeCardProps {
@@ -10,14 +10,20 @@ interface GradeCardProps {
 
 export default function GradeCard({ subjectName, grades, onSelect }: GradeCardProps) {
   const avg = computeWeightedAverage(grades);
+  const suggestedGrade = getSuggestedGrade(avg);
 
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden h-full flex flex-col hover:border-border/80 transition-shadow">
+    <div className="bg-card rounded-xl overflow-hidden h-full flex flex-col hover:border-border/80 transition-shadow">
       <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
         <h3 className="font-semibold text-foreground">{subjectName}</h3>
-        <span className="text-xs px-2.5 py-1 rounded-md tabular-nums font-bold text-primary bg-primary/10 border border-primary/20 dark:bg-primary/20 dark:border-primary/30">
-          Średnia: {avg.toFixed(2)}
-        </span>
+        <div className="flex gap-2">
+          <span className="text-xs px-2.5 py-1 rounded-md tabular-nums font-bold text-primary bg-primary/10 border border-primary/20 dark:bg-primary/20 dark:border-primary/30">
+            Średnia: {avg.toFixed(2)}
+          </span>
+          <span className={`text-xs px-2.5 py-1 rounded-md tabular-nums font-bold ${getGradeColor(suggestedGrade)}`}>
+            Propozycja: {suggestedGrade}
+          </span>
+        </div>
       </div>
       <div className="overflow-x-auto flex-1">
         <Table>

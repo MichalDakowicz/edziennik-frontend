@@ -21,6 +21,7 @@ export default function GradesPage() {
   const [tab, setTab] = useState<Tab>("partial");
   const [search, setSearch] = useState("");
   const [selectedGrade, setSelectedGrade] = useState<Grade | null>(null);
+  const [showLastWeekOnly, setShowLastWeekOnly] = useState(false);
 
   const enabled = Boolean(studentId);
 
@@ -38,13 +39,25 @@ export default function GradesPage() {
 
   const grouped = useMemo(() => {
     const map = new Map<number, Grade[]>();
-    grades.forEach((grade) => {
+    let filteredGrades = grades;
+
+    // Filtruj oceny z ostatniego tygodnia jeśli jest włączone
+    if (showLastWeekOnly) {
+      const now = new Date();
+      const sevenDaysAgo = new Date(now.getTime() - 7 *24 * 60 * 60 * 1000);
+      filteredGrades = grades.filter((grade) => {
+        const gradeDate = new Date(grade.data_wystawienia);
+        return gradeDate >= sevenDaysAgo && gradeDate <= now;
+      });
+    }
+
+    filteredGrades.forEach((grade) => {
       const current = map.get(grade.przedmiot) ?? [];
       current.push(grade);
       map.set(grade.przedmiot, current);
     });
     return map;
-  }, [grades]);
+  }, [grades, showLastWeekOnly]);
 
   if (!studentId) return <ErrorState message="Brak przypisanego ucznia" />;
   if ([gradesQuery, periodQuery, finalQuery, behaviorQuery, subjectsQuery].some((q) => q.isPending)) return <Spinner />;
@@ -63,7 +76,19 @@ export default function GradesPage() {
 
       {tab === "partial" ? (
         <>
-          <input className="input-base" placeholder="Filtruj przedmiot..." value={search} onChange={(event) => setSearch(event.target.value)} />
+          <div className="flex gap-2">
+            <input className="input-base flex-1" placeholder="Filtruj przedmiot..." value={search} onChange={(event) => setSearch(event.target.value)} />
+            <button
+              onClick={() => setShowLastWeekOnly(!showLastWeekOnly)}
+              className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                showLastWeekOnly
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              Ostatni tydzień
+            </button>
+          </div>
           <div className="grid md:grid-cols-2 gap-4">
             {[...grouped.entries()]
               .filter(([subjectId]) => {

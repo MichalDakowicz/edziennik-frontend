@@ -45,3 +45,12 @@ export function simulateGradeNeeded(
   if (needed < 1 || needed > 6) return null;
   return Math.round(needed * 100) / 100;
 }
+
+export function getSuggestedGrade(average: number): number {
+  if (average >= 5.4) return 6;
+  if (average >= 4.7) return 5;
+  if (average >= 3.75) return 4;
+  if (average >= 2.8) return 3;
+  if (average >= 1.85) return 2;
+  return 1;
+}

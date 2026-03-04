@@ -143,7 +143,7 @@ export default function Layout() {
                 <div className="flex items-center gap-2">
                     <h2 className="font-semibold text-lg">Modéa</h2>
                     {lucky?.lucky_number && (
-                        <div className="bg-primary/20 text-primary w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold border border-primary/30">
+                        <div className="bg-primary/20 text-primary w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold border border-primary/30" title={`Szczęśliwy numerek to: ${lucky.lucky_number}`}>
                             {lucky.lucky_number}
                         </div>
                     )}
@@ -169,7 +169,7 @@ export default function Layout() {
                             {lucky?.lucky_number && (
                                 <div
                                     className="bg-primary/20 text-primary w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold border border-primary/30"
-                                    title="Szczęśliwy numerek"
+                                    title={`Szczęśliwy numerek to: ${lucky.lucky_number}`}
                                 >
                                     {lucky.lucky_number}
                                 </div>

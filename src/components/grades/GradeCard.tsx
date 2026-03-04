@@ -1,5 +1,6 @@
 import type { Grade } from "../../types/api";
 import { computeWeightedAverage, formatGradeValue, getGradeColor } from "../../utils/gradeUtils";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/Table";
 
 interface GradeCardProps {
   subjectName: string;
@@ -11,27 +12,51 @@ export default function GradeCard({ subjectName, grades, onSelect }: GradeCardPr
   const avg = computeWeightedAverage(grades);
 
   return (
-    <div className="bg-card border border-border/50 rounded-xl p-4">
-      <div className="flex items-center justify-between mb-3">
+    <div className="bg-card border border-border rounded-xl overflow-hidden h-full flex flex-col hover:border-border/80 transition-shadow">
+      <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
         <h3 className="font-semibold text-foreground">{subjectName}</h3>
-        <span className="text-xs px-2 py-1 rounded border border-blue-900/30 bg-blue-900/20 text-primary">avg: {avg.toFixed(2)}</span>
+        <span className="text-xs px-2.5 py-1 rounded-md tabular-nums font-bold text-primary bg-primary/10 border border-primary/20 dark:bg-primary/20 dark:border-primary/30">
+          Średnia: {avg.toFixed(2)}
+        </span>
       </div>
-      <div className="space-y-2">
-        {grades.map((grade) => (
-          <button
-            key={grade.id}
-            className="w-full text-left bg-zinc-950 border border-border/50 rounded-lg p-2 hover:border-border/50"
-            onClick={() => onSelect(grade)}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-foreground">{grade.opis ?? "Ocena"}</p>
-                <p className="text-xs text-muted-foreground">{new Date(grade.data_wystawienia).toLocaleDateString("pl-PL")} · Waga: {grade.waga}</p>
-              </div>
-              <span className={`px-2 py-1 rounded border text-sm ${getGradeColor(grade.wartosc)}`}>{formatGradeValue(grade.wartosc)}</span>
-            </div>
-          </button>
-        ))}
+      <div className="overflow-x-auto flex-1">
+        <Table>
+          <TableHeader className="bg-muted/50 hidden md:table-header-group">
+            <TableRow className="hover:bg-transparent border-b border-border">
+              <TableHead className="w-[80px] text-xs uppercase tracking-wider font-bold text-muted-foreground p-3">Ocena</TableHead>
+              <TableHead className="text-xs uppercase tracking-wider font-bold text-muted-foreground p-3">Opis</TableHead>
+              <TableHead className="text-right text-xs uppercase tracking-wider font-bold text-muted-foreground w-[80px] p-3">Waga</TableHead>
+              <TableHead className="text-right text-xs uppercase tracking-wider font-bold text-muted-foreground w-[120px] p-3">Data</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {grades.map((grade) => (
+              <TableRow 
+                key={grade.id} 
+                className="cursor-pointer hover:bg-muted/50 border-b border-border/50 last:border-0 transition-colors"
+                onClick={() => onSelect(grade)}
+              >
+                <TableCell className="font-medium p-3">
+                  <span className={`inline-flex items-center justify-center w-8 h-8 rounded-md font-bold text-sm ${getGradeColor(grade.wartosc)}`}>
+                    {formatGradeValue(grade.wartosc)}
+                  </span>
+                </TableCell>
+                <TableCell className="p-3">
+                  <span className="block text-sm font-medium text-foreground">{grade.opis || "Ocena cząstkowa"}</span>
+                  <span className="md:hidden text-xs text-muted-foreground mt-1 block">
+                    {new Date(grade.data_wystawienia).toLocaleDateString("pl-PL")} · Waga: {grade.waga}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right tabular-nums text-muted-foreground hidden md:table-cell p-3 font-medium">
+                  {grade.waga}
+                </TableCell>
+                <TableCell className="text-right tabular-nums text-muted-foreground hidden md:table-cell p-3">
+                  {new Date(grade.data_wystawienia).toLocaleDateString("pl-PL")}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

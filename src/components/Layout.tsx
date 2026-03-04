@@ -146,8 +146,8 @@ export default function Layout() {
     };
 
     return (
-        <div className="flex h-screen bg-zinc-950 text-foreground overflow-hidden">
-            <div className="md:hidden p-4 border-b border-zinc-800 bg-card flex items-center justify-between z-10 w-full fixed top-0 h-16">
+        <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans">
+            <div className="md:hidden p-4 border-b border-border bg-card flex items-center justify-between z-10 w-full fixed top-0 h-16">
                 <div className="flex items-center gap-2">
                     <h2 className="font-semibold text-lg">Modéa</h2>
                     {lucky?.lucky_number && (
@@ -168,8 +168,8 @@ export default function Layout() {
             <div
                 className={`fixed inset-y-0 left-0 z-40 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
             >
-                <aside className="h-full w-72 bg-card border-r border-zinc-800 flex flex-col shadow-sm">
-                    <div className="p-6">
+                <aside className="h-full w-72 bg-card border-r border-border flex flex-col">
+                    <div className="p-6 border-b border-border/50">
                         <div className="flex items-center justify-between">
                             <h1 className="text-2xl font-bold text-foreground">
                                 Modéa
@@ -183,13 +183,13 @@ export default function Layout() {
                                 </div>
                             )}
                         </div>
-                        <div className="mt-3 text-sm text-muted-foreground">
-                            <p>
-                                {user.firstName} {user.lastName}
-                            </p>
+                        <div className="mt-2 text-sm text-muted-foreground flex flex-col">
+                            <span className="font-medium text-foreground">{user.firstName} {user.lastName}</span>
+                            <span className="text-xs capitalize">{user.role}</span>
                         </div>
                     </div>
-                    <nav className="px-4 py-2 space-y-1 flex-1 overflow-y-auto">
+                    <nav className="p-4 space-y-1.5 flex-1 overflow-y-auto">
+                        <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-3">Menu</div>
                         {items.map((item) => {
                             const active =
                                 location.pathname === item.to ||
@@ -200,15 +200,15 @@ export default function Layout() {
                                     key={item.to}
                                     to={item.to}
                                     className={cn(
-                                        "flex items-center justify-between px-3 py-2.5 rounded-md transition-colors text-sm font-medium",
+                                        "flex items-center justify-between px-3 py-2.5 rounded-md transition-all text-sm font-medium group relative overflow-hidden",
                                         active
-                                            ? "bg-primary text-primary-foreground"
-                                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                                            ? "bg-primary text-primary-foreground shadow-sm"
+                                            : "text-muted-foreground hover:bg-muted hover:text-foreground",
                                     )}
                                     onClick={() => setMobileOpen(false)}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <item.icon size={18} />
+                                    <div className="flex items-center gap-3 relative z-10">
+                                        <item.icon size={18} className={cn(active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground")} />
                                         <span>{item.label}</span>
                                     </div>
                                     {item.to === "/dashboard/messages" &&
@@ -217,7 +217,7 @@ export default function Layout() {
                                             variant={
                                                 active ? "secondary" : "default"
                                             }
-                                            className="ml-ml-auto shrink-0"
+                                            className="ml-auto shrink-0 relative z-10 px-1.5 py-0.5"
                                         >
                                             {unreadCount}
                                         </Badge>
@@ -226,13 +226,13 @@ export default function Layout() {
                             );
                         })}
                     </nav>
-                    <div className="p-4 border-t border-zinc-800">
+                    <div className="p-4 border-t border-border bg-muted/20">
                         <button
-                            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-sm font-medium"
+                            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md border border-border bg-background hover:bg-muted/50 transition-colors text-sm font-medium text-foreground"
                             onClick={handleLogout}
                         >
-                            <LogOut size={16} />
-                            Wyloguj
+                            <LogOut size={16} className="text-muted-foreground" />
+                            Wyloguj się
                         </button>
                     </div>
                 </aside>
@@ -240,12 +240,12 @@ export default function Layout() {
 
             {mobileOpen ? (
                 <div
-                    className="fixed inset-0 z-30 bg-zinc-950/80 backdrop-blur-sm md:hidden"
+                    className="fixed inset-0 z-30 bg-background/80 backdrop-blur-sm md:hidden"
                     onClick={() => setMobileOpen(false)}
                 />
             ) : null}
 
-            <main className="flex-1 overflow-y-auto pt-16 md:pt-0">
+            <main className="flex-1 overflow-y-auto pt-16 md:pt-0 bg-slate-50 dark:bg-background">
                 <div className="container p-4 md:p-8 max-w-6xl mx-auto">
                     <Outlet />
                 </div>

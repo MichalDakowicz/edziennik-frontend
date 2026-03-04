@@ -1,261 +1,650 @@
-﻿import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import {
-  getAttendance,
-  getAttendanceStatuses,
-  getEvents,
-  getGrades,
-  getHomework,
-  getInboxMessages,
-  getLessonHours,
-  getLuckyNumber,
-  getTimetableEntries,
-  getTimetablePlan,
-  getSubjects,
-  getZajecia,
-  getDaysOfWeek,
+    getAttendance,
+    getAttendanceStatuses,
+    getEvents,
+    getGrades,
+    getHomework,
+    getInboxMessages,
+    getLessonHours,
+    getLuckyNumber,
+    getTimetableEntries,
+    getTimetablePlan,
+    getSubjects,
+    getZajecia,
+    getDaysOfWeek,
+    getTeachers,
+    getUserProfile,
+    markMessageRead,
 } from "../services/api";
 import { getCurrentUser } from "../services/auth";
+import { keys } from "../services/queryKeys";
 import { Card } from "./ui/Card";
 import { Spinner } from "./ui/Spinner";
 import { ErrorState } from "./ui/ErrorState";
-import { formatGradeValue, computeWeightedAverage, getGradeColor } from "../utils/gradeUtils";
+import MessageDetail from "./messages/MessageDetail";
+import {
+    formatGradeValue,
+    computeWeightedAverage,
+    getGradeColor,
+    getPercentageColor,
+} from "../utils/gradeUtils";
+import { formatDate } from "../utils/dateUtils";
 
 export default function DashboardHome() {
-  const user = getCurrentUser();
+    const user = getCurrentUser();
+    const queryClient = useQueryClient();
+    const [selectedMessage, setSelectedMessage] = useState<any | null>(null);
 
-  const query = useQuery({
-    queryKey: user ? ["dashboard-home", user.id, user.role, user.studentId, user.classId] : ["dashboard-home", "guest"],
-    enabled: Boolean(user),
-    queryFn: async () => {
-      if (!user) return null;
+    const markReadMutation = useMutation({
+        mutationFn: (id: number) => markMessageRead(id),
+        onError: () =>
+            toast.error("Nie udało się oznaczyć wiadomości jako przeczytanej"),
+        onSuccess: () => {
+            // Invalidate dashboard query to refresh the unread count
+            if (user) {
+                queryClient.invalidateQueries({
+                    queryKey: [
+                        "dashboard-home",
+                        user.id,
+                        user.role,
+                        user.studentId,
+                        user.classId,
+                    ],
+                });
+                // Also invalidate basic inbox query if cached elsewhere
+                queryClient.invalidateQueries({
+                    queryKey: keys.inbox(user.id),
+                });
+            }
+        },
+    });
 
-      if (user.role === "uczen" && user.studentId && user.classId) {
-        const [lucky, attendance, attendanceStatuses, plans, grades, inbox, homework, events, hours, subjects, zajecia, days] = await Promise.all([
-          getLuckyNumber(user.classId),
-          getAttendance(user.studentId),
-          getAttendanceStatuses(),
-          getTimetablePlan(user.classId),
-          getGrades(user.studentId),
-          getInboxMessages(user.id),
-          getHomework(user.classId),
-          getEvents(user.classId),
-          getLessonHours(),
-          getSubjects(),
-          getZajecia(),
-          getDaysOfWeek(),
-        ]);
+    const teachersQuery = useQuery({
+        queryKey: keys.teachers(),
+        queryFn: getTeachers,
+        enabled: Boolean(user),
+    });
 
-        const latestPlan = [...plans].sort((a, b) => b.id - a.id)[0];
-        const entries = latestPlan ? await getTimetableEntries(latestPlan.id) : [];
-        return { lucky, attendance, attendanceStatuses, entries, grades, inbox, homework, events, hours, subjects, zajecia, days };
-      }
+    const query = useQuery({
+        queryKey: user
+            ? [
+                  "dashboard-home",
+                  user.id,
+                  user.role,
+                  user.studentId,
+                  user.classId,
+              ]
+            : ["dashboard-home", "guest"],
+        enabled: Boolean(user),
+        queryFn: async () => {
+            if (!user) return null;
 
-      const inbox = await getInboxMessages(user.id);
-      return { inbox };
-    },
-  });
+            if (user.role === "uczen" && user.studentId && user.classId) {
+                const [
+                    lucky,
+                    attendance,
+                    attendanceStatuses,
+                    plans,
+                    grades,
+                    inbox,
+                    homework,
+                    events,
+                    hours,
+                    subjects,
+                    zajecia,
+                    days,
+                ] = await Promise.all([
+                    getLuckyNumber(user.classId),
+                    getAttendance(user.studentId),
+                    getAttendanceStatuses(),
+                    getTimetablePlan(user.classId),
+                    getGrades(user.studentId),
+                    getInboxMessages(user.id),
+                    getHomework(user.classId),
+                    getEvents(user.classId),
+                    getLessonHours(),
+                    getSubjects(),
+                    getZajecia(),
+                    getDaysOfWeek(),
+                ]);
 
-  if (!user) return <ErrorState message="Brak zalogowanego użytkownika" />;
-  if (query.isPending) return <Spinner />;
-  if (query.isError) return <ErrorState message={query.error.message} />;
+                const latestPlan = [...plans].sort((a, b) => b.id - a.id)[0];
+                const entries = latestPlan
+                    ? await getTimetableEntries(latestPlan.id)
+                    : [];
+                return {
+                    lucky,
+                    attendance,
+                    attendanceStatuses,
+                    entries,
+                    grades,
+                    inbox,
+                    homework,
+                    events,
+                    hours,
+                    subjects,
+                    zajecia,
+                    days,
+                };
+            }
 
-  const data = query.data;
-  if (!data) return null;
+            const inbox = await getInboxMessages(user.id);
+            return { inbox };
+        },
+    });
 
-  if (user.role !== "uczen") {
-    const unread = data.inbox?.filter((message: any) => !message.przeczytana).length ?? 0;
-    return (
-      <div>
-        <h1 className="page-title mb-6">Pulpit</h1>
-        <Card>
-          <p className="text-foreground">Nieprzeczytane wiadomości: {unread}</p>
-          <Link className="text-primary hover:text-primary/80 mt-2 inline-block" to="/dashboard/messages">
-            Przejdź do wiadomości
-          </Link>
-        </Card>
-      </div>
-    );
-  }
+    const inboxData = (query.data as any)?.inbox ?? [];
 
-  const studentData = data as any;
-  const attendanceCount = studentData.attendance?.length ?? 0;
-  
-  const statusMap = new Map((studentData.attendanceStatuses || []).map((s: any) => [s.id, s.Wartosc]));
+    const userIds = useMemo(() => {
+        const unread = inboxData.filter((m: any) => !m.przeczytana);
+        const ids = unread.map((m: any) => m.nadawca);
+        if (selectedMessage) {
+            ids.push(selectedMessage.nadawca);
+            ids.push(selectedMessage.odbiorca);
+        }
+        return [...new Set(ids)].filter((id) => id); // filter out null/undefined
+    }, [inboxData, selectedMessage]);
 
-  const absentCount = studentData.attendance?.filter((record: any) => {
-    const statusText = (String(statusMap.get(record.status)) || "").toLowerCase();
-    return statusText.includes("nieobecn") || statusText.includes("uspraw");
-  }).length ?? 0;
+    const usersQuery = useQuery({
+        queryKey: ["message-users", userIds],
+        queryFn: async () => {
+            const entries = await Promise.all(
+                (userIds as number[]).map(async (id: number) => {
+                    try {
+                        const p = await getUserProfile(id);
+                        return { id, name: `${p.first_name} ${p.last_name}` };
+                    } catch (e) {
+                        return { id, name: `Użytkownik #${id}` };
+                    }
+                }),
+            );
+            return new Map(entries.map((e) => [e.id, e.name]));
+        },
+        enabled: userIds.length > 0,
+    });
 
-  const recentGrades = [...(studentData.grades || [])].sort((a, b) => Date.parse(b.data_wystawienia) - Date.parse(a.data_wystawienia)).slice(0, 5);
-  const weighted = computeWeightedAverage(studentData.grades || []);
-  const unreadMessages = studentData.inbox?.filter((message: any) => !message.przeczytana).slice(0, 3) || [];
+    if (!user) return <ErrorState message="Brak zalogowanego użytkownika" />;
+    if (query.isPending) return <Spinner />;
+    if (query.isError) return <ErrorState message={query.error.message} />;
 
-  const attendancePercentage = attendanceCount ? ((attendanceCount - absentCount) / attendanceCount) * 100 : 100;
-  const attendanceColor = attendancePercentage >= 90 ? "text-emerald-400" : attendancePercentage >= 75 ? "text-yellow-400" : "text-red-400";
+    const data = query.data;
+    if (!data) return null;
 
-  const today = new Date();
-  const todayDayOfWeek = today.getDay(); // 0 = niedziela, 1 = poniedzialek, etc.
-  
-  // Find the day ID from the database using the "Numer" field
-  // JS getDay(): 0=Sun, 1=Mon, ..., 6=Sat
-  // DB Numer: Usually 1=Mon, ..., 7=Sun
-  const jsDayToDbNumer = todayDayOfWeek === 0 ? 7 : todayDayOfWeek;
-  
-  const targetDayObj = (studentData.days || []).find((d: any) => d.Numer === jsDayToDbNumer);
-  const targetDayId = targetDayObj ? targetDayObj.id : null;
-
-  const zajeciaMap = new Map((studentData.zajecia || []).map((z: any) => [z.id, z]));
-  const przedmiotMap = new Map((studentData.subjects || []).map((s: any) => [s.id, s]));
-
-  const getSubjectName = (zajeciaId: number) => {
-    const zajecia = zajeciaMap.get(zajeciaId);
-    if (!zajecia) return "Nieznany przedmiot";
-    const subject = przedmiotMap.get((zajecia as any).przedmiot);
-    return subject ? (subject as any).nazwa : "Nieznany przedmiot";
-  };
-  
-  const getGradeSubjectName = (subjectId: number) => {
-      const subject = przedmiotMap.get(subjectId);
-      return subject ? (subject as any).nazwa : "Nieznany przedmiot";
-  };
-  const todayLessons = (studentData.entries || [])
-    .filter((entry: any) => targetDayId && (entry.dzien_tygodnia ?? entry.DzienTygodnia) === targetDayId)
-    .map((entry: any) => {
-      const hour = (studentData.hours || []).find((h: any) => h.id === entry.godzina_lekcyjna);
-      return { ...entry, hour };
-    })
-    .sort((a: any, b: any) => (a.hour?.Numer ?? 0) - (b.hour?.Numer ?? 0));
-
-  const currentHourTime = today.getHours() * 60 + today.getMinutes();
-  const nextLesson = todayLessons.find((lesson: any) => {
-    if (!lesson.hour) return false;
-    const [h, m] = lesson.hour.CzasDo.split(":").map(Number);
-    return (h * 60 + m) > currentHourTime;
-  });
-
-  return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-foreground tracking-tight">Witaj, {user.firstName}!</h2>
-        <span className="text-muted-foreground text-sm bg-card/50 px-3 py-1 rounded-full border border-border/40">
-          {new Date().toLocaleDateString("pl-PL", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-        </span>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="flex flex-col p-4 cursor-pointer hover:border-border transition group">
-          <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-1">Średnia ocen</div>
-          <div className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">{weighted.toFixed(2)}</div>
-        </Card>
-        <Card className="flex flex-col p-4 cursor-pointer hover:border-border transition group">
-          <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-1">Frekwencja</div>
-          <div className={`text-2xl font-bold ${attendanceColor}`}>
-            {Math.round(attendancePercentage)}%
-          </div>
-        </Card>
-        <Card className="flex flex-col p-4">
-          <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-1">Następna lekcja</div>
-          <div className="truncate text-foreground font-semibold">
-            {nextLesson ? (
-               <div className="flex justify-between items-center group">
-                 <span className="truncate mr-2 group-hover:text-primary transition-colors">{getSubjectName(nextLesson.zajecia)}</span>
-                 <span className="text-xs text-muted-foreground bg-card/50 px-2 py-1 rounded-md shrink-0 font-mono tracking-wide">{nextLesson.hour?.CzasOd?.substring(0, 5)}</span>
-               </div>
-             ) : (
-                <span className="text-muted-foreground text-sm italic">Brak kolejnych lekcji</span>
-             )}
-          </div>
-        </Card>
-        <Card className="flex flex-col p-4 cursor-pointer hover:border-border transition group">
-          <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-1">Nowe wiadomości</div>
-          <div className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
-            {studentData.inbox?.filter((message: any) => !message.przeczytana).length ?? 0}
-          </div>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold text-foreground">Ostatnie oceny</h3>
-            <Link to="/dashboard/grades" className="text-xs text-primary hover:text-primary/80 font-medium">Zobacz wszystkie</Link>
-          </div>
-          <div className="bg-card/50 border border-border/40 rounded-xl overflow-hidden">
-            <div className="divide-y divide-border/30">
-              {recentGrades.length ? recentGrades.map((grade: any) => (
-                <div key={grade.id} className="flex items-center justify-between p-3 hover:bg-card/50/30 transition-colors">
-                  <div className="flex-1 font-medium text-sm text-foreground truncate mr-2">{getGradeSubjectName(grade.przedmiot)}</div>
-                  <div className={`flex shrink-0 w-8 h-8 rounded-lg text-sm font-bold border items-center justify-center ${getGradeColor(grade.wartosc)}`}>
-                    {formatGradeValue(grade.wartosc)}
-                  </div>
-                </div>
-              )) : <div className="p-4 text-center text-sm text-muted-foreground">Brak ocen</div>}
+    if (user.role !== "uczen") {
+        const unread =
+            data.inbox?.filter((message: any) => !message.przeczytana).length ??
+            0;
+        return (
+            <div>
+                <h1 className="page-title mb-6">Pulpit</h1>
+                <Card>
+                    <p className="text-foreground">
+                        Nieprzeczytane wiadomości: {unread}
+                    </p>
+                    <Link
+                        className="text-primary hover:text-primary/80 mt-2 inline-block"
+                        to="/dashboard/messages"
+                    >
+                        Przejdź do wiadomości
+                    </Link>
+                </Card>
             </div>
-          </div>
+        );
+    }
+
+    const studentData = data as any;
+    const attendanceCount = studentData.attendance?.length ?? 0;
+
+    const statusMap = new Map(
+        (studentData.attendanceStatuses || []).map((s: any) => [
+            s.id,
+            s.Wartosc,
+        ]),
+    );
+
+    const absentCount =
+        studentData.attendance?.filter((record: any) => {
+            const statusText = (
+                String(statusMap.get(record.status)) || ""
+            ).toLowerCase();
+            return (
+                statusText.includes("nieobecn") || statusText.includes("uspraw")
+            );
+        }).length ?? 0;
+
+    const recentGrades = [...(studentData.grades || [])]
+        .sort(
+            (a, b) =>
+                Date.parse(b.data_wystawienia) - Date.parse(a.data_wystawienia),
+        )
+        .slice(0, 5);
+    const weighted = computeWeightedAverage(studentData.grades || []);
+    const unreadMessages =
+        studentData.inbox?.filter((message: any) => !message.przeczytana) || [];
+
+    const attendancePercentage = attendanceCount
+        ? ((attendanceCount - absentCount) / attendanceCount) * 100
+        : 100;
+    const attendanceColorClass = getPercentageColor(attendancePercentage);
+
+    const today = new Date();
+    const todayDayOfWeek = today.getDay(); // 0 = niedziela, 1 = poniedzialek, etc.
+
+    // Find the day ID from the database using the "Numer" field
+    // JS getDay(): 0=Sun, 1=Mon, ..., 6=Sat
+    // DB Numer: Usually 1=Mon, ..., 7=Sun
+    const jsDayToDbNumer = todayDayOfWeek === 0 ? 7 : todayDayOfWeek;
+
+    const targetDayObj = (studentData.days || []).find(
+        (d: any) => d.Numer === jsDayToDbNumer,
+    );
+    const targetDayId = targetDayObj ? targetDayObj.id : null;
+
+    const zajeciaMap = new Map(
+        (studentData.zajecia || []).map((z: any) => [z.id, z]),
+    );
+    const przedmiotMap = new Map(
+        (studentData.subjects || []).map((s: any) => [s.id, s]),
+    );
+
+    // Resolve user name using users query cache or teachers cache
+    const resolveUserName = (id: number) => {
+        if (!id) return "Nieznany";
+        if (id === user?.id) return "Ja";
+
+        const name = usersQuery.data?.get(id);
+        if (name) return name;
+
+        const teachers = teachersQuery.data || [];
+        const teacher = teachers.find((t: any) => t.user?.id === id);
+        if (teacher)
+            return `${teacher.user.first_name} ${teacher.user.last_name}`;
+
+        return `Użytkownik #${id}`;
+    };
+
+    const handleOpenMessage = (message: any) => {
+        setSelectedMessage(message);
+        if (!message.przeczytana) {
+            markReadMutation.mutate(message.id);
+        }
+    };
+
+    const getSubjectName = (zajeciaId: number) => {
+        const zajecia = zajeciaMap.get(zajeciaId);
+        if (!zajecia) return "Nieznany przedmiot";
+        const subject = przedmiotMap.get((zajecia as any).przedmiot);
+        return subject ? (subject as any).nazwa : "Nieznany przedmiot";
+    };
+
+    const getGradeSubjectName = (subjectId: number) => {
+        const subject = przedmiotMap.get(subjectId);
+        return subject ? (subject as any).nazwa : "Nieznany przedmiot";
+    };
+    const todayLessons = (studentData.entries || [])
+        .filter(
+            (entry: any) =>
+                targetDayId &&
+                (entry.dzien_tygodnia ?? entry.DzienTygodnia) === targetDayId,
+        )
+        .map((entry: any) => {
+            const hour = (studentData.hours || []).find(
+                (h: any) => h.id === entry.godzina_lekcyjna,
+            );
+            return { ...entry, hour };
+        })
+        .sort((a: any, b: any) => (a.hour?.Numer ?? 0) - (b.hour?.Numer ?? 0));
+
+    const currentHourTime = today.getHours() * 60 + today.getMinutes();
+    const nextLesson = todayLessons.find((lesson: any) => {
+        if (!lesson.hour) return false;
+        const [h, m] = lesson.hour.CzasDo.split(":").map(Number);
+        return h * 60 + m > currentHourTime;
+    });
+
+    return (
+        <div className="space-y-6">
+            {/* 4 Cards Grid - Replaced Header & Lucky Number */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Card 1: Welcome */}
+                <div className="bg-card border border-border rounded-xl p-5 shadow-sm relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-primary/10" />
+                    <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2">
+                        Dzień dobry
+                    </div>
+                    <div className="flex flex-col relative z-10">
+                        <span className="text-xl font-bold text-foreground truncate">
+                            {user.firstName}
+                        </span>
+                        <span className="text-xs text-muted-foreground mt-1">
+                            {new Date().toLocaleDateString("pl-PL", {
+                                weekday: "long",
+                                day: "numeric",
+                                month: "long",
+                            })}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Card 2: Average */}
+                <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2">
+                        Średnia ocen
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold tabular-nums text-foreground">
+                            {weighted.toFixed(2)}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                            ważona
+                        </span>
+                    </div>
+                </div>
+
+                {/* Card 3: Attendance */}
+                <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2">
+                        Frekwencja
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                        <span
+                            className={`text-3xl font-bold tabular-nums ${attendanceColorClass}`}
+                        >
+                            {Math.round(attendancePercentage)}%
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                            obecności
+                        </span>
+                    </div>
+                </div>
+
+                {/* Card 4: Messages */}
+                <Link
+                    to="/dashboard/messages"
+                    className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow block group cursor-pointer"
+                >
+                    <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2 group-hover:text-primary transition-colors">
+                        Wiadomości
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold tabular-nums text-foreground group-hover:text-primary transition-colors">
+                            {studentData.inbox?.filter(
+                                (message: any) => !message.przeczytana,
+                            ).length ?? 0}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                            nieprzeczytane
+                        </span>
+                    </div>
+                </Link>
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                {/* Left Column: Schedule & Grades */}
+                <div className="xl:col-span-2 space-y-6">
+                    {/* Today's Schedule Details */}
+                    <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+                        <div className="flex items-center justify-between p-5 border-b border-border bg-muted/30">
+                            <h3 className="section-title text-base font-bold">
+                                Dzisiejszy plan
+                            </h3>
+                            <Link
+                                to="/dashboard/timetable"
+                                className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide"
+                            >
+                                Pełny plan
+                            </Link>
+                        </div>
+
+                        <div className="p-0">
+                            {/* Next Lesson Highlight */}
+                            {nextLesson && (
+                                <div className="m-5 p-4 bg-primary/5 border border-primary/20 rounded-lg flex items-center gap-4 relative overflow-hidden">
+                                    <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                                    <div className="w-12 h-12 rounded-xl bg-background border border-border flex items-center justify-center text-primary font-bold shadow-sm relative z-10">
+                                        <span className="text-xl">
+                                            {nextLesson.hour?.Numer}
+                                        </span>
+                                    </div>
+                                    <div className="flex-1 min-w-0 relative z-10">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-xs text-muted-foreground font-mono tabular-nums">
+                                                {nextLesson.hour?.CzasOd?.substring(
+                                                    0,
+                                                    5,
+                                                )}{" "}
+                                                -{" "}
+                                                {nextLesson.hour?.CzasDo?.substring(
+                                                    0,
+                                                    5,
+                                                )}
+                                            </span>
+                                        </div>
+                                        <p className="font-bold text-foreground truncate text-lg leading-tight">
+                                            {getSubjectName(nextLesson.zajecia)}
+                                        </p>
+                                    </div>
+                                    <div className="text-right relative z-10 flex flex-row items-center gap-2">
+                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary text-primary-foreground uppercase tracking-wide">
+                                            Teraz
+                                        </span>
+                                        <div className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">
+                                            Sala
+                                        </div>
+                                        <div className="bg-background border border-border px-3 py-1 rounded-md font-mono text-sm shadow-sm inline-block">
+                                            {nextLesson.sala ?? "—"}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Schedule List */}
+                            <div className="overflow-x-auto">
+                                {todayLessons.length > 0 ? (
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="bg-muted/50 text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                                            <tr>
+                                                <th className="px-5 py-3 w-16 text-center">
+                                                    Nr
+                                                </th>
+                                                <th className="px-5 py-3 w-32">
+                                                    Godzina
+                                                </th>
+                                                <th className="px-5 py-3">
+                                                    Przedmiot
+                                                </th>
+                                                <th className="px-5 py-3 w-24 text-right">
+                                                    Sala
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-border">
+                                            {todayLessons.map((lesson: any) => {
+                                                const isNext =
+                                                    nextLesson &&
+                                                    nextLesson.id === lesson.id;
+                                                const isPast =
+                                                    nextLesson &&
+                                                    (lesson.hour?.Numer ?? 0) <
+                                                        (nextLesson.hour
+                                                            ?.Numer ?? 0);
+
+                                                return (
+                                                    <tr
+                                                        key={lesson.id}
+                                                        className={`group hover:bg-muted/30 transition-colors ${isPast ? "opacity-40" : ""} ${isNext ? "bg-primary/5" : ""}`}
+                                                    >
+                                                        <td className="px-5 py-3 text-center font-mono font-medium text-muted-foreground group-hover:text-foreground transition-colors border-r border-border/40">
+                                                            {lesson.hour?.Numer}
+                                                        </td>
+                                                        <td className="px-5 py-3 font-mono text-muted-foreground tabular-nums">
+                                                            {lesson.hour?.CzasOd?.substring(
+                                                                0,
+                                                                5,
+                                                            )}{" "}
+                                                            -{" "}
+                                                            {lesson.hour?.CzasDo?.substring(
+                                                                0,
+                                                                5,
+                                                            )}
+                                                        </td>
+                                                        <td className="px-5 py-3 font-medium text-foreground">
+                                                            {getSubjectName(
+                                                                lesson.zajecia,
+                                                            )}
+                                                        </td>
+                                                        <td className="px-5 py-3 text-right text-muted-foreground font-medium">
+                                                            {lesson.sala ?? "-"}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                ) : (
+                                    <div className="p-12 text-center flex flex-col items-center justify-center text-muted-foreground bg-card/50">
+                                        <p className="text-sm">
+                                            Brak zaplanowanych lekcji na dzisiaj
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Recent Grades Block */}
+                    <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+                        <div className="flex items-center justify-between p-5 border-b border-border bg-muted/30">
+                            <h3 className="section-title text-base font-bold">
+                                Ostatnie oceny
+                            </h3>
+                            <Link
+                                to="/dashboard/grades"
+                                className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide"
+                            >
+                                Wszystkie oceny
+                            </Link>
+                        </div>
+                        <div>
+                            {recentGrades.length ? (
+                                <div className="divide-y divide-border/60">
+                                    {recentGrades.map((grade: any) => (
+                                        <div
+                                            key={grade.id}
+                                            className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group"
+                                        >
+                                            <div className="flex items-center gap-4 overflow-hidden">
+                                                <span
+                                                    className={`flex shrink-0 w-10 h-10 rounded-lg font-bold tabular-nums text-lg items-center justify-center shadow-sm border border-black/5 ${getGradeColor(grade.wartosc)}`}
+                                                >
+                                                    {formatGradeValue(
+                                                        grade.wartosc,
+                                                    )}
+                                                </span>
+                                                <div className="min-w-0">
+                                                    <p className="font-semibold text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                                                        {getGradeSubjectName(
+                                                            grade.przedmiot,
+                                                        )}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground truncate">
+                                                        {grade.opis ||
+                                                            "Ocena cząstkowa"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right shrink-0">
+                                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">
+                                                    Waga: {grade.waga}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground tabular-nums">
+                                                    {formatDate(
+                                                        grade.data_wystawienia,
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-8 text-center text-muted-foreground italic">
+                                    Brak ostatnich ocen
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Column: Messages (Inbox Preview) */}
+                <div className="space-y-6 flex flex-col">
+                    <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+                        <div className="flex items-center justify-between p-5 border-b border-border bg-muted/30">
+                            <h3 className="section-title text-base font-bold">
+                                Wiadomości
+                            </h3>
+                            <Link
+                                to="/dashboard/messages"
+                                className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide"
+                            >
+                                Skrzynka
+                            </Link>
+                        </div>
+                        <div className="p-4 space-y-3 flex-1 overflow-y-auto">
+                            {unreadMessages.length ? (
+                                unreadMessages.map((message: any) => (
+                                    <div
+                                        key={message.id}
+                                        onClick={() =>
+                                            handleOpenMessage(message)
+                                        }
+                                        className="block group cursor-pointer"
+                                    >
+                                        <div className="bg-background border border-border rounded-lg p-3 hover:border-primary/50 hover:shadow-sm transition-all relative overflow-hidden group-hover:bg-accent/5">
+                                            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+                                            <div className="pl-3">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <p className="font-semibold text-sm text-foreground truncate pr-2 group-hover:text-primary transition-colors">
+                                                        {message.temat}
+                                                    </p>
+                                                    <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                                        {formatDate(
+                                                            message.data_wyslania,
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs text-muted-foreground line-clamp-2">
+                                                    {message.tresc.substring(
+                                                        0,
+                                                        60,
+                                                    )}
+                                                    ...
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
+                                    <p className="text-sm">
+                                        Brak nowych wiadomości
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <MessageDetail
+                message={selectedMessage}
+                open={Boolean(selectedMessage)}
+                onClose={() => setSelectedMessage(null)}
+                resolveUserName={resolveUserName}
+            />
         </div>
-
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between mt-8 mb-2">
-            <h3 className="text-xl font-bold text-foreground">Dzisiejszy plan lekcji</h3>
-          </div>
-          <div className="space-y-2">
-            {todayLessons.length > 0 ? todayLessons.map((lesson: any) => {
-              const isNext = nextLesson && nextLesson.id === lesson.id;
-              return (
-              <div key={lesson.id} className={`flex items-center p-3 rounded-xl border ${isNext ? "border-primary bg-primary/5" : "border-border/40 bg-card/50"}`}>
-                <div className="w-16 font-mono text-xs text-muted-foreground mr-4 text-center">
-                   <div className="font-bold text-foreground">{lesson.hour?.Numer ?? "-"}</div>
-                   <div>{lesson.hour?.CzasOd}</div>
-                </div>
-                <div className="flex-1">
-                  <div className={`font-semibold text-sm ${isNext ? "text-primary" : "text-foreground"}`}>
-                    {getSubjectName(lesson.zajecia)}
-                  </div>
-                  {isNext && <span className="text-[10px] uppercase font-bold text-primary tracking-wider bg-primary/10 px-1.5 py-0.5 rounded">Teraz / Następna</span>}
-                </div>
-              </div>
-            )}) : <div className="text-muted-foreground italic py-4 bg-card/30 rounded-xl border border-border/30 px-4">Brak lekcji na dzisiaj</div>}
-          </div>
-
-          <div className="flex items-center justify-between mt-8 mb-2">
-            <h3 className="text-xl font-bold text-foreground">Wiadomości</h3>
-            <Link to="/dashboard/messages" className="text-xs text-primary hover:text-primary/80 font-medium">Przejdź do skrzynki</Link>
-          </div>
-          <div className="space-y-3">
-            {unreadMessages.length ? unreadMessages.map((message: any) => (
-              <div key={message.id} className="bg-card/50 rounded-xl border border-border/40 p-4 hover:border-border transition-colors flex gap-4 items-start cursor-pointer">
-                <div className="w-2 h-2 rounded-full mt-2 shrink-0 bg-primary animate-pulse"></div>
-                <div className="min-w-0">
-                  <p className="font-semibold text-foreground text-sm mb-1 truncate">{message.temat}</p>
-                  <p className="text-muted-foreground text-xs">Otrzymano nieprzeczytaną wiadomość</p>
-                </div>
-              </div>
-            )) : <div className="text-muted-foreground italic col-span-full py-4 bg-card/30 rounded-xl border border-border/30 px-4">Brak nowych wiadomości</div>}
-          </div>
-
-          {/* 
-          <div className="flex items-center justify-between mt-8 mb-2">
-            <h3 className="text-xl font-bold text-foreground">Nadchodzące wydarzenia i zadania</h3>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {upcomingHomework.map((item: any) => (
-               <div key={`hw-${item.id}`} className="bg-primary/5 rounded-xl border border-primary/10 p-4">
-                 <div className="text-xs text-primary font-mono mb-1">{formatDate(item.termin)}</div>
-                 <div className="font-semibold text-sm">Praca domowa</div>
-               </div>
-            ))}
-            {upcomingEvents.map((item: any) => (
-              <div key={`ev-${item.id}`} className="bg-card/50 rounded-xl border border-border/40 p-4">
-                <div className="text-xs text-muted-foreground font-mono mb-1">{formatDate(item.data)}</div>
-                <div className="font-semibold text-sm truncate">{item.tytul}</div>
-              </div>
-            ))}
-          </div>
-           */}
-        </div>
-      </div>
-    </div>
-  );
+    );
 }

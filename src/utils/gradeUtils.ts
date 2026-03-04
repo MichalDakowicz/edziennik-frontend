@@ -6,14 +6,22 @@ export function formatGradeValue(value: string | number): string {
   return String(Math.round(val));
 }
 
+/** Tailwind classes for grade blocks: use with flex items-center justify-center w-8 h-8 rounded-md font-medium tabular-nums text-sm */
 export function getGradeColor(value: string | number): string {
   const val = typeof value === "string" ? parseFloat(value) : value;
-  if (Number.isNaN(val)) return "bg-zinc-900 border-zinc-800 text-zinc-100";
-  if (val >= 5) return "bg-emerald-900/20 text-emerald-400 border-emerald-900/30";
-  if (val >= 4) return "bg-green-900/20 text-green-400 border-green-900/30";
-  if (val >= 3) return "bg-yellow-900/20 text-yellow-400 border-yellow-900/30";
-  if (val >= 2) return "bg-orange-900/20 text-orange-400 border-orange-900/30";
-  return "bg-red-900/20 text-red-400 border-red-900/30";
+  if (Number.isNaN(val)) return "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300";
+  if (val >= 5.0) return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400";
+  if (val >= 4.0) return "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400";
+  if (val >= 3.0) return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400";
+  if (val >= 2.0) return "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400";
+  return "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400";
+}
+
+/** Tailwind classes for percentage text (attendance rates, test scores). Apply tabular-nums to parent. */
+export function getPercentageColor(pct: number): string {
+  if (pct >= 90) return "text-emerald-600 dark:text-emerald-400 font-semibold";
+  if (pct >= 75) return "text-yellow-600 dark:text-yellow-400 font-medium";
+  return "text-red-600 dark:text-red-400 font-medium";
 }
 
 export function computeWeightedAverage(

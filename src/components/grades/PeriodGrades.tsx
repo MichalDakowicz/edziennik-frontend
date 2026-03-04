@@ -1,5 +1,6 @@
 import type { FinalGrade, PeriodGrade, Subject } from "../../types/api";
-import { formatGradeValue } from "../../utils/gradeUtils";
+import { formatGradeValue, getGradeColor } from "../../utils/gradeUtils";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/Table";
 
 interface PeriodGradesProps {
   periodGrades: PeriodGrade[];
@@ -11,6 +12,7 @@ export default function PeriodGrades({ periodGrades, finalGrades, subjects }: Pe
   const bySubject = new Map<number, { sem1?: string; sem2?: string; final?: string }>();
 
   periodGrades.forEach((grade) => {
+    // Make sure we have a number
     if (!grade.przedmiot) return;
     const current = bySubject.get(grade.przedmiot) ?? {};
     if (grade.okres === 1) current.sem1 = grade.wartosc;
@@ -25,31 +27,49 @@ export default function PeriodGrades({ periodGrades, finalGrades, subjects }: Pe
   });
 
   return (
-    <div className="overflow-x-auto border border-border/50 rounded-xl">
-      <table className="min-w-full text-sm">
-        <thead className="bg-card">
-          <tr>
-            <th className="text-left p-3">Przedmiot</th>
-            <th className="text-left p-3">Ocena I półrocze</th>
-            <th className="text-left p-3">Ocena II półrocze</th>
-            <th className="text-left p-3">Ocena końcowa</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div className="rounded-xl border border-border overflow-hidden">
+      <Table>
+        <TableHeader className="bg-muted/50">
+          <TableRow className="hover:bg-transparent">
+            <TableHead className="text-muted-foreground font-semibold">Przedmiot</TableHead>
+            <TableHead className="text-muted-foreground font-semibold">Ocena I półrocze</TableHead>
+            <TableHead className="text-muted-foreground font-semibold">Ocena II półrocze</TableHead>
+            <TableHead className="text-muted-foreground font-semibold">Ocena końcowa</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {[...bySubject.entries()].map(([subjectId, values]) => {
             const subject = subjects.find((s) => s.id === subjectId);
             const subjectName = subject?.nazwa ?? subject?.Nazwa ?? `#${subjectId}`;
             return (
-              <tr key={subjectId} className="border-t border-border/50">
-                <td className="p-3">{subjectName}</td>
-                <td className="p-3">{values.sem1 ? formatGradeValue(values.sem1) : "-"}</td>
-                <td className="p-3">{values.sem2 ? formatGradeValue(values.sem2) : "-"}</td>
-                <td className="p-3">{values.final ? formatGradeValue(values.final) : "-"}</td>
-              </tr>
+              <TableRow key={subjectId} className="hover:bg-muted/50">
+                <TableCell className="font-medium">{subjectName}</TableCell>
+                <TableCell className="tabular-nums">
+                  {values.sem1 ? (
+                    <span className={`inline-flex items-center justify-center w-8 h-8 rounded-md font-medium text-sm ${getGradeColor(values.sem1)}`}>{formatGradeValue(values.sem1)}</span>
+                  ) : (
+                    <span className="text-muted-foreground/50">-</span>
+                  )}
+                </TableCell>
+                <TableCell className="tabular-nums">
+                  {values.sem2 ? (
+                    <span className={`inline-flex items-center justify-center w-8 h-8 rounded-md font-medium text-sm ${getGradeColor(values.sem2)}`}>{formatGradeValue(values.sem2)}</span>
+                  ) : (
+                    <span className="text-muted-foreground/50">-</span>
+                  )}
+                </TableCell>
+                <TableCell className="tabular-nums">
+                  {values.final ? (
+                    <span className={`inline-flex items-center justify-center w-8 h-8 rounded-md font-medium text-sm ${getGradeColor(values.final)}`}>{formatGradeValue(values.final)}</span>
+                  ) : (
+                    <span className="text-muted-foreground/50">-</span>
+                  )}
+                </TableCell>
+              </TableRow>
             );
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }

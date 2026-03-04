@@ -31,6 +31,7 @@ export default function App() {
           <Route path="attendance" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><AttendancePage /></RoleGuard>} />
           <Route path="timetable" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><TimetablePage /></RoleGuard>} />
           <Route path="messages" element={<MessagesPage />} />
+          <Route path="messages/:messageId" element={<MessagesPage />} />
           <Route path="homework" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><HomeworkPage /></RoleGuard>} />
           <Route path="events" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><EventsPage /></RoleGuard>} />
           <Route path="profile" element={<ProfilePage />} />

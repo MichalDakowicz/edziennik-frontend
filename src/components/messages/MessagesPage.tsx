@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useParams, useNavigate } from "react-router-dom";
 import { Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { getInboxMessages, getSentMessages, getTeachers, getUserProfile, markMessageRead, sendMessage } from "../../services/api";
@@ -18,6 +19,9 @@ type Tab = "inbox" | "sent";
 export default function MessagesPage() {
   const user = getCurrentUser();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { messageId } = useParams();
+  
   const [tab, setTab] = useState<Tab>("inbox");
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [composeOpen, setComposeOpen] = useState(false);
@@ -37,6 +41,29 @@ export default function MessagesPage() {
 
   const teachersQuery = useQuery({ queryKey: keys.teachers(), queryFn: getTeachers });
 
+  const markReadMutation = useMutation({
+    mutationFn: (id: number) => markMessageRead(id),
+    onError: () => toast.error("Nie udało się oznaczyć wiadomości jako przeczytanej"),
+    onSuccess: () => {
+      if (user) queryClient.invalidateQueries({ queryKey: keys.inbox(user.id) });
+    },
+  });
+
+  useEffect(() => {
+    if (messageId && inboxQuery.data) {
+      const idNum = Number(messageId);
+      const message = inboxQuery.data.find((m) => m.id === idNum);
+      if (message) {
+        setSelectedMessage(message);
+        if (!message.przeczytana && tab === "inbox") {
+          markReadMutation.mutate(message.id);
+        }
+      }
+    } else if (!messageId) {
+      setSelectedMessage(null);
+    }
+  }, [messageId, inboxQuery.data, tab]);
+
   const userIds = useMemo(() => {
     const fromInbox = inboxQuery.data?.flatMap((message) => [message.nadawca, message.odbiorca]) ?? [];
     const fromSent = sentQuery.data?.flatMap((message) => [message.nadawca, message.odbiorca]) ?? [];
@@ -50,14 +77,6 @@ export default function MessagesPage() {
       return new Map(entries.map((entry) => [entry.id, `${entry.user.first_name} ${entry.user.last_name}`]));
     },
     enabled: userIds.length > 0,
-  });
-
-  const markReadMutation = useMutation({
-    mutationFn: (id: number) => markMessageRead(id),
-    onError: () => toast.error("Nie udało się oznaczyć wiadomości jako przeczytanej"),
-    onSuccess: () => {
-      if (user) queryClient.invalidateQueries({ queryKey: keys.inbox(user.id) });
-    },
   });
 
   const sendMutation = useMutation({
@@ -81,10 +100,7 @@ export default function MessagesPage() {
   const resolveUserName = (id: number) => userNameMap.get(id) ?? `Użytkownik #${id}`;
 
   const openMessage = (message: Message) => {
-    setSelectedMessage(message);
-    if (!message.przeczytana && tab === "inbox") {
-      markReadMutation.mutate(message.id);
-    }
+    navigate(`/dashboard/messages/${message.id}`);
   };
 
   return (
@@ -108,7 +124,7 @@ export default function MessagesPage() {
       <MessageDetail
         message={selectedMessage}
         open={Boolean(selectedMessage)}
-        onClose={() => setSelectedMessage(null)}
+        onClose={() => navigate("/dashboard/messages")}
         resolveUserName={resolveUserName}
       />
 

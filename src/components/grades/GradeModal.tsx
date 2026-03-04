@@ -22,7 +22,7 @@ export default function GradeModal({ open, onClose, grade, subjects }: GradeModa
         <div><span className="text-muted-foreground">Przedmiot:</span> {subjectName}</div>
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground">Ocena:</span>
-          <span className={`px-3 py-1 rounded border font-semibold ${getGradeColor(grade.wartosc)}`}>{formatGradeValue(grade.wartosc)}</span>
+          <span className={`flex items-center justify-center w-8 h-8 rounded-md font-medium tabular-nums text-sm ${getGradeColor(grade.wartosc)}`}>{formatGradeValue(grade.wartosc)}</span>
         </div>
         <div><span className="text-muted-foreground">Waga:</span> {grade.waga}</div>
         <div><span className="text-muted-foreground">Kategoria / Opis:</span> {grade.opis ?? "-"}</div>

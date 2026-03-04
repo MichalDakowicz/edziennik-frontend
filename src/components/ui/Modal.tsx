@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 export const Modal = ({
   open,
@@ -32,18 +33,26 @@ export const Modal = ({
 
   if (!open) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
+  const modal = (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60"
+      style={{ top: 0, left: 0, right: 0, bottom: 0 }}
+      onClick={onClose}
+      aria-modal
+      role="dialog"
+    >
       <div
         ref={contentRef}
-        className={`bg-card/50 border border-border/50 rounded-xl shadow-xl w-full max-h-[90vh] flex flex-col ${className}`}
-        onClick={(event) => event.stopPropagation()}
+        className={`bg-card border border-border rounded-[var(--radius)] w-full max-h-[90vh] flex flex-col shadow-lg ${className}`}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-border/50">
+        <div className="p-6 border-b border-border">
           <h3 className="text-lg font-bold text-foreground">{title}</h3>
         </div>
         <div className="p-6 overflow-y-auto flex-1">{children}</div>
       </div>
     </div>
   );
+
+  return createPortal(modal, document.body);
 };

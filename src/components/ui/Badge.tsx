@@ -11,15 +11,20 @@ const badgeVariants = cva(
         default:
           "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
         secondary:
-          "border-transparent bg-card/50 text-secondary-foreground hover:bg-card/50/80",
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-        success: "border-transparent bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25",
-        warning: "border-transparent bg-amber-500/15 text-amber-500 hover:bg-amber-500/25",
-        danger: "border-transparent bg-destructive/15 text-destructive hover:bg-destructive/25",
-        info: "border-transparent bg-blue-500/15 text-primary/80 hover:bg-blue-500/25",
-        neutral: "border-transparent bg-zinc-500/15 text-muted-foreground hover:bg-zinc-500/25",
+          "border-transparent bg-destructive/15 text-destructive hover:bg-destructive/25 dark:text-destructive",
+        outline: "border-border text-foreground bg-transparent",
+        success:
+          "border-transparent bg-emerald-500/15 text-emerald-600 dark:text-emerald-500 hover:bg-emerald-500/25",
+        warning:
+          "border-transparent bg-amber-500/15 text-amber-600 dark:text-amber-500 hover:bg-amber-500/25",
+        danger:
+          "border-transparent bg-destructive/15 text-destructive hover:bg-destructive/25",
+        info:
+          "border-transparent bg-primary/15 text-primary dark:text-primary/80 hover:bg-primary/25",
+        neutral:
+          "border-transparent bg-muted text-muted-foreground hover:bg-muted/80",
       },
     },
     defaultVariants: {

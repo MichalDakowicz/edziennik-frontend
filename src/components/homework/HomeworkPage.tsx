@@ -61,7 +61,7 @@ export default function HomeworkPage() {
 
       <section className="space-y-3">
         <h2 className="section-title">Nadchodzące</h2>
-        {displayUpcoming.length ? displayUpcoming.map((item) => <HomeworkCard key={item.id} item={item} subject={subjects.find((s) => s.id === item.przedmiot)} teacher={teachers.find((t) => t.id === item.nauczyciel)} onClick={() => setSelectedHomework(item)} />) : <p className="text-muted-foreground">Brak nadchodzących prac</p>}
+        {displayUpcoming.length ? displayUpcoming.map((item) => <HomeworkCard key={item.id} item={item} subject={subjects.find((s) => s.id === item.przedmiot)} onClick={() => setSelectedHomework(item)} />) : <p className="text-muted-foreground">Brak nadchodzących prac</p>}
       </section>
 
       <section className="space-y-3">
@@ -72,7 +72,7 @@ export default function HomeworkPage() {
           <ChevronDown size={20} className={`transition-transform ${showPast ? "rotate-180" : ""}`} />
           {showPast ? "Ukryj" : "Pokaż"} zaległe ({past.filter((item) => subjectId === "all" || item.przedmiot === subjectId).length})
         </button>
-        {showPast ? displayPast.map((item) => <HomeworkCard key={item.id} item={item} subject={subjects.find((s) => s.id === item.przedmiot)} teacher={teachers.find((t) => t.id === item.nauczyciel)} onClick={() => setSelectedHomework(item)} />) : null}
+        {showPast ? displayPast.map((item) => <HomeworkCard key={item.id} item={item} subject={subjects.find((s) => s.id === item.przedmiot)} onClick={() => setSelectedHomework(item)} />) : null}
         {showPast && displayPast.length === 0 ? <p className="text-muted-foreground">Brak zaległych prac</p> : null}
       </section>
 

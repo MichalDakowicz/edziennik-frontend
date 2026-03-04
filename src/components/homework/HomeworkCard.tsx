@@ -1,16 +1,14 @@
-import type { Homework, Subject, Teacher } from "../../types/api";
+import type { Homework, Subject } from "../../types/api";
 import { Badge } from "../ui/Badge";
 import { formatDate } from "../../utils/dateUtils";
 
 export default function HomeworkCard({
   item,
   subject,
-  teacher,
   onClick,
 }: {
   item: Homework;
   subject?: Subject;
-  teacher?: Teacher;
   onClick: () => void;
 }) {
   const dueMs = Date.parse(item.termin);

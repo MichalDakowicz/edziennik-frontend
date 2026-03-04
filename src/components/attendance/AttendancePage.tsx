@@ -73,7 +73,7 @@ export default function AttendancePage() {
     .filter((record) => {
       if (selectedStatus === "Wszystkie") return true;
       const statusName = resolveStatusName(record.status).toLowerCase();
-      if (selectedStatus === "Obecność") return !statusName.includes("nieobecn") && !statusName.includes("spóźn") && !statusName.includes("spozn");
+      if (selectedStatus === "Obecność") return !statusName.includes("nieobecn") && !statusName.includes("spóźn") && !statusName.includes("spozn") && !statusName.includes("uspraw") && !statusName.includes("zwoln");
       if (selectedStatus === "Nieobecność") return statusName.includes("nieobecn");
       if (selectedStatus === "Spóźnienie") return statusName.includes("spóźn") || statusName.includes("spozn");
       if (selectedStatus === "Usprawiedliwienie") return statusName.includes("uspraw");

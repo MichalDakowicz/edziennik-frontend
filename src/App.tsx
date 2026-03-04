@@ -7,10 +7,9 @@ import Layout from "./components/Layout";
 import DashboardHome from "./components/DashboardHome";
 import GradesPage from "./components/grades/GradesPage";
 import AttendancePage from "./components/attendance/AttendancePage";
-import TimetablePage from "./components/timetable/TimetablePage";
 import MessagesPage from "./components/messages/MessagesPage";
 import HomeworkPage from "./components/homework/HomeworkPage";
-import EventsPage from "./components/events/EventsPage";
+import KalendarzPage from "./components/calendar/KalendarzPage";
 import ProfilePage from "./components/profile/ProfilePage";
 
 const RoleGuard = ({ allow, children }: { allow: Role[]; children: ReactNode }) => {
@@ -29,11 +28,12 @@ export default function App() {
           <Route index element={<DashboardHome />} />
           <Route path="grades" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><GradesPage /></RoleGuard>} />
           <Route path="attendance" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><AttendancePage /></RoleGuard>} />
-          <Route path="timetable" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><TimetablePage /></RoleGuard>} />
+          <Route path="calendar" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><KalendarzPage /></RoleGuard>} />
+          <Route path="timetable" element={<Navigate to="/dashboard/calendar" replace />} />
+          <Route path="events" element={<Navigate to="/dashboard/calendar" replace />} />
           <Route path="messages" element={<MessagesPage />} />
           <Route path="messages/:messageId" element={<MessagesPage />} />
           <Route path="homework" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><HomeworkPage /></RoleGuard>} />
-          <Route path="events" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><EventsPage /></RoleGuard>} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

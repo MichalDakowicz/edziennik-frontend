@@ -13,9 +13,8 @@ import {
     LayoutDashboard, 
     GraduationCap, 
     UserCheck, 
-    CalendarDays, 
+    CalendarRange, 
     BookOpen, 
-    Calendar, 
     Mail, 
     User 
 } from "lucide-react";
@@ -59,9 +58,9 @@ const navItems: NavItem[] = [
         parent: true,
     },
     {
-        label: "Plan lekcji",
-        to: "/dashboard/timetable",
-        icon: CalendarDays,
+        label: "Kalendarz",
+        to: "/dashboard/calendar",
+        icon: CalendarRange,
         student: true,
         parent: true,
     },
@@ -71,13 +70,6 @@ const navItems: NavItem[] = [
         icon: BookOpen,
         student: true,
         parent: true,
-    },
-    {
-        label: "Terminarz",
-        to: "/dashboard/events",
-        icon: Calendar,
-        student: true,
-        parent: false,
     },
     {
         label: "Wiadomości",

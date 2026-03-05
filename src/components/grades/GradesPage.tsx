@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getBehaviorPoints, getFinalGrades, getGrades, getPeriodGrades, getSubjects } from "../../services/api";
 import { keys } from "../../services/queryKeys";
@@ -6,12 +7,24 @@ import { getCurrentUser } from "../../services/auth";
 import { Spinner } from "../ui/Spinner";
 import { ErrorState } from "../ui/ErrorState";
 import { EmptyState } from "../ui/EmptyState";
-import type { Grade } from "../../types/api";
-import GradeCard from "./GradeCard";
-import GradeModal from "./GradeModal";
 import GradeSimulator from "./GradeSimulator";
 import PeriodGrades from "./PeriodGrades";
 import BehaviorPoints from "./BehaviorPoints";
+import type { Grade } from "../../types/api";
+import { computeWeightedAverage, formatGradeValue, getGradeColor } from "../../utils/gradeUtils";
+
+const SUBJECT_BORDER_COLORS = [
+  "border-l-red-500",
+  "border-l-pink-500",
+  "border-l-purple-500",
+  "border-l-indigo-500",
+  "border-l-blue-500",
+  "border-l-teal-500",
+  "border-l-orange-500",
+  "border-l-amber-500",
+  "border-l-cyan-500",
+  "border-l-emerald-500",
+];
 
 type Tab = "partial" | "period" | "behavior";
 
@@ -20,7 +33,6 @@ export default function GradesPage() {
   const studentId = user?.studentId;
   const [tab, setTab] = useState<Tab>("partial");
   const [search, setSearch] = useState("");
-  const [selectedGrade, setSelectedGrade] = useState<Grade | null>(null);
   const [showLastWeekOnly, setShowLastWeekOnly] = useState(false);
 
   const enabled = Boolean(studentId);
@@ -77,7 +89,12 @@ export default function GradesPage() {
       {tab === "partial" ? (
         <>
           <div className="flex gap-2">
-            <input className="input-base flex-1" placeholder="Filtruj przedmiot..." value={search} onChange={(event) => setSearch(event.target.value)} />
+            <input
+              className="input-base flex-1"
+              placeholder="Filtruj przedmiot..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
             <button
               onClick={() => setShowLastWeekOnly(!showLastWeekOnly)}
               className={`px-4 py-2 rounded-md font-medium transition-colors ${
@@ -89,32 +106,70 @@ export default function GradesPage() {
               Ostatni tydzień
             </button>
           </div>
-          <div className="grid md:grid-cols-2 gap-4">
+
+          <div className="flex flex-col gap-2">
             {[...grouped.entries()]
               .filter(([subjectId]) => {
                 const subject = subjects.find((item) => item.id === subjectId);
                 const name = (subject?.nazwa ?? subject?.Nazwa ?? "").toLowerCase();
                 return name.includes(search.toLowerCase());
               })
-              .map(([subjectId, subjectGrades]) => {
+              .sort(([, aGrades], [, bGrades]) => {
+                const aSubjectId = aGrades[0]?.przedmiot;
+                const bSubjectId = bGrades[0]?.przedmiot;
+                const aName = (subjects.find((s) => s.id === aSubjectId)?.nazwa ?? subjects.find((s) => s.id === aSubjectId)?.Nazwa ?? "").toLowerCase();
+                const bName = (subjects.find((s) => s.id === bSubjectId)?.nazwa ?? subjects.find((s) => s.id === bSubjectId)?.Nazwa ?? "").toLowerCase();
+                return aName.localeCompare(bName, "pl");
+              })
+              .map(([subjectId, subjectGrades], idx) => {
                 const subject = subjects.find((item) => item.id === subjectId);
+                const subjectName = subject?.nazwa ?? subject?.Nazwa ?? `#${subjectId}`;
+                const avg = computeWeightedAverage(subjectGrades);
+                const borderColor = SUBJECT_BORDER_COLORS[idx % SUBJECT_BORDER_COLORS.length];
+                const gradesInOrder = [...subjectGrades].sort(
+                  (a, b) => Date.parse(b.data_wystawienia) - Date.parse(a.data_wystawienia)
+                );
                 return (
-                  <GradeCard
+                  <Link
                     key={subjectId}
-                    subjectName={subject?.nazwa ?? subject?.Nazwa ?? `#${subjectId}`}
-                    grades={subjectGrades}
-                    onSelect={setSelectedGrade}
-                  />
+                    to={`/dashboard/grades/${subjectId}`}
+                    className={`flex items-center gap-4 p-4 rounded-xl bg-card border border-border border-l-4 ${borderColor} hover:bg-muted/40 transition-colors`}
+                  >
+                    {/* Average + subject name */}
+                    <div className="min-w-[64px]">
+                      <div className="text-3xl font-bold tabular-nums leading-none text-foreground">
+                        {avg > 0 ? avg.toFixed(2) : "—"}
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1 leading-tight">{subjectName}</div>
+                    </div>
+
+                    {/* Grade chips */}
+                    <div className="flex flex-wrap gap-1.5 ml-auto justify-end">
+                      {gradesInOrder.slice(0, 12).map((grade) => (
+                        <span
+                          key={grade.id}
+                          className={`inline-flex items-center justify-center w-8 h-8 rounded-md text-sm font-bold tabular-nums ${getGradeColor(grade.wartosc)}`}
+                        >
+                          {formatGradeValue(grade.wartosc)}
+                        </span>
+                      ))}
+                      {gradesInOrder.length > 12 && (
+                        <span className="inline-flex items-center justify-center h-8 px-2 rounded-md text-sm font-medium bg-muted text-muted-foreground">
+                          +{gradesInOrder.length - 12}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
                 );
               })}
           </div>
+
           {!grouped.size ? <EmptyState message="Brak ocen" /> : null}
           <GradeSimulator grades={grades} subjects={subjects} />
-          <GradeModal open={Boolean(selectedGrade)} onClose={() => setSelectedGrade(null)} grade={selectedGrade} subjects={subjects} />
         </>
       ) : null}
 
-      {tab === "period" ? <PeriodGrades periodGrades={periodGrades} finalGrades={finalGrades} subjects={subjects} /> : null}
+      {tab === "period" ? <PeriodGrades periodGrades={periodGrades} finalGrades={finalGrades} subjects={subjects} grades={grades} /> : null}
       {tab === "behavior" ? <BehaviorPoints behavior={behavior} /> : null}
     </div>
   );

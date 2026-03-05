@@ -155,7 +155,10 @@ export interface Event {
   id: number;
   tytul: string;
   opis: string;
-  data: string;
+  data: string; // YYYY-MM-DD
+  calodobowe: boolean;
+  godzina_od: string | null; // HH:mm:ss
+  godzina_do: string | null; // HH:mm:ss
   klasa: number | null;
   przedmiot: number | null;
   nauczyciel: number | null;

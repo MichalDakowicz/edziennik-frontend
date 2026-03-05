@@ -25,6 +25,9 @@ export interface EventItem {
   title: string;
   description: string;
   subject?: string;
+  isAllDay: boolean;
+  startTime?: string; // HH:mm
+  endTime?: string; // HH:mm
 }
 
 export interface HomeworkItem {

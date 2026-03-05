@@ -8,6 +8,21 @@ import type {
   TimetableData,
 } from "./types";
 
+export const TIMELINE_START_HOUR = 7;
+export const TIMELINE_END_HOUR = 19;
+export const PIXELS_PER_MINUTE = 1.6;
+
+export function timeToMinutes(timeStr?: string): number {
+  if (!timeStr) return 0;
+  const [h, m] = timeStr.split(":").map(Number);
+  return h * 60 + (isNaN(m) ? 0 : m);
+}
+
+export function checkOverlap(startA?: string, endA?: string, startB?: string, endB?: string) {
+  if (!startA || !endA || !startB || !endB) return false;
+  return timeToMinutes(startA) < timeToMinutes(endB) && timeToMinutes(endA) > timeToMinutes(startB);
+}
+
 export const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function getLessonsForDate(date: Date, timetable: TimetableData): LessonItem[] {
@@ -47,6 +62,9 @@ export function getEventsForDate(
         title: e.tytul,
         description: e.opis,
         subject: subject?.nazwa ?? subject?.Nazwa ?? undefined,
+        isAllDay: e.calodobowe,
+        startTime: e.godzina_od?.slice(0, 5) ?? undefined,
+        endTime: e.godzina_do?.slice(0, 5) ?? undefined,
       };
     });
 }

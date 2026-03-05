@@ -1,6 +1,6 @@
 export function Legend() {
   return (
-    <div className="flex flex-wrap gap-4 pt-4 border-t border-border/50 text-xs text-muted-foreground">
+    <div className="flex flex-wrap gap-4 border-t border-border/50 text-xs text-muted-foreground">
       <div className="flex items-center gap-1.5">
         <div className="w-3 h-3 rounded bg-muted/80 border border-border" />
         <span>Lekcja</span>

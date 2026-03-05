@@ -46,8 +46,8 @@ export function MonthView({ date, timetable, events, homework }: MonthViewProps)
 
   return (
     <>
-      <div className="overflow-x-auto">
-        <div className="min-w-[520px]">
+      <div>
+        <div className="w-full">
           {/* Weekday headers */}
           <div className="grid grid-cols-7 gap-1 mb-1">
             {WEEK_DAYS.map((d) => (

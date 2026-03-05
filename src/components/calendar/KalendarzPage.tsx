@@ -20,13 +20,16 @@ import { Legend } from "./Legend";
 import { MonthView } from "./MonthView";
 import { ThreeDayView } from "./ThreeDayView";
 import { WeekView } from "./WeekView";
-import type { TimetableData, ViewMode } from "./types";
+import type { TimetableData, ViewMode, DisplayItem } from "./types";
+import { Modal } from "../ui/Modal";
+import { ItemCard } from "./ItemCard";
 
 export default function KalendarzPage() {
   const user = getCurrentUser();
   const classId = user?.classId;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>("week");
+  const [selectedItem, setSelectedItem] = useState<DisplayItem | null>(null);
 
   const timetableQuery = useQuery({
     queryKey: classId ? keys.timetable(classId) : ["timetable", "na"],
@@ -65,7 +68,7 @@ export default function KalendarzPage() {
   const timetable = timetableQuery.data!;
   const events = eventsQuery.data ?? [];
   const homework = homeworkQuery.data ?? [];
-  const viewProps = { date: currentDate, timetable, events, homework };
+  const viewProps = { date: currentDate, timetable, events, homework, onItemClick: setSelectedItem };
 
   const renderView = () => {
     switch (viewMode) {
@@ -90,6 +93,24 @@ export default function KalendarzPage() {
       />
       <div>{renderView()}</div>
       <Legend />
+
+      <Modal
+        open={selectedItem !== null}
+        onClose={() => setSelectedItem(null)}
+        title={
+          selectedItem?.kind === "lesson"
+            ? "Szczegóły lekcji"
+            : selectedItem?.kind === "event"
+              ? "Szczegóły wydarzenia"
+              : "Szczegóły pracy domowej"
+        }
+      >
+        {selectedItem && (
+          <div className="space-y-4">
+            <ItemCard item={selectedItem} fill />
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

@@ -10,7 +10,7 @@ export function itemColorClass(kind: DisplayItem["kind"]): string {
   return "bg-muted/60 border-border text-foreground";
 }
 
-export function ItemCard({ item, compact = false }: { item: DisplayItem; compact?: boolean }) {
+export function ItemCard({ item, compact = false, onClick, fill = false }: { item: DisplayItem; compact?: boolean; onClick?: (item: DisplayItem) => void; fill?: boolean }) {
   const colorCls = itemColorClass(item.kind);
   const icon =
     item.kind === "lesson" ? (
@@ -24,8 +24,10 @@ export function ItemCard({ item, compact = false }: { item: DisplayItem; compact
   if (compact) {
     return (
       <div
+        onClick={() => onClick?.(item)}
         className={cn(
-          "px-2 py-1 rounded border-l-2 text-xs flex items-start gap-1.5 truncate",
+          "px-2 py-1 rounded border-l-2 text-[10px] md:text-xs flex items-start gap-1.5 truncate",
+          onClick && "cursor-pointer hover:opacity-80 transition-opacity",
           colorCls,
         )}
       >
@@ -38,7 +40,14 @@ export function ItemCard({ item, compact = false }: { item: DisplayItem; compact
   }
 
   return (
-    <div className={cn("p-3 rounded-lg border", colorCls)}>
+    <div 
+      onClick={() => onClick?.(item)}
+      className={cn(
+        "p-3 rounded-lg border", 
+        onClick && "cursor-pointer hover:opacity-80 transition-opacity",
+        colorCls
+      )}
+    >
       <div className="flex items-start gap-2">
         {icon}
         <div className="flex-1 min-w-0">
@@ -54,7 +63,7 @@ export function ItemCard({ item, compact = false }: { item: DisplayItem; compact
             <div className="text-xs opacity-70 mt-0.5">{item.subject}</div>
           )}
           {item.kind !== "lesson" && item.description && (
-            <div className="text-xs opacity-60 mt-1 line-clamp-3 whitespace-pre-wrap">
+            <div className={cn("text-xs opacity-60 mt-2 whitespace-pre-wrap", !fill && "line-clamp-3")}>
               {item.description}
             </div>
           )}

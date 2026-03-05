@@ -8,9 +8,11 @@ import { Spinner } from "../ui/Spinner";
 import { ErrorState } from "../ui/ErrorState";
 import AttendanceStats from "./AttendanceStats";
 import AttendanceTable from "./AttendanceTable";
+import AttendanceAbsencesView from "./AttendanceAbsencesView";
 import ExcuseModal from "./ExcuseModal";
 
 const statusFilters = ["Wszystkie", "Nieobecność", "Obecność", "Spóźnienie", "Usprawiedliwienie", "Zwolnienie"];
+type ViewMode = "chart" | "absences";
 
 export default function AttendancePage() {
   const user = getCurrentUser();
@@ -19,6 +21,7 @@ export default function AttendancePage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [excuseOpen, setExcuseOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("chart");
 
   const attendanceQuery = useQuery({
     queryKey: studentId ? [...keys.attendance(studentId), dateFrom, dateTo] : ["attendance", "na"],
@@ -94,10 +97,27 @@ export default function AttendancePage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="page-title">Obecność</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="page-title">Obecność</h1>
+        <div className="flex gap-2">
+          <button 
+            className={viewMode === "chart" ? "btn-primary" : "btn-ghost"}
+            onClick={() => setViewMode("chart")}
+          >
+            Wykresy
+          </button>
+          <button 
+            className={viewMode === "absences" ? "btn-primary" : "btn-ghost"}
+            onClick={() => setViewMode("absences")}
+          >
+            Absencje
+          </button>
+        </div>
+      </div>
+      
       <AttendanceStats percentage={percentage} absences={absences} lates={lates} />
 
-      {monthlyData.length >= 2 ? (
+      {viewMode === "chart" && monthlyData.length >= 2 ? (
         <div className="bg-card border border-border rounded-[var(--radius)] p-4 h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthlyData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
@@ -135,21 +155,38 @@ export default function AttendancePage() {
         </div>
       ) : null}
 
-      <div className="bg-card border border-border rounded-[var(--radius)] p-4 space-y-3">
-        <div className="flex flex-wrap gap-2">
-          {statusFilters.map((status) => (
-            <button key={status} className={selectedStatus === status ? "btn-primary" : "btn-ghost"} onClick={() => setSelectedStatus(status)}>
-              {status}
-            </button>
-          ))}
-        </div>
-        <div className="grid md:grid-cols-2 gap-3">
-          <label className="text-sm text-muted-foreground">Od<input className="input-base mt-1" type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} /></label>
-          <label className="text-sm text-muted-foreground">Do<input className="input-base mt-1" type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} /></label>
-        </div>
-      </div>
+      {viewMode === "chart" && (
+        <div className="space-y-4">
+          <div className="bg-card border border-border rounded-[var(--radius)] p-4 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {statusFilters.map((status) => (
+                <button key={status} className={selectedStatus === status ? "btn-primary" : "btn-ghost"} onClick={() => setSelectedStatus(status)}>
+                  {status}
+                </button>
+              ))}
+            </div>
+            <div className="grid md:grid-cols-2 gap-3">
+              <label className="text-sm text-muted-foreground">Od<input className="input-base mt-1" type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} /></label>
+              <label className="text-sm text-muted-foreground">Do<input className="input-base mt-1" type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} /></label>
+            </div>
+          </div>
 
-      <AttendanceTable records={filtered} resolveStatusName={resolveStatusName} getStatusVariant={getStatusVariant} hours={hours} />
+          <AttendanceTable records={filtered} resolveStatusName={resolveStatusName} getStatusVariant={getStatusVariant} hours={hours} />
+        </div>
+      )}
+
+      {viewMode === "absences" && (
+        <AttendanceAbsencesView 
+          records={attendance} 
+          resolveStatusName={resolveStatusName} 
+          getStatusVariant={getStatusVariant}
+          hours={hours}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          onDateFromChange={setDateFrom}
+          onDateToChange={setDateTo}
+        />
+      )}
 
       <button className="btn-ghost" onClick={() => setExcuseOpen(true)}>Zgłoś usprawiedliwienie</button>
       <ExcuseModal open={excuseOpen} onClose={() => setExcuseOpen(false)} />

@@ -84,13 +84,13 @@ export default function AttendancePage() {
 
   const absences = attendance.filter((record) => {
     const name = resolveStatusName(record.status).toLowerCase();
-    return name.includes("nieobecn");
+    return name.includes("nieobecn") || name.includes("uspraw");
   }).length;
   const lates = attendance.filter((record) => {
     const name = resolveStatusName(record.status).toLowerCase();
     return name.includes("spóźn") || name.includes("spozn");
   }).length;
-  const percentage = attendance.length ? ((attendance.length - absences - lates) / attendance.length) * 100 : 100;
+  const percentage = attendance.length ? ((attendance.length - absences) / attendance.length) * 100 : 100;
 
   return (
     <div className="space-y-4">

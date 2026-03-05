@@ -403,7 +403,7 @@ export default function DashboardHome() {
                         <div className="p-0">
                             {/* Next Lesson Highlight */}
                             {nextLesson && (
-                                <div className="m-5 p-4 bg-primary/5 border border-primary/20 rounded-lg flex items-center gap-4 relative overflow-hidden">
+                                <div className="p-4 bg-primary/5 border border-primary/20 flex items-center gap-4 relative overflow-hidden">
                                     <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
                                     <div className="w-12 h-12 rounded-xl bg-background border border-border flex items-center justify-center text-primary font-bold shadow-sm relative z-10">
                                         <span className="text-xl">

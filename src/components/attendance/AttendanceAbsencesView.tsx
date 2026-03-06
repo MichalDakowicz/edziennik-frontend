@@ -11,6 +11,8 @@ export default function AttendanceAbsencesView({
   dateTo,
   onDateFromChange,
   onDateToChange,
+  selectedStatus,
+  onStatusChange,
 }: {
   records: Attendance[];
   resolveStatusName: (status: Attendance["status"]) => string;
@@ -20,6 +22,8 @@ export default function AttendanceAbsencesView({
   dateTo: string;
   onDateFromChange: (date: string) => void;
   onDateToChange: (date: string) => void;
+  selectedStatus: string;
+  onStatusChange: (status: string) => void;
 }) {
   const hourMap = new Map(hours.map((hour) => [hour.id, hour]));
 
@@ -27,7 +31,16 @@ export default function AttendanceAbsencesView({
     return records
       .filter((record) => {
         const statusName = resolveStatusName(record.status).toLowerCase();
-        // Show only absences, lates, and excuses (exclude pure "present" records)
+        
+        if (selectedStatus !== "Wszystkie") {
+          if (selectedStatus === "Obecność") return !statusName.includes("nieobecn") && !statusName.includes("spóźn") && !statusName.includes("spozn") && !statusName.includes("uspraw") && !statusName.includes("zwoln");
+          if (selectedStatus === "Nieobecność") return statusName.includes("nieobecn");
+          if (selectedStatus === "Spóźnienie") return statusName.includes("spóźn") || statusName.includes("spozn");
+          if (selectedStatus === "Usprawiedliwienie") return statusName.includes("uspraw");
+          if (selectedStatus === "Zwolnienie") return statusName.includes("zwoln");
+        }
+
+        // Default "Wszystkie" - Show only absences, lates, and excuses (exclude pure "present" records)
         return (
           statusName.includes("nieobecn") ||
           statusName.includes("spóźn") ||
@@ -46,7 +59,7 @@ export default function AttendanceAbsencesView({
         return true;
       })
       .sort((a, b) => new Date(b.Data).getTime() - new Date(a.Data).getTime());
-  }, [records, dateFrom, dateTo, resolveStatusName]);
+  }, [records, dateFrom, dateTo, resolveStatusName, selectedStatus]);
 
   // Group by date
   const groupedByDate = useMemo(() => {
@@ -81,12 +94,32 @@ export default function AttendanceAbsencesView({
 
   return (
     <div className="space-y-4">
-      <div className="bg-card border border-border rounded-[var(--radius)] p-4 space-y-3">
-        <h2 className="font-semibold text-foreground">Filtr daty</h2>
-        <div className="grid md:grid-cols-2 gap-3">
-          <label className="text-sm text-muted-foreground">
-            Od
-            <input
+      <div className="bg-card border border-border rounded-[var(--radius)] p-4 space-y-4">
+        <div>
+          <h2 className="font-semibold text-foreground mb-2">Typ absencji</h2>
+          <div className="flex flex-wrap gap-2">
+            {["Wszystkie", "Nieobecność", "Obecność", "Spóźnienie", "Usprawiedliwienie", "Zwolnienie"].map((status) => (
+              <button
+                key={status}
+                onClick={() => onStatusChange(status)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  selectedStatus === status
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="font-semibold text-foreground mb-2">Filtr daty</h2>
+          <div className="grid md:grid-cols-2 gap-3">
+            <label className="text-sm text-muted-foreground">
+              Od
+              <input
               className="input-base mt-1"
               type="date"
               value={dateFrom}
@@ -103,6 +136,7 @@ export default function AttendanceAbsencesView({
             />
           </label>
         </div>
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -111,7 +145,7 @@ export default function AttendanceAbsencesView({
             Brak absencji w wybranym okresie
           </div>
         ) : (
-          Array.from(groupedByDate.entries()).map(([date, dateRecords], index) => (
+          Array.from(groupedByDate.entries()).map(([date, dateRecords]) => (
             <div key={date}>
               <div className="flex items-center gap-4 py-4">
                 <h3 className="font-semibold text-foreground capitalize">{date}</h3>

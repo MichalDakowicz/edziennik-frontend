@@ -178,6 +178,52 @@ export default function DashboardHome() {
         const unread =
             data.inbox?.filter((message: any) => !message.przeczytana).length ??
             0;
+        
+        if (user.role === "nauczyciel" || user.role === "admin") {
+            return (
+                <div>
+                    <h1 className="page-title mb-6">Pulpit</h1>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <Card className="md:col-span-3">
+                            <h2 className="section-title mb-4">Szybkie akcje</h2>
+                            <div className="space-y-3">
+                                <Link to="/dashboard/teacher/grades" className="block p-3 bg-blue-900/20 border border-blue-900/30 rounded-lg hover:bg-blue-900/30 transition-colors">
+                                    <h3 className="font-medium text-blue-400">Wystawianie ocen</h3>
+                                    <p className="text-sm text-blue-300">Dodaj i edytuj oceny uczniów</p>
+                                </Link>
+                                <Link to="/dashboard/teacher/attendance" className="block p-3 bg-green-900/20 border border-green-900/30 rounded-lg hover:bg-green-900/30 transition-colors">
+                                    <h3 className="font-medium text-green-400">Sprawdzanie obecności</h3>
+                                    <p className="text-sm text-green-300">Zaznacz obecność uczniów</p>
+                                </Link>
+                                <Link to="/dashboard/teacher/homework" className="block p-3 bg-purple-900/20 border border-purple-900/30 rounded-lg hover:bg-purple-900/30 transition-colors">
+                                    <h3 className="font-medium text-purple-400">Zadania domowe</h3>
+                                    <p className="text-sm text-purple-300">Zarządzaj pracami domowymi</p>
+                                </Link>
+                            </div>
+                        </Card>
+                    </div>
+
+                    <Card>
+                        <h2 className="section-title mb-4">Ostatnie wiadomości</h2>
+                        {unread > 0 ? (
+                            <div className="flex items-center gap-2">
+                                <span className="text-lg font-bold text-yellow-400">{unread}</span>
+                                <span className="text-zinc-300">nieprzeczytane wiadomości</span>
+                                <Link
+                                    className="ml-auto text-primary hover:text-primary/80"
+                                    to="/dashboard/messages"
+                                >
+                                    Przejdź do wiadomości →
+                                </Link>
+                            </div>
+                        ) : (
+                            <p className="text-zinc-400">Brak nowych wiadomości</p>
+                        )}
+                    </Card>
+                </div>
+            );
+        }
+
         return (
             <div>
                 <h1 className="page-title mb-6">Pulpit</h1>

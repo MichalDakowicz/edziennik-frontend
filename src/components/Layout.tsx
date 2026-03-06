@@ -16,7 +16,9 @@ import {
     CalendarRange, 
     BookOpen, 
     Mail, 
-    User 
+    User,
+    ClipboardList,
+    CheckSquare,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "../services/auth";
@@ -85,6 +87,24 @@ const navItems: NavItem[] = [
         icon: User,
         student: true,
         parent: true,
+        teacher: true,
+    },
+    {
+        label: "Wystawianie ocen",
+        to: "/dashboard/teacher/grades",
+        icon: GraduationCap,
+        teacher: true,
+    },
+    {
+        label: "Sprawdzanie obecności",
+        to: "/dashboard/teacher/attendance",
+        icon: CheckSquare,
+        teacher: true,
+    },
+    {
+        label: "Zadania domowe",
+        to: "/dashboard/teacher/homework",
+        icon: ClipboardList,
         teacher: true,
     },
 ];

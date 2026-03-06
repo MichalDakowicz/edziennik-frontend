@@ -221,6 +221,23 @@ Notes ([Part 22](../docs/specifications/parts/part-22.md))
 Notes ([Part 23](../docs/specifications/parts/part-23.md))
 - Keep create/edit/delete mutations in one page state to simplify invalidation.
 
+## 7.4) Teacher additional features
+- [ ] Create `src/hooks/useTeacherGrades.ts` (fetch students, subjects, grades for teacher view)
+- [ ] Create `src/hooks/useTeacherAttendance.ts` (fetch classes, students in class, attendance statuses, lesson hours)
+- [ ] Create `src/hooks/useTeacherHomework.ts` (fetch homework with filters)
+- [ ] Create `src/hooks/useTeacherMessages.ts` (fetch messages for teacher, support student/parent recipients)
+- [ ] Create `src/hooks/useTeacherStudents.ts` (fetch and cache student list for teacher)
+- [ ] Create `src/hooks/useTeacherClasses.ts` (fetch and cache class list for teacher)
+- [ ] Implement `AddGradeModal` component with value buttons/input and form validation
+- [ ] Implement `AddPeriodGradeModal` component for semester grades
+- [ ] Implement `AddHomeworkModal` component (klasa, przedmiot, opis, termin pickers)
+- [ ] Implement `EditHomeworkModal` component (pre-fill from existing homework)
+
+Notes
+- Each hook should use React Query with proper `staleTime` and retry logic.
+- Grade value input should support both button controls (`+`/`-` modifiers) and numeric input.
+- All teacher modals should use `react-hook-form` + `zod` validation with Polish error messages.
+
 ## 8) Cross-cutting quality requirements
 - [ ] Global query error handling via `ErrorState`
 - [ ] Mutation failure handling via `toast.error(...)` only
@@ -235,11 +252,47 @@ Notes ([Part 26](../docs/specifications/parts/part-26.md), [Part 27](../docs/spe
 - Query errors render `ErrorState`; mutation errors trigger toasts.
 - Ensure non-color indicators are present on status badges and attendance/grade meaning.
 
+## 8.1) Teacher-specific UI and integration
+- [ ] Update `src/components/Layout.tsx` for teacher navigation:
+  - [ ] Add teacher nav items: Wystawianie ocen, Sprawdzanie obecności, Zadania domowe
+  - [ ] Update sidebar branding/description based on user role
+  - [ ] Ensure active link highlighting works for teacher routes
+- [ ] Update `src/components/DashboardHome.tsx` teacher widgets:
+  - [ ] Today's class schedule (zajęcia for logged-in teacher)
+  - [ ] Quick action links (enter grades, mark attendance, add homework)
+  - [ ] Recent unread messages section
+- [ ] Update `src/components/messages/MessagesPage.tsx` for teacher recipients:
+  - [ ] Allow selecting student, parent, or other teacher as recipient
+  - [ ] Adjust recipient dropdown to include students and parents
+- [ ] Update `src/App.tsx` to add teacher routes with RoleGuard:
+  - [ ] `/dashboard/teacher/grades` → `TeacherGradesPage`
+  - [ ] `/dashboard/teacher/attendance` → `TeacherAttendancePage`
+  - [ ] `/dashboard/teacher/homework` → `TeacherHomeworkPage`
+
+Notes ([Part 11](../docs/specifications/parts/part-11.md), [Part 13](../docs/specifications/parts/part-13.md), [Part 19](../docs/specifications/parts/part-19.md))
+- Teacher dashboard should show quick actions (buttons) linking to respective pages.
+- Navigation must be Polish: "Wystawianie ocen", "Sprawdzanie obecności", "Zadania domowe".
+- Recipient dropdown in messages must support filtering students by class if multiple classes taught.
+
 ## 9) Validation and completion
 - [ ] Verify all listed API endpoints are wired per spec
 - [ ] Verify known API quirks are handled defensively
 - [ ] Verify role access paths and redirects
+- [ ] Verify teacher panel functionality:
+  - [ ] Grade entry works with all grade types (partial, period, behavior points)
+  - [ ] Attendance marking with status dropdown and save-all flow
+  - [ ] Homework creation, editing, deletion with date picker
+  - [ ] All forms validate correctly with Polish error messages
+  - [ ] Mutations trigger success/error toasts
+- [ ] Accessibility pass on teacher pages:
+  - [ ] All form inputs have labels
+  - [ ] Modals support Escape key and focus management
+  - [ ] Grade value buttons are keyboard accessible
+  - [ ] Status/state not indicated by color alone
+- [ ] Mobile responsiveness check for teacher pages
 - [ ] Final pass against [Part 31 checklist](../docs/specifications/parts/part-31.md) order
 
 Notes ([Part 31](../docs/specifications/parts/part-31.md))
 - `Apply Django backend changes (Part 0)` is listed in spec order but is out of scope for this frontend repository; track externally if backend repo is separate.
+- Teacher panel implementation should follow the same patterns as student panel for consistency.
+- All UI labels and messages must be in Polish to match application language.

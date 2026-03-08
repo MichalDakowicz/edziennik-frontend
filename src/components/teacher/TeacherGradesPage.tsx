@@ -2,16 +2,19 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
-import { Modal } from "../ui/Modal";
 import { Spinner } from "../ui/Spinner";
 import { EmptyState } from "../ui/EmptyState";
 import { ErrorState } from "../ui/ErrorState";
 import { keys } from "../../services/queryKeys";
 import { getStudents, getSubjects } from "../../services/api";
+import AddGradeModal from "./AddGradeModal";
+import AddPeriodGradeModal from "./AddPeriodGradeModal";
 
 export default function TeacherGradesPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddGradeModalOpen, setIsAddGradeModalOpen] = useState(false);
+  const [isAddPeriodGradeModalOpen, setIsAddPeriodGradeModalOpen] = useState(false);
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
 
   const { data: students, isLoading: studentsLoading, error: studentsError } = useQuery({
     queryKey: keys.students?.() ?? ["students"],
@@ -55,7 +58,10 @@ export default function TeacherGradesPage() {
       <Card>
         <div className="flex justify-between items-center mb-4">
           <h2 className="section-title">Uczniowie</h2>
-          <Button onClick={() => setIsModalOpen(true)}>+ Dodaj ocenę</Button>
+          <div className="space-x-2">
+            <Button onClick={() => setIsAddGradeModalOpen(true)}>+ Dodaj ocenę</Button>
+            <Button onClick={() => setIsAddPeriodGradeModalOpen(true)} className="btn-ghost">+ Ocena okresowa</Button>
+          </div>
         </div>
 
         {students && students.length > 0 ? (
@@ -76,7 +82,13 @@ export default function TeacherGradesPage() {
                     <td className="py-3 px-4">Klasa</td>
                     <td className="py-3 px-4">Brak ocen</td>
                     <td className="text-right py-3 px-4">
-                      <Button onClick={() => setIsModalOpen(true)} className="text-xs">
+                      <Button 
+                        onClick={() => {
+                          setSelectedStudentId(student.id);
+                          setIsAddGradeModalOpen(true);
+                        }} 
+                        className="text-xs"
+                      >
                         Dodaj ocenę
                       </Button>
                     </td>
@@ -90,11 +102,27 @@ export default function TeacherGradesPage() {
         )}
       </Card>
 
-      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} title="Dodaj ocenę">
-        <div className="space-y-4">
-          <p className="text-zinc-400">Modal do dodawania oceny zostanie zaimplementowany...</p>
-        </div>
-      </Modal>
+      <AddGradeModal
+        open={isAddGradeModalOpen}
+        onClose={() => {
+          setIsAddGradeModalOpen(false);
+          setSelectedStudentId(null);
+        }}
+        studentId={selectedStudentId ?? undefined}
+        students={students || []}
+        subjects={subjects || []}
+      />
+
+      <AddPeriodGradeModal
+        open={isAddPeriodGradeModalOpen}
+        onClose={() => {
+          setIsAddPeriodGradeModalOpen(false);
+          setSelectedStudentId(null);
+        }}
+        studentId={selectedStudentId ?? undefined}
+        students={students || []}
+        subjects={subjects || []}
+      />
     </div>
   );
 }

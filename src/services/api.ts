@@ -77,6 +77,20 @@ export const getFinalGrades = (studentId: number) =>
 export const getBehaviorPoints = (studentId: number) =>
   fetchWithAuth<BehaviorPoint[]>(`/zachowanie-punkty/?uczen=${studentId}`);
 
+// Grade mutations
+export const createGrade = (data: Omit<Grade, "id" | "data_wystawienia">) =>
+  fetchWithAuth<Grade>("/oceny/", { method: "POST", body: JSON.stringify(data) });
+export const updateGrade = (id: number, data: Partial<Grade>) =>
+  fetchWithAuth<Grade>(`/oceny/${id}/`, { method: "PATCH", body: JSON.stringify(data) });
+export const deleteGrade = (id: number) =>
+  fetchWithAuth<void>(`/oceny/${id}/`, { method: "DELETE" });
+
+export const createPeriodGrade = (data: Omit<PeriodGrade, "id">) =>
+  fetchWithAuth<PeriodGrade>("/oceny-okresowe/", { method: "POST", body: JSON.stringify(data) });
+
+export const createBehaviorPoint = (data: Omit<BehaviorPoint, "id" | "data_wpisu">) =>
+  fetchWithAuth<BehaviorPoint>("/zachowanie-punkty/", { method: "POST", body: JSON.stringify(data) });
+
 export const getAttendance = (studentId: number, dateFrom?: string, dateTo?: string) => {
   const params = new URLSearchParams({ uczen_id: String(studentId) });
   if (dateFrom) params.set("date_from", dateFrom);
@@ -135,6 +149,15 @@ export const getHomework = (classId: number, subjectId?: number) => {
   if (subjectId) params.set("przedmiot", String(subjectId));
   return fetchWithAuth<Homework[]>(`/prace-domowe/?${params.toString()}`);
 };
+
+// Homework mutations
+export const createHomework = (data: Omit<Homework, "id" | "data_utworzenia">) =>
+  fetchWithAuth<Homework>("/prace-domowe/", { method: "POST", body: JSON.stringify(data) });
+export const updateHomework = (id: number, data: Partial<Homework>) =>
+  fetchWithAuth<Homework>(`/prace-domowe/${id}/`, { method: "PATCH", body: JSON.stringify(data) });
+export const deleteHomework = (id: number) =>
+  fetchWithAuth<void>(`/prace-domowe/${id}/`, { method: "DELETE" });
+
 export const getEvents = (classId: number) => fetchWithAuth<Event[]>(`/wydarzenia/?klasa=${classId}`);
 export const getLuckyNumber = async (classId: number): Promise<LuckyNumber | null> => {
   try {

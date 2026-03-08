@@ -3,12 +3,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
-import { Modal } from "../ui/Modal";
 import { Spinner } from "../ui/Spinner";
 import { EmptyState } from "../ui/EmptyState";
 import { ErrorState } from "../ui/ErrorState";
 import { keys } from "../../services/queryKeys";
-import { getHomework, getClasses, getSubjects } from "../../services/api";
+import { getHomework, getClasses, getSubjects, deleteHomework } from "../../services/api";
+import AddHomeworkModal from "./AddHomeworkModal";
+import EditHomeworkModal from "./EditHomeworkModal";
+import { Homework } from "../../types/api";
 
 export default function TeacherHomeworkPage() {
   const queryClient = useQueryClient();
@@ -16,7 +18,7 @@ export default function TeacherHomeworkPage() {
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [_selectedHomework, _setSelectedHomework] = useState<any | null>(null);
+  const [selectedHomework, setSelectedHomework] = useState<Homework | null>(null);
 
   const { data: classes, isLoading: classesLoading, error: classesError } = useQuery({
     queryKey: keys.classes?.() ?? ["classes"],
@@ -35,10 +37,7 @@ export default function TeacherHomeworkPage() {
   });
 
   const deleteHomeworkMutation = useMutation({
-    mutationFn: (_id: number) => {
-      // deleteHomework is optional in the API service - for now we'll just show error
-      return Promise.reject(new Error("Delete not implemented"));
-    },
+    mutationFn: deleteHomework,
     onSuccess: () => {
       toast.success("Praca domowa usunięta");
       queryClient.invalidateQueries({ queryKey: ["homework"] });
@@ -114,7 +113,7 @@ export default function TeacherHomeworkPage() {
                   <div className="space-x-2">
                     <Button
                       onClick={() => {
-                        _setSelectedHomework(hw);
+                        setSelectedHomework(hw);
                         setEditModalOpen(true);
                       }}
                       className="btn-ghost text-xs"
@@ -137,17 +136,19 @@ export default function TeacherHomeworkPage() {
         )}
       </Card>
 
-      <Modal open={addModalOpen} onClose={() => setAddModalOpen(false)} title="Dodaj pracę domową">
-        <div className="space-y-4">
-          <p className="text-zinc-400">Modal do dodawania pracy domowej zostanie zaimplementowany...</p>
-        </div>
-      </Modal>
+      <AddHomeworkModal
+        open={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        classId={selectedClassId ?? undefined}
+        classes={classes?.map(c => ({ id: c.id, nazwa: c.nazwa ?? undefined, numer: String(c.numer ?? "") })) ?? []}
+        subjects={subjects?.map(s => ({ id: s.id, nazwa: s.nazwa ?? "" })) ?? []}
+      />
 
-      <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)} title="Edytuj pracę domową">
-        <div className="space-y-4">
-          <p className="text-zinc-400">Modal do edycji pracy domowej zostanie zaimplementowany...</p>
-        </div>
-      </Modal>
+      <EditHomeworkModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        homework={selectedHomework ?? undefined}
+      />
     </div>
   );
 }

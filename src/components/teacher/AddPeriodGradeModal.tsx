@@ -24,6 +24,7 @@ interface AddPeriodGradeModalProps {
   open: boolean;
   onClose: () => void;
   studentId?: number;
+  subjectId?: number;
   students: any[];
   subjects: any[];
 }
@@ -32,6 +33,7 @@ export default function AddPeriodGradeModal({
   open,
   onClose,
   studentId,
+  subjectId,
   students,
   subjects,
 }: AddPeriodGradeModalProps) {
@@ -48,7 +50,7 @@ export default function AddPeriodGradeModal({
     resolver: zodResolver(periodGradeSchema),
     defaultValues: {
       uczen: studentId ?? undefined,
-      przedmiot: undefined,
+      przedmiot: subjectId ?? undefined,
       okres: "1",
       wartosc: "",
     },
@@ -58,7 +60,10 @@ export default function AddPeriodGradeModal({
     if (studentId && studentId > 0) {
       setValue("uczen", studentId);
     }
-  }, [studentId, setValue]);
+    if (subjectId && subjectId > 0) {
+      setValue("przedmiot", subjectId);
+    }
+  }, [studentId, subjectId, setValue]);
 
   const createPeriodGradeMutation = useMutation({
     mutationFn: (data: PeriodGradeFormData) =>
@@ -131,7 +136,7 @@ export default function AddPeriodGradeModal({
                 {...field}
                 value={field.value ?? ""}
                 onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 0)}
-                className="input-base"
+                className="input-base max-w-xs"
               >
                 <option value="">Wybierz przedmiot</option>
                 {subjects?.map((s) => (

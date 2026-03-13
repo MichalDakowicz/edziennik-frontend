@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { Modal } from "../ui/Modal";
 import { createGrade } from "../../services/api";
 import { getCurrentUser } from "../../services/auth";
-import { Badge } from "../ui/Badge";
 
 const gradeSchema = z.object({
   uczen: z.number({ required_error: "Wybierz ucznia" }),
@@ -25,24 +24,16 @@ const gradeSchema = z.object({
 
 type GradeFormData = z.infer<typeof gradeSchema>;
 
-const gradeValues = [
-  { label: "1", value: "1.00" },
-  { label: "1+", value: "1.50" },
-  { label: "2", value: "2.00" },
-  { label: "2+", value: "2.50" },
-  { label: "3", value: "3.00" },
-  { label: "3+", value: "3.50" },
-  { label: "4", value: "4.00" },
-  { label: "4+", value: "4.50" },
-  { label: "5", value: "5.00" },
-  { label: "5-", value: "4.75" },
-  { label: "6", value: "6.00" },
-];
-
 interface AddGradeModalProps {
   open: boolean;
   onClose: () => void;
   studentId?: number;
+  subjectId?: number;
+  weight?: number;
+  description?: string;
+  doSredniej?: boolean;
+  punkty?: boolean;
+  opisowa?: boolean;
   students: any[];
   subjects: any[];
 }
@@ -51,12 +42,19 @@ export default function AddGradeModal({
   open,
   onClose,
   studentId,
+  subjectId,
+  weight,
+  description,
+  doSredniej,
+  punkty,
+  opisowa,
   students,
   subjects,
 }: AddGradeModalProps) {
   const queryClient = useQueryClient();
   const user = getCurrentUser();
-  const [selectedGradeButton, setSelectedGradeButton] = useState<string | null>(null);
+  const [baseGrade, setBaseGrade] = useState<number | null>(null);
+  const [modifier, setModifier] = useState<string>('');
 
   const {
     control,
@@ -69,13 +67,13 @@ export default function AddGradeModal({
     resolver: zodResolver(gradeSchema),
     defaultValues: {
       uczen: studentId ?? 0,
-      przedmiot: 0,
+      przedmiot: subjectId ?? 0,
       wartosc: "",
-      waga: 1,
-      opis: "",
-      czy_do_sredniej: true,
-      czy_punkty: false,
-      czy_opisowa: false,
+      waga: weight ?? 1,
+      opis: description ?? "",
+      czy_do_sredniej: doSredniej ?? true,
+      czy_punkty: punkty ?? false,
+      czy_opisowa: opisowa ?? false,
     },
   });
 
@@ -85,7 +83,25 @@ export default function AddGradeModal({
     if (studentId && studentId > 0) {
       setValue("uczen", studentId);
     }
-  }, [studentId, setValue]);
+    if (subjectId && subjectId > 0) {
+      setValue("przedmiot", subjectId);
+    }
+    if (weight && weight > 0) {
+      setValue("waga", weight);
+    }
+    if (description !== undefined) {
+      setValue("opis", description);
+    }
+    if (doSredniej !== undefined) {
+      setValue("czy_do_sredniej", doSredniej);
+    }
+    if (punkty !== undefined) {
+      setValue("czy_punkty", punkty);
+    }
+    if (opisowa !== undefined) {
+      setValue("czy_opisowa", opisowa);
+    }
+  }, [studentId, subjectId, weight, description, doSredniej, punkty, opisowa, setValue]);
 
   const createGradeMutation = useMutation({
     mutationFn: (data: GradeFormData) =>
@@ -104,7 +120,8 @@ export default function AddGradeModal({
       toast.success("Ocena dodana");
       queryClient.invalidateQueries({ queryKey: ["grades"] });
       reset();
-      setSelectedGradeButton(null);
+      setBaseGrade(null);
+      setModifier('');
       onClose();
     },
     onError: (err: any) => {
@@ -112,10 +129,28 @@ export default function AddGradeModal({
     },
   });
 
-  const handleGradeButtonClick = (value: string) => {
-    setSelectedGradeButton(value);
-    setValue("wartosc", value);
+  const handleBaseClick = (num: number) => {
+    setBaseGrade(num);
+    setModifier('');
+    const val = num + '.00';
+    setValue("wartosc", val);
   };
+
+  const handleModifierClick = (mod: '+' | '-') => {
+    if (!baseGrade) return;
+    if (mod === '-' && baseGrade === 1) return;
+    if (mod === '+' && baseGrade === 6) return;
+    setModifier(mod);
+    let val: string;
+    if (mod === '+') {
+      val = (baseGrade + 0.5).toFixed(2);
+    } else {
+      val = (baseGrade - 0.25).toFixed(2);
+    }
+    setValue("wartosc", val);
+  };
+
+  const selectedStudent = students.find((s) => s.id === studentId);
 
   const onSubmit = (data: GradeFormData) => {
     createGradeMutation.mutate(data);
@@ -131,81 +166,124 @@ export default function AddGradeModal({
           <label className="block text-sm font-medium text-zinc-300 mb-2">
             Uczeń *
           </label>
-          <Controller
-            name="uczen"
-            control={control}
-            render={({ field }) => (
-              <select
-                {...field}
-                value={field.value ?? ""}
-                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 0)}
-                className="input-base"
-              >
-                <option value="">Wybierz ucznia</option>
-                {students?.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.user?.first_name} {s.user?.last_name}
-                  </option>
-                ))}
-              </select>
-            )}
-          />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                {selectedStudent ? `${selectedStudent.user?.first_name} ${selectedStudent.user?.last_name}` : "Wybierz ucznia"}
+              </p>
+              <p className="text-xs text-muted-foreground">Wybierz ucznia, zanim dodasz ocenę</p>
+            </div>
+            <Controller
+              name="uczen"
+              control={control}
+              render={({ field }) => (
+                <select
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 0)}
+                  className="input-base max-w-xs"
+                >
+                  <option value="">Wybierz ucznia</option>
+                  {students?.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.user?.first_name} {s.user?.last_name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            />
+          </div>
           {errors.uczen && (
             <p className="text-red-400 text-sm mt-1">{errors.uczen.message}</p>
           )}
         </div>
 
         {/* Przedmiot */}
-        <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">
-            Przedmiot *
-          </label>
-          <Controller
-            name="przedmiot"
-            control={control}
-            render={({ field }) => (
-              <select
-                {...field}
-                value={field.value ?? ""}
-                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 0)}
-                className="input-base"
-              >
-                <option value="">Wybierz przedmiot</option>
-                {subjects?.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.nazwa}
-                  </option>
-                ))}
-              </select>
+        {!subjectId && (
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-2">
+              Przedmiot *
+            </label>
+            <Controller
+              name="przedmiot"
+              control={control}
+              render={({ field }) => (
+                <select
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 0)}
+                  className="input-base max-w-xs"
+                >
+                  <option value="">Wybierz przedmiot</option>
+                  {subjects?.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.nazwa}
+                    </option>
+                  ))}
+                </select>
+              )}
+            />
+            {errors.przedmiot && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.przedmiot.message}
+              </p>
             )}
-          />
-          {errors.przedmiot && (
-            <p className="text-red-400 text-sm mt-1">
-              {errors.przedmiot.message}
-            </p>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Wartość oceny */}
         <div>
           <label className="block text-sm font-medium text-zinc-300 mb-3">
             Wartość oceny *
           </label>
-          <div className="grid grid-cols-5 gap-2 mb-3">
-            {gradeValues.map((g) => (
+          <div className="flex items-start gap-4 mb-3">
+            <div className="grid grid-cols-6 gap-2">
+              {[1, 2, 3, 4, 5, 6].map((num) => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => handleBaseClick(num)}
+                  className={`py-2 px-3 rounded-lg font-semibold text-sm transition-all ${
+                    baseGrade === num
+                      ? "bg-blue-600 text-white border-2 border-blue-400"
+                      : "bg-zinc-800 text-zinc-300 border border-zinc-700 hover:bg-zinc-700"
+                  }`}
+                >
+                  {num}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-col gap-2">
               <button
-                key={g.value}
                 type="button"
-                onClick={() => handleGradeButtonClick(g.value)}
-                className={`py-2 px-3 rounded-lg font-semibold text-sm transition-all ${
-                  selectedGradeButton === g.value
+                onClick={() => handleModifierClick('+')}
+                disabled={!baseGrade || baseGrade === 6}
+                className={`py-1 px-2 rounded text-sm font-semibold transition-all ${
+                  modifier === '+' && baseGrade
                     ? "bg-blue-600 text-white border-2 border-blue-400"
-                    : "bg-zinc-800 text-zinc-300 border border-zinc-700 hover:bg-zinc-700"
+                    : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 }`}
               >
-                {g.label}
+                +
               </button>
-            ))}
+              <button
+                type="button"
+                onClick={() => handleModifierClick('-')}
+                disabled={!baseGrade || baseGrade === 1}
+                className={`py-1 px-2 rounded text-sm font-semibold transition-all ${
+                  modifier === '-' && baseGrade
+                    ? "bg-blue-600 text-white border-2 border-blue-400"
+                    : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                }`}
+              >
+                -
+              </button>
+            </div>
+            <div className="flex flex-col items-center justify-center w-24 h-24 rounded-xl bg-zinc-900/50">
+              <span className="text-3xl font-bold text-emerald-400">
+                {wartosc || "-"}
+              </span>
+            </div>
           </div>
 
           {/* Pole tekstowe na wartość */}
@@ -225,17 +303,10 @@ export default function AddGradeModal({
             <p className="text-red-400 text-sm mt-1">{errors.wartosc.message}</p>
           )}
 
-          {/* Preview */}
-          {wartosc && !errors.wartosc && (
-            <div className="mt-3 p-3 bg-zinc-900/50 rounded-lg flex items-center gap-2">
-              <span className="text-zinc-400 text-sm">Podgląd:</span>
-              <Badge variant="default">Ocena: {wartosc}</Badge>
-            </div>
-          )}
         </div>
 
-        {/* Waga */}
-        <div>
+        {/* Waga - ukryta, ustawiana z filtrów */}
+        {/* <div>
           <label className="block text-sm font-medium text-zinc-300 mb-2">
             Waga (1-5)
           </label>
@@ -261,87 +332,9 @@ export default function AddGradeModal({
               </div>
             )}
           />
-        </div>
+        </div> */}
 
-        {/* Opis */}
-        <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">
-            Opis / Kategoria
-          </label>
-          <Controller
-            name="opis"
-            control={control}
-            render={({ field }) => (
-              <input
-                {...field}
-                type="text"
-                placeholder="np. Klasówka, odpowiedź ustna..."
-                maxLength={200}
-                className="input-base"
-              />
-            )}
-          />
-        </div>
-
-        {/* Checkboxy */}
-        <div className="space-y-3 border-t border-zinc-700 pt-4">
-          <div className="flex items-center gap-3">
-            <Controller
-              name="czy_do_sredniej"
-              control={control}
-              render={({ field: { value, onChange } }) => (
-                <input
-                  type="checkbox"
-                  checked={value}
-                  onChange={onChange}
-                  className="w-4 h-4 cursor-pointer"
-                  id="czy_do_sredniej"
-                />
-              )}
-            />
-            <label htmlFor="czy_do_sredniej" className="text-zinc-300 cursor-pointer">
-              Czy do średniej
-            </label>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Controller
-              name="czy_punkty"
-              control={control}
-              render={({ field: { value, onChange } }) => (
-                <input
-                  type="checkbox"
-                  checked={value}
-                  onChange={onChange}
-                  className="w-4 h-4 cursor-pointer"
-                  id="czy_punkty"
-                />
-              )}
-            />
-            <label htmlFor="czy_punkty" className="text-zinc-300 cursor-pointer">
-              Czy punktowa
-            </label>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Controller
-              name="czy_opisowa"
-              control={control}
-              render={({ field: { value, onChange } }) => (
-                <input
-                  type="checkbox"
-                  checked={value}
-                  onChange={onChange}
-                  className="w-4 h-4 cursor-pointer"
-                  id="czy_opisowa"
-                />
-              )}
-            />
-            <label htmlFor="czy_opisowa" className="text-zinc-300 cursor-pointer">
-              Czy opisowa
-            </label>
-          </div>
-        </div>
+        {/* (Opis/kategoria + checkboxy przeniesione do filtru pod wagą) */}
 
         {/* Buttons */}
         <div className="flex gap-3 border-t border-zinc-700 pt-4">

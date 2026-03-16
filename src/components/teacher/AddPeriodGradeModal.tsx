@@ -1,12 +1,33 @@
+import { useMemo, useRef, useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { createPeriodGrade } from "../../services/api";
 import { getCurrentUser } from "../../services/auth";
+
+type Modifier = "+" | "-" | "";
+
+const getGradeValue = (num: number, mod: Modifier): number => {
+  if (mod === "+") return num + 0.5;
+  if (mod === "-") return num - 0.25;
+  return num;
+};
+
+const getGradeStyles = (num: number | null, mod: Modifier) => {
+  if (num === null) return "bg-muted text-muted-foreground border-border";
+
+  const value = getGradeValue(num, mod);
+
+  if (value >= 5.0) return "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/50";
+  if (value >= 4.0) return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800/50";
+  if (value >= 3.0) return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800/50";
+  if (value >= 2.0) return "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800/50";
+  return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/50";
+};
 
 const periodGradeSchema = z.object({
   uczen: z.number({ required_error: "Wybierz ucznia" }),
@@ -39,11 +60,16 @@ export default function AddPeriodGradeModal({
 }: AddPeriodGradeModalProps) {
   const queryClient = useQueryClient();
   const user = getCurrentUser();
+  const [isGradeMenuOpen, setIsGradeMenuOpen] = useState(false);
+  const [baseGrade, setBaseGrade] = useState<number | null>(null);
+  const [modifier, setModifier] = useState<Modifier>("");
+  const gradeMenuRef = useRef<HTMLDivElement | null>(null);
 
   const {
     control,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors },
   } = useForm<PeriodGradeFormData>({
@@ -56,6 +82,20 @@ export default function AddPeriodGradeModal({
     },
   });
 
+  const wartosc = watch("wartosc");
+
+  // Close grade menu when clicking outside
+  useEffect(() => {
+    if (!isGradeMenuOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (gradeMenuRef.current && !gradeMenuRef.current.contains(event.target as Node)) {
+        setIsGradeMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isGradeMenuOpen]);
+
   useEffect(() => {
     if (studentId && studentId > 0) {
       setValue("uczen", studentId);
@@ -64,6 +104,45 @@ export default function AddPeriodGradeModal({
       setValue("przedmiot", subjectId);
     }
   }, [studentId, subjectId, setValue]);
+
+  // Keep visual selector in sync when user types manually
+  useEffect(() => {
+    const raw = (wartosc ?? "").trim();
+    if (!raw) {
+      setBaseGrade(null);
+      setModifier("");
+      return;
+    }
+    const n = Number(raw);
+    if (Number.isNaN(n)) return;
+
+    const rounded = Math.round(n * 100) / 100;
+    const frac = Math.round((rounded - Math.floor(rounded)) * 100) / 100;
+
+    if (frac === 0) {
+      const base = Math.floor(rounded);
+      if (base >= 1 && base <= 6) {
+        setBaseGrade(base);
+        setModifier("");
+      }
+      return;
+    }
+    if (frac === 0.5) {
+      const base = Math.floor(rounded);
+      if (base >= 1 && base <= 6) {
+        setBaseGrade(base);
+        setModifier("+");
+      }
+      return;
+    }
+    if (frac === 0.75) {
+      const base = Math.ceil(rounded);
+      if (base >= 1 && base <= 6) {
+        setBaseGrade(base);
+        setModifier("-");
+      }
+    }
+  }, [wartosc]);
 
   const createPeriodGradeMutation = useMutation({
     mutationFn: (data: PeriodGradeFormData) =>
@@ -90,6 +169,39 @@ export default function AddPeriodGradeModal({
   };
 
   if (!open) return null;
+
+  const setGradeValue = (num: number | null, mod: Modifier) => {
+    if (num === null) {
+      setValue("wartosc", "");
+      return;
+    }
+    const val = getGradeValue(num, mod).toFixed(2);
+    setValue("wartosc", val);
+  };
+
+  const handleNumberSelect = (num: number) => {
+    if (baseGrade === num) {
+      setBaseGrade(null);
+      setModifier("");
+      setGradeValue(null, "");
+      return;
+    }
+    setBaseGrade(num);
+    if (num === 1 && modifier === "-") setModifier("");
+    if (num === 6 && modifier === "+") setModifier("");
+    setGradeValue(num, modifier === "+" && num === 6 ? "" : modifier === "-" && num === 1 ? "" : modifier);
+  };
+
+  const handleModifierSelect = (mod: Modifier) => {
+    if (!baseGrade) return;
+    if (mod === "+" && baseGrade === 6) return;
+    if (mod === "-" && baseGrade === 1) return;
+    const next = modifier === mod ? "" : mod;
+    setModifier(next);
+    setGradeValue(baseGrade, next);
+  };
+
+  const activeStyles = useMemo(() => getGradeStyles(baseGrade, modifier), [baseGrade, modifier]);
 
   return (
     <Modal open={open} onClose={onClose} title="Dodaj ocenę okresową">
@@ -196,6 +308,86 @@ export default function AddPeriodGradeModal({
           <label className="block text-sm font-medium text-zinc-300 mb-2">
             Wartość oceny (1-6) *
           </label>
+          <div className="flex items-start gap-4 mb-3">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsGradeMenuOpen((v) => !v)}
+                className={`w-24 h-24 md:w-28 md:h-28 flex items-center justify-center rounded-3xl border-2 transition-all duration-200 shadow-sm select-none ${
+                  isGradeMenuOpen ? `border-solid ${activeStyles}` : `border-dashed ${activeStyles}`
+                } bg-background`}
+              >
+                {baseGrade === null && modifier === "" ? (
+                  <Plus size={36} strokeWidth={1.5} className="text-muted-foreground" />
+                ) : (
+                  <div className="flex items-baseline text-4xl md:text-5xl font-bold tabular-nums">
+                    {baseGrade}
+                    {modifier && <span className="text-2xl md:text-3xl ml-1 opacity-80">{modifier}</span>}
+                  </div>
+                )}
+              </button>
+
+              <div
+                ref={gradeMenuRef}
+                className={`absolute bottom-full right-full mb-2 mr-2 p-2 rounded-3xl border border-border shadow-lg z-50 w-72 bg-popover text-popover-foreground origin-bottom-right transition-all duration-150 ${
+                  isGradeMenuOpen ? "opacity-100 scale-100 translate-x-0 translate-y-0 pointer-events-auto" : "opacity-0 scale-95 translate-x-2 translate-y-2 pointer-events-none"
+                }`}
+              >
+                <div className="grid grid-cols-4 gap-1.5">
+                  <div className="col-span-3 grid grid-cols-3 gap-1.5">
+                    {[1, 3, 5, 2, 4, 6].map((n) => {
+                      const isActive = baseGrade === n;
+                      const styles = getGradeStyles(n, modifier);
+                      return (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => handleNumberSelect(n)}
+                          className={`h-14 rounded-xl text-2xl font-bold transition-all border ${
+                            isActive
+                              ? `${styles} shadow-sm scale-[1.03] z-10 border-current`
+                              : "bg-muted text-muted-foreground hover:bg-muted/80 border-border"
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    {(["+", "-"] as Modifier[]).map((mod) => {
+                      const isActive = modifier === mod;
+                      const isDisabled = !baseGrade || (mod === "+" && baseGrade === 6) || (mod === "-" && baseGrade === 1);
+                      const styles = baseGrade !== null ? getGradeStyles(baseGrade, mod) : "bg-muted text-muted-foreground border-border";
+                      return (
+                        <button
+                          key={mod}
+                          type="button"
+                          disabled={isDisabled}
+                          onClick={() => handleModifierSelect(mod)}
+                          className={`flex-1 rounded-xl text-2xl font-bold transition-all border disabled:opacity-20 disabled:cursor-not-allowed ${
+                            isActive
+                              ? `${styles} shadow-sm scale-[1.03] z-10 border-current`
+                              : "bg-muted text-muted-foreground hover:bg-muted/80 border-border"
+                          }`}
+                        >
+                          {mod}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center justify-center w-24 h-24 rounded-xl border border-border bg-muted/30">
+              <span className="text-3xl font-bold tabular-nums text-foreground">
+                {wartosc || "-"}
+              </span>
+            </div>
+          </div>
+
           <Controller
             name="wartosc"
             control={control}
@@ -203,7 +395,7 @@ export default function AddPeriodGradeModal({
               <input
                 {...field}
                 type="text"
-                placeholder="np. 4.5 lub 5"
+                placeholder="np. 4.50 lub wpisz wartość"
                 className="input-base"
               />
             )}

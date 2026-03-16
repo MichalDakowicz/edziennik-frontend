@@ -23,6 +23,13 @@ import type {
 } from "../types/api";
 import { getAuthToken, logout, refreshAccessToken } from "./auth";
 
+type AttendanceWritePayload = {
+  Data: string;
+  uczen: number;
+  godzina_lekcyjna: number;
+  status: number | null;
+};
+
 const makeHeaders = (token: string | null, extra?: HeadersInit): HeadersInit => ({
   "Content-Type": "application/json",
   ...(token
@@ -98,6 +105,10 @@ export const getAttendance = (studentId: number, dateFrom?: string, dateTo?: str
   return fetchWithAuth<Attendance[]>(`/frekwencja/?${params.toString()}`);
 };
 export const getAttendanceStatuses = () => fetchWithAuth<AttendanceStatus[]>("/statusy/");
+export const createAttendance = (data: AttendanceWritePayload) =>
+  fetchWithAuth<Attendance>("/frekwencja/", { method: "POST", body: JSON.stringify(data) });
+export const updateAttendance = (id: number, data: Partial<AttendanceWritePayload>) =>
+  fetchWithAuth<Attendance>(`/frekwencja/${id}/`, { method: "PATCH", body: JSON.stringify(data) });
 
 export const getTimetablePlan = (classId: number) =>
   fetchWithAuth<TimetablePlan[]>(`/plany-zajec/?klasa_id=${classId}`);

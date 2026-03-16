@@ -110,7 +110,17 @@ export default function TeacherGradesPage() {
   const filteredStudents = useMemo(() => {
     if (!students) return [];
     if (!selectedClassId) return [];
-    return students.filter((s: any) => s.klasa === selectedClassId);
+    return students
+      .filter((s: any) => s.klasa === selectedClassId)
+      .sort((left: any, right: any) => {
+        const lastNameComparison = (left.user?.last_name ?? "").localeCompare(right.user?.last_name ?? "", "pl", {
+          sensitivity: "base",
+        });
+        if (lastNameComparison !== 0) return lastNameComparison;
+        return (left.user?.first_name ?? "").localeCompare(right.user?.first_name ?? "", "pl", {
+          sensitivity: "base",
+        });
+      });
   }, [students, selectedClassId]);
 
   // Close grade picker when clicking outside

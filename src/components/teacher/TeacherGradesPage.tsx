@@ -9,7 +9,7 @@ import { Spinner } from "../ui/Spinner";
 import { EmptyState } from "../ui/EmptyState";
 import { ErrorState } from "../ui/ErrorState";
 import { keys } from "../../services/queryKeys";
-import { createGrade, getClasses, getGrades, getStudents, getSubjects } from "../../services/api";
+import { createBehaviorPoint, createGrade, getBehaviorPoints, getClasses, getGrades, getStudents, getSubjects } from "../../services/api";
 import { formatGradeValue, getGradeColor } from "../../utils/gradeUtils";
 import { formatDateTime } from "../../utils/dateUtils";
 import { getCurrentUser } from "../../services/auth";
@@ -55,13 +55,29 @@ function RecentGradesCell({ studentId, selectedSubjectId }: { studentId: number;
   );
 }
 
+function BehaviorTotalCell({ studentId }: { studentId: number }) {
+  const { data: behavior, isLoading } = useQuery({
+    queryKey: keys.behavior(studentId),
+    queryFn: () => getBehaviorPoints(studentId),
+  });
+
+  if (isLoading) return <span className="text-xs text-muted-foreground">Ładowanie...</span>;
+
+  const total = (behavior ?? []).reduce((sum, item) => sum + item.punkty, 0);
+  return (
+    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ${total >= 0 ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400" : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"}`}>
+      {total >= 0 ? `+${total}` : total}
+    </span>
+  );
+}
+
 export default function TeacherGradesPage() {
   const [activeGradeStudentId, setActiveGradeStudentId] = useState<number | null>(null);
   const [isAddPeriodGradeModalOpen, setIsAddPeriodGradeModalOpen] = useState(false);
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
   const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
-  const [gradeMode, setGradeMode] = useState<'regular' | 'period'>('regular');
+  const [gradeMode, setGradeMode] = useState<'regular' | 'period' | 'behavior'>('regular');
   const [selectedWeight, setSelectedWeight] = useState<number>(1);
   const [gradeDescription, setGradeDescription] = useState<string>("");
   const [gradeDoSredniej, setGradeDoSredniej] = useState<boolean>(true);
@@ -70,6 +86,7 @@ export default function TeacherGradesPage() {
   const [gradeBase, setGradeBase] = useState<number | null>(null);
   const [gradeModifier, setGradeModifier] = useState<'+' | '-' | ''>('');
   const [pendingGrades, setPendingGrades] = useState<Record<number, { value: string; base: number; modifier: '+' | '-' | '' }>>({});
+  const [pendingBehaviorPoints, setPendingBehaviorPoints] = useState<Record<number, number>>({});
   const [gradeMenuAnchor, setGradeMenuAnchor] = useState<{ top: number; left: number } | null>(null);
   const [gradeMenuPosition, setGradeMenuPosition] = useState<{ top: number; left: number } | null>(null);
   const queryClient = useQueryClient();
@@ -88,8 +105,38 @@ export default function TeacherGradesPage() {
     },
   });
 
+  const createBehaviorPointMutation = useMutation({
+    mutationFn: (payload: { uczen: number; punkty: number; opis: string | null }) =>
+      createBehaviorPoint({
+        ...payload,
+        nauczyciel_wpisujacy: currentUser?.teacherId ?? null,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["behavior"] });
+    },
+  });
+
   const setPendingGrade = (studentId: number, grade: { value: string; base: number; modifier: '+' | '-' | '' }) => {
     setPendingGrades((prev) => ({ ...prev, [studentId]: grade }));
+  };
+
+  const setPendingBehaviorPoint = (studentId: number, points: number | null) => {
+    setPendingBehaviorPoints((prev) => {
+      const next = { ...prev };
+      if (points === null) {
+        delete next[studentId];
+        return next;
+      }
+      next[studentId] = points;
+      return next;
+    });
+  };
+
+  const switchMode = (mode: 'regular' | 'period' | 'behavior') => {
+    setGradeMode(mode);
+    setActiveGradeStudentId(null);
+    setPendingGrades({});
+    setPendingBehaviorPoints({});
   };
 
   const { data: students, isLoading: studentsLoading, error: studentsError } = useQuery({
@@ -122,6 +169,8 @@ export default function TeacherGradesPage() {
         });
       });
   }, [students, selectedClassId]);
+
+  const canShowStudents = Boolean(selectedClassId && (gradeMode === "behavior" || selectedSubjectId));
 
   // Close grade picker when clicking outside
   useEffect(() => {
@@ -219,7 +268,7 @@ export default function TeacherGradesPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs">
-            {selectedSubjectId && (
+            {selectedSubjectId && gradeMode !== "behavior" && (
               <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-secondary-foreground">
                 <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 Przedmiot:
@@ -237,9 +286,11 @@ export default function TeacherGradesPage() {
                 </span>
               </span>
             )}
-            <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-muted-foreground">
-              Waga: <span className="font-semibold text-foreground">{selectedWeight}</span>
-            </span>
+            {gradeMode !== "behavior" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-muted-foreground">
+                Waga: <span className="font-semibold text-foreground">{selectedWeight}</span>
+              </span>
+            )}
           </div>
         </div>
 
@@ -251,6 +302,7 @@ export default function TeacherGradesPage() {
                 value={selectedSubjectId ?? ""}
                 onChange={(e) => setSelectedSubjectId(e.target.value ? Number(e.target.value) : null)}
                 className="input-base"
+                disabled={gradeMode === "behavior"}
               >
                 <option value="">Wybierz przedmiot</option>
                 {subjects?.map((s) => (
@@ -328,6 +380,7 @@ export default function TeacherGradesPage() {
                   checked={gradePunkty}
                   onChange={(e) => setGradePunkty(e.target.checked)}
                   className="w-4 h-4 cursor-pointer"
+                  disabled={gradeMode === "behavior"}
                 />
               </label>
               <label className="flex items-center justify-between gap-2 text-xs">
@@ -337,6 +390,7 @@ export default function TeacherGradesPage() {
                   checked={gradeOpisowa}
                   onChange={(e) => setGradeOpisowa(e.target.checked)}
                   className="w-4 h-4 cursor-pointer"
+                  disabled={gradeMode === "behavior"}
                 />
               </label>
             </div>
@@ -348,31 +402,70 @@ export default function TeacherGradesPage() {
         <div className="flex justify-between items-center mb-4">
           <h2 className="section-title">Uczniowie</h2>
           <div className="space-x-2">
-            <Button onClick={() => setGradeMode('regular')} className={gradeMode === 'regular' ? 'btn-primary' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}>Dodaj ocenę</Button>
-            <Button onClick={() => setGradeMode('period')} className={gradeMode === 'period' ? 'btn-primary' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}>Ocena okresowa</Button>
+            <Button onClick={() => switchMode('regular')} className={gradeMode === 'regular' ? 'btn-primary' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}>Dodaj ocenę</Button>
+            <Button onClick={() => switchMode('period')} className={gradeMode === 'period' ? 'btn-primary' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}>Ocena okresowa</Button>
+            <Button onClick={() => switchMode('behavior')} className={gradeMode === 'behavior' ? 'btn-primary' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}>Zachowanie</Button>
           </div>
         </div>
 
-        {selectedSubjectId && selectedClassId && filteredStudents.length > 0 ? (
+        {canShowStudents && filteredStudents.length > 0 ? (
           <>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-zinc-700">
+                  <th className="text-left py-3 px-4 w-28">Nr w dzienniku</th>
                   <th className="text-left py-3 px-4">Imię i Nazwisko</th>
-                  <th className="text-left py-3 px-4">Ostatnie oceny</th>
-                  <th className="text-right py-3 px-4">Akcje</th>
+                  <th className="text-left py-3 px-4">{gradeMode === 'behavior' ? 'Suma punktów' : 'Ostatnie oceny'}</th>
+                  <th className="text-right py-3 px-4">{gradeMode === 'behavior' ? 'Punkty' : 'Akcje'}</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredStudents.map((student: any) => (
+                {filteredStudents.map((student: any, index: number) => (
                   <tr key={student.id} className="border-b border-zinc-800 hover:bg-zinc-900/50">
+                    <td className="py-3 px-4 font-medium text-muted-foreground">{index + 1}</td>
                     <td className="py-3 px-4">{student.user?.first_name} {student.user?.last_name}</td>
                     <td className="py-3 px-4">
-                      <RecentGradesCell studentId={student.id} selectedSubjectId={selectedSubjectId} />
+                      {gradeMode === 'behavior' ? (
+                        <BehaviorTotalCell studentId={student.id} />
+                      ) : (
+                        <RecentGradesCell studentId={student.id} selectedSubjectId={selectedSubjectId} />
+                      )}
                     </td>
                     <td className="text-right py-3 px-4 relative">
-                      {gradeMode === 'period' ? (
+                      {gradeMode === 'behavior' ? (
+                        <div className="inline-flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setPendingBehaviorPoint(student.id, (pendingBehaviorPoints[student.id] ?? 0) - 1)}
+                            className="h-9 w-9 rounded-md border border-border bg-card text-sm font-semibold hover:bg-muted"
+                          >
+                            -
+                          </button>
+                          <input
+                            type="number"
+                            value={pendingBehaviorPoints[student.id] ?? ""}
+                            onChange={(event) => {
+                              if (event.target.value === "") {
+                                setPendingBehaviorPoint(student.id, null);
+                                return;
+                              }
+                              const value = Number(event.target.value);
+                              if (Number.isNaN(value)) return;
+                              setPendingBehaviorPoint(student.id, Math.trunc(value));
+                            }}
+                            className="input-base h-9 w-24 text-center"
+                            placeholder="np. 5"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setPendingBehaviorPoint(student.id, (pendingBehaviorPoints[student.id] ?? 0) + 1)}
+                            className="h-9 w-9 rounded-md border border-border bg-card text-sm font-semibold hover:bg-muted"
+                          >
+                            +
+                          </button>
+                        </div>
+                      ) : gradeMode === 'period' ? (
                         <Button
                           onClick={() => {
                             setSelectedStudentId(student.id);
@@ -550,7 +643,7 @@ export default function TeacherGradesPage() {
             </table>
           </div>
 
-          {Object.keys(pendingGrades).length > 0 && (
+          {gradeMode !== 'behavior' && Object.keys(pendingGrades).length > 0 && (
             <div className="mt-4 flex justify-end">
               <Button
                 onClick={async () => {
@@ -579,9 +672,32 @@ export default function TeacherGradesPage() {
               </Button>
             </div>
           )}
+
+          {gradeMode === 'behavior' && Object.keys(pendingBehaviorPoints).length > 0 && (
+            <div className="mt-4 flex justify-end">
+              <Button
+                onClick={async () => {
+                  const entries = Object.entries(pendingBehaviorPoints).filter(([, points]) => points !== 0);
+                  await Promise.all(
+                    entries.map(([studentId, points]) =>
+                      createBehaviorPointMutation.mutateAsync({
+                        uczen: Number(studentId),
+                        punkty: points,
+                        opis: gradeDescription || null,
+                      }),
+                    ),
+                  );
+                  setPendingBehaviorPoints({});
+                }}
+                className="btn-primary"
+              >
+                Zapisz punkty zachowania
+              </Button>
+            </div>
+          )}
           </>
         ) : (
-          <EmptyState message="Brak uczniów" />
+          <EmptyState message={gradeMode === 'behavior' ? 'Wybierz klasę, aby wystawić punkty zachowania' : 'Wybierz przedmiot i klasę, aby wystawić oceny'} />
         )}
       </Card>
 

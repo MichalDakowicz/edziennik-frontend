@@ -132,6 +132,10 @@ export interface Student {
   klasa: number | null;
   telefon: string | null;
   data_urodzenia: string;
+  numer_w_dzienniku?: number | null;
+  nr_w_dzienniku?: number | null;
+  NumerWDzienniku?: number | null;
+  numerWDzienniku?: number | null;
 }
 
 export interface ClassInfo {

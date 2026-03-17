@@ -225,13 +225,17 @@ export default function TeacherAttendancePage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-zinc-700">
+                  <th className="text-left py-3 px-4 w-28">Nr w dzienniku</th>
                   <th className="text-left py-3 px-4">Imię i Nazwisko</th>
                   <th className="text-left py-3 px-4">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {classStudents.map((student) => (
+                {classStudents.map((student, index) => (
                   <tr key={student.id} className="border-b border-zinc-800 hover:bg-zinc-900/50">
+                    <td className="py-3 px-4 font-medium text-muted-foreground">
+                      {index + 1}
+                    </td>
                     <td className="py-3 px-4">
                       {student.user.first_name} {student.user.last_name}
                     </td>

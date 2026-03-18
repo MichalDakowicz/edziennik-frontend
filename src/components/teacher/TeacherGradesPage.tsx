@@ -333,16 +333,28 @@ export default function TeacherGradesPage() {
           <div className="space-y-3">
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-1.5">Waga (1-5)</label>
-              <div className="inline-flex rounded-lg bg-zinc-900/40 p-1 border border-zinc-800">
+              <div
+                className={`inline-flex rounded-lg p-1 border ${
+                  gradeMode === "behavior"
+                    ? "bg-muted/40 border-border/60 opacity-60"
+                    : "bg-zinc-900/40 border-zinc-800"
+                }`}
+              >
                 {[1, 2, 3, 4, 5].map((w) => (
                   <button
                     key={w}
                     type="button"
-                    onClick={() => setSelectedWeight(w)}
+                    onClick={() => {
+                      if (gradeMode === "behavior") return;
+                      setSelectedWeight(w);
+                    }}
+                    disabled={gradeMode === "behavior"}
                     className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                      selectedWeight === w
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "text-zinc-300 hover:bg-zinc-800"
+                      gradeMode === "behavior"
+                        ? "text-muted-foreground cursor-not-allowed bg-transparent hover:bg-transparent"
+                        : selectedWeight === w
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-zinc-300 hover:bg-zinc-800"
                     }`}
                   >
                     {w}

@@ -14,6 +14,7 @@ import { formatGradeValue, getGradeColor } from "../../utils/gradeUtils";
 import { formatDateTime } from "../../utils/dateUtils";
 import { getCurrentUser } from "../../services/auth";
 import AddPeriodGradeModal from "./AddPeriodGradeModal";
+import { formatClassDisplay } from "../../utils/classUtils";
 
 function RecentGradesCell({ studentId, selectedSubjectId }: { studentId: number; selectedSubjectId: number | null }) {
   const { data: grades, isLoading } = useQuery({
@@ -233,7 +234,7 @@ export default function TeacherGradesPage() {
                 <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 Klasa:
                 <span className="font-semibold">
-                  {classes?.find((c) => c.id === selectedClassId)?.nazwa ?? `Klasa ${selectedClassId}`}
+                  {formatClassDisplay(classes?.find((c) => c.id === selectedClassId) ?? { id: selectedClassId })}
                 </span>
               </span>
             )}
@@ -270,7 +271,7 @@ export default function TeacherGradesPage() {
                 <option value="">Wybierz klasę</option>
                 {classes?.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.nazwa ?? `Klasa ${c.id}`}
+                    {formatClassDisplay(c)}
                   </option>
                 ))}
               </select>

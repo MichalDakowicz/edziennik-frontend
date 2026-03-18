@@ -6,6 +6,7 @@ import { keys } from "../../services/queryKeys";
 import { ErrorState } from "../ui/ErrorState";
 import { Spinner } from "../ui/Spinner";
 import TimetableGrid from "./TimetableGrid";
+import { formatClassDisplay } from "../../utils/classUtils";
 
 export default function TimetablePage() {
   const user = getCurrentUser();
@@ -59,7 +60,7 @@ export default function TimetablePage() {
 
   if (!data) return <Spinner />;
 
-  const classDisplay = data.klasa.numer && data.klasa.nazwa ? `${data.klasa.numer} ${data.klasa.nazwa}` : data.klasa.nazwa ?? `#${data.klasa.id}`;
+  const classDisplay = formatClassDisplay(data.klasa);
 
   return (
     <div className="space-y-4">

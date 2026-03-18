@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Modal } from "../ui/Modal";
 import { Spinner } from "../ui/Spinner";
 import { createHomework } from "../../services/api";
+import { formatClassDisplay } from "../../utils/classUtils";
 
 const homeworkSchema = z.object({
   klasa: z.number().min(1, "Klasa jest wymagana"),
@@ -86,7 +87,7 @@ export default function AddHomeworkModal({
                 <option value="">Wybierz klasę</option>
                 {classes.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.nazwa || `Klasa ${c.numer}`}
+                    {formatClassDisplay(c)}
                   </option>
                 ))}
               </select>

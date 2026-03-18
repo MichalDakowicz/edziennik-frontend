@@ -18,6 +18,7 @@ import {
   updateAttendance,
 } from "../../services/api";
 import type { AttendanceStatus, Attendance } from "../../types/api";
+import { formatClassDisplay } from "../../utils/classUtils";
 
 const normalizeDate = (value: string) => value.split("T")[0];
 
@@ -252,7 +253,7 @@ export default function TeacherAttendancePage() {
               <option value="">Wybierz klasę</option>
               {classes?.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.nazwa || `Klasa ${c.numer}`}
+                  {formatClassDisplay(c)}
                 </option>
               ))}
             </select>

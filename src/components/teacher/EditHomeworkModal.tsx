@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -53,7 +54,19 @@ export default function EditHomeworkModal({ open, onClose, homework }: EditHomew
     },
   });
 
+  useEffect(() => {
+    if (!open || !homework) return;
+    reset({
+      opis: homework.opis,
+      termin: homework.termin,
+    });
+  }, [open, homework, reset]);
+
   const onSubmit = (data: HomeworkFormData) => {
+    if (!homework) {
+      toast.error("Brak pracy domowej do edycji");
+      return;
+    }
     mutation.mutate(data);
   };
 

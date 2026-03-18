@@ -32,8 +32,13 @@ export default function TeacherHomeworkPage() {
   });
 
   const { data: homework, isLoading: homeworkLoading, error: homeworkError } = useQuery({
-    queryKey: selectedClassId ? [keys.homework?.(selectedClassId)] : ["homework"],
-    queryFn: () => (selectedClassId ? getHomework(selectedClassId, selectedSubjectId ?? undefined) : Promise.resolve([])),
+    queryKey: selectedClassId
+      ? [...(keys.homework?.(selectedClassId) ?? ["homework", selectedClassId]), selectedSubjectId ?? "all"]
+      : ["homework", "none"],
+    queryFn: () =>
+      selectedClassId
+        ? getHomework(selectedClassId, selectedSubjectId ?? undefined)
+        : Promise.resolve([]),
     enabled: !!selectedClassId,
   });
 
@@ -141,6 +146,7 @@ export default function TeacherHomeworkPage() {
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         classId={selectedClassId ?? undefined}
+        subjectId={selectedSubjectId ?? undefined}
         classes={classes?.map(c => ({ id: c.id, nazwa: c.nazwa ?? undefined, numer: String(c.numer ?? "") })) ?? []}
         subjects={subjects?.map(s => ({ id: s.id, nazwa: s.nazwa ?? "" })) ?? []}
       />

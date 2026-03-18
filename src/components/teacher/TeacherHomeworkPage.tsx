@@ -11,6 +11,7 @@ import { getHomework, getClasses, getSubjects, deleteHomework } from "../../serv
 import AddHomeworkModal from "./AddHomeworkModal";
 import EditHomeworkModal from "./EditHomeworkModal";
 import { Homework } from "../../types/api";
+import { formatClassDisplay } from "../../utils/classUtils";
 
 export default function TeacherHomeworkPage() {
   const queryClient = useQueryClient();
@@ -31,8 +32,13 @@ export default function TeacherHomeworkPage() {
   });
 
   const { data: homework, isLoading: homeworkLoading, error: homeworkError } = useQuery({
-    queryKey: selectedClassId ? [keys.homework?.(selectedClassId)] : ["homework"],
-    queryFn: () => (selectedClassId ? getHomework(selectedClassId, selectedSubjectId ?? undefined) : Promise.resolve([])),
+    queryKey: selectedClassId
+      ? [...(keys.homework?.(selectedClassId) ?? ["homework", selectedClassId]), selectedSubjectId ?? "all"]
+      : ["homework", "none"],
+    queryFn: () =>
+      selectedClassId
+        ? getHomework(selectedClassId, selectedSubjectId ?? undefined)
+        : Promise.resolve([]),
     enabled: !!selectedClassId,
   });
 
@@ -66,7 +72,7 @@ export default function TeacherHomeworkPage() {
               <option value="">Wybierz klasę</option>
               {classes?.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.nazwa || `Klasa ${c.numer}`}
+                  {formatClassDisplay(c)}
                 </option>
               ))}
             </select>
@@ -140,6 +146,7 @@ export default function TeacherHomeworkPage() {
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         classId={selectedClassId ?? undefined}
+        subjectId={selectedSubjectId ?? undefined}
         classes={classes?.map(c => ({ id: c.id, nazwa: c.nazwa ?? undefined, numer: String(c.numer ?? "") })) ?? []}
         subjects={subjects?.map(s => ({ id: s.id, nazwa: s.nazwa ?? "" })) ?? []}
       />

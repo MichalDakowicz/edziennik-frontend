@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -6,6 +7,8 @@ import { toast } from "sonner";
 import { Modal } from "../ui/Modal";
 import { Spinner } from "../ui/Spinner";
 import { createHomework } from "../../services/api";
+import { formatClassDisplay } from "../../utils/classUtils";
+import { getCurrentUser } from "../../services/auth";
 
 const homeworkSchema = z.object({
   klasa: z.number().min(1, "Klasa jest wymagana"),
@@ -20,6 +23,7 @@ interface AddHomeworkModalProps {
   open: boolean;
   onClose: () => void;
   classId?: number;
+  subjectId?: number;
   classes: Array<{ id: number; nazwa?: string; numer?: string }>;
   subjects: Array<{ id: number; nazwa: string }>;
 }
@@ -28,9 +32,11 @@ export default function AddHomeworkModal({
   open,
   onClose,
   classId,
+  subjectId,
   classes,
   subjects,
 }: AddHomeworkModalProps) {
+  const currentUser = getCurrentUser();
   const queryClient = useQueryClient();
   const {
     control,
@@ -41,11 +47,21 @@ export default function AddHomeworkModal({
     resolver: zodResolver(homeworkSchema),
     defaultValues: {
       klasa: classId ?? 0,
-      przedmiot: 0,
+      przedmiot: subjectId ?? 0,
       opis: "",
       termin: "",
     },
   });
+
+  useEffect(() => {
+    if (!open) return;
+    reset({
+      klasa: classId ?? 0,
+      przedmiot: subjectId ?? 0,
+      opis: "",
+      termin: "",
+    });
+  }, [open, classId, subjectId, reset]);
 
   const mutation = useMutation({
     mutationFn: createHomework,
@@ -61,14 +77,19 @@ export default function AddHomeworkModal({
   });
 
   const onSubmit = (data: HomeworkFormData) => {
+    if (!currentUser?.teacherId) {
+      toast.error("Brak przypisanego nauczyciela");
+      return;
+    }
+
     mutation.mutate({
       klasa: data.klasa,
       przedmiot: data.przedmiot,
       opis: data.opis,
       termin: data.termin,
-      nauczyciel: 0,
-      data_wystawienia: new Date().toISOString().split('T')[0],
-    } as any);
+      nauczyciel: currentUser.teacherId,
+      data_wystawienia: new Date().toISOString().split("T")[0],
+    });
   };
 
   return (
@@ -82,11 +103,17 @@ export default function AddHomeworkModal({
             name="klasa"
             control={control}
             render={({ field }) => (
-              <select {...field} value={field.value ?? ""} className="input-base w-full">
+              <select
+                value={field.value || ""}
+                onChange={(event) =>
+                  field.onChange(event.target.value ? Number(event.target.value) : 0)
+                }
+                className="input-base w-full"
+              >
                 <option value="">Wybierz klasę</option>
                 {classes.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.nazwa || `Klasa ${c.numer}`}
+                    {formatClassDisplay(c)}
                   </option>
                 ))}
               </select>
@@ -103,7 +130,13 @@ export default function AddHomeworkModal({
             name="przedmiot"
             control={control}
             render={({ field }) => (
-              <select {...field} value={field.value ?? ""} className="input-base w-full">
+              <select
+                value={field.value || ""}
+                onChange={(event) =>
+                  field.onChange(event.target.value ? Number(event.target.value) : 0)
+                }
+                className="input-base w-full"
+              >
                 <option value="">Wybierz przedmiot</option>
                 {subjects.map((s) => (
                   <option key={s.id} value={s.id}>

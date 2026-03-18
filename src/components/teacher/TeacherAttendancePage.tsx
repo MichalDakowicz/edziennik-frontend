@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Check, X, Clock, AlertCircle } from "lucide-react";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Spinner } from "../ui/Spinner";
@@ -16,9 +17,37 @@ import {
   getStudents,
   updateAttendance,
 } from "../../services/api";
-import type { Attendance } from "../../types/api";
+import type { AttendanceStatus, Attendance, LessonHour } from "../../types/api";
+import { formatClassDisplay } from "../../utils/classUtils";
 
 const normalizeDate = (value: string) => value.split("T")[0];
+
+const parseTimeToMinutes = (value: string) => {
+  const [hours, minutes] = value.split(":").map((part) => Number(part));
+  return hours * 60 + minutes;
+};
+
+const getAutoSelectedHourId = (lessonHours: LessonHour[]) => {
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const normalized = lessonHours
+    .map((hour) => ({
+      id: hour.id,
+      start: parseTimeToMinutes(hour.CzasOd),
+      end: parseTimeToMinutes(hour.CzasDo),
+    }))
+    .filter((hour) => Number.isFinite(hour.start) && Number.isFinite(hour.end))
+    .sort((left, right) => left.start - right.start);
+
+  const current = normalized.find((hour) => nowMinutes >= hour.start && nowMinutes <= hour.end);
+  if (current) return current.id;
+
+  const upcoming = normalized.find((hour) => nowMinutes < hour.start);
+  if (upcoming) return upcoming.id;
+
+  return normalized.length ? normalized[normalized.length - 1].id : null;
+};
 
 const getStatusId = (status: Attendance["status"]) => {
   if (status == null) return null;
@@ -26,11 +55,52 @@ const getStatusId = (status: Attendance["status"]) => {
   return Number(status);
 };
 
+const getStatusConfig = (status: AttendanceStatus) => {
+  const value = status.Wartosc.toLowerCase();
+  
+  // Match the logic from AttendancePage.tsx getStatusVariant
+  if (value.includes("nieobecn")) {
+    return {
+      bgActive: "bg-destructive hover:bg-destructive/90",
+      bgInactive: "bg-destructive/15 text-destructive hover:bg-destructive/25",
+      icon: X,
+    };
+  }
+  if (value.includes("usprawiedliw")) {
+    return {
+      bgActive: "bg-emerald-500 hover:bg-emerald-600",
+      bgInactive: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-500 hover:bg-emerald-500/25",
+      icon: Check,
+    };
+  }
+  if (value.includes("spóźn") || value.includes("spozn")) {
+    return {
+      bgActive: "bg-amber-500 hover:bg-amber-600",
+      bgInactive: "bg-amber-500/15 text-amber-600 dark:text-amber-500 hover:bg-amber-500/25",
+      icon: Clock,
+    };
+  }
+  if (value.includes("zwoln")) {
+    return {
+      bgActive: "bg-primary hover:bg-primary/90",
+      bgInactive: "bg-primary/15 text-primary dark:text-primary/80 hover:bg-primary/25",
+      icon: AlertCircle,
+    };
+  }
+  // Obecny/Present
+  return {
+    bgActive: "bg-emerald-500 hover:bg-emerald-600",
+    bgInactive: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-500 hover:bg-emerald-500/25",
+    icon: Check,
+  };
+};
+
 export default function TeacherAttendancePage() {
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
   const [selectedHourId, setSelectedHourId] = useState<number | null>(null);
+  const [hourManuallyChanged, setHourManuallyChanged] = useState(false);
   const [statusByStudent, setStatusByStudent] = useState<Record<number, number | null>>({});
 
   const { data: classes, isLoading: classesLoading, error: classesError } = useQuery({
@@ -47,6 +117,23 @@ export default function TeacherAttendancePage() {
     queryKey: ["lesson-hours"],
     queryFn: getLessonHours,
   });
+
+  useEffect(() => {
+    setHourManuallyChanged(false);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (!hours?.length) return;
+    if (hourManuallyChanged) return;
+
+    const today = new Date().toISOString().split("T")[0];
+    if (selectedDate !== today) return;
+
+    const autoHourId = getAutoSelectedHourId(hours);
+    if (autoHourId != null) {
+      setSelectedHourId(autoHourId);
+    }
+  }, [hours, hourManuallyChanged, selectedDate]);
 
   const { data: students, isLoading: studentsLoading, error: studentsError } = useQuery({
     queryKey: keys.students?.() ?? ["students"],
@@ -102,12 +189,14 @@ export default function TeacherAttendancePage() {
       (existingAttendanceQuery.data ?? []).map((entry) => [entry.uczen, getStatusId(entry.status)]),
     );
 
+    const defaultStatusId = statuses?.[0]?.id ?? null;
+
     classStudents.forEach((student) => {
-      nextStatusByStudent[student.id] = existingByStudent.get(student.id) ?? null;
+      nextStatusByStudent[student.id] = existingByStudent.get(student.id) ?? defaultStatusId;
     });
 
     setStatusByStudent(nextStatusByStudent);
-  }, [classStudents, existingAttendanceQuery.data, selectedClassId, selectedDate, selectedHourId]);
+  }, [classStudents, existingAttendanceQuery.data, selectedClassId, selectedDate, selectedHourId, statuses]);
 
   const saveAttendanceMutation = useMutation({
     mutationFn: async () => {
@@ -120,7 +209,7 @@ export default function TeacherAttendancePage() {
       );
 
       const operations = classStudents.map(async (student) => {
-        const statusId = statusByStudent[student.id] ?? null;
+        const statusId = statusByStudent[student.id];
         if (statusId == null) return null;
 
         const existing = existingByStudent.get(student.id);
@@ -150,10 +239,10 @@ export default function TeacherAttendancePage() {
     },
   });
 
-  const handleStatusChange = (studentId: number, value: string) => {
+  const handleStatusChange = (studentId: number, statusId: number) => {
     setStatusByStudent((prev) => ({
       ...prev,
-      [studentId]: value ? Number(value) : null,
+      [studentId]: statusId,
     }));
   };
 
@@ -188,7 +277,10 @@ export default function TeacherAttendancePage() {
             <label className="block text-sm font-medium text-zinc-300 mb-2">Godzina lekcji</label>
             <select
               value={selectedHourId ?? ""}
-              onChange={(e) => setSelectedHourId(e.target.value ? Number(e.target.value) : null)}
+              onChange={(e) => {
+                setHourManuallyChanged(true);
+                setSelectedHourId(e.target.value ? Number(e.target.value) : null);
+              }}
               className="input-base"
             >
               <option value="">Wybierz godzinę</option>
@@ -209,7 +301,7 @@ export default function TeacherAttendancePage() {
               <option value="">Wybierz klasę</option>
               {classes?.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.nazwa || `Klasa ${c.numer}`}
+                  {formatClassDisplay(c)}
                 </option>
               ))}
             </select>
@@ -240,18 +332,29 @@ export default function TeacherAttendancePage() {
                       {student.user.first_name} {student.user.last_name}
                     </td>
                     <td className="py-3 px-4">
-                      <select
-                        className="input-base text-xs min-w-48"
-                        value={statusByStudent[student.id] ?? ""}
-                        onChange={(event) => handleStatusChange(student.id, event.target.value)}
-                      >
-                        <option value="">Brak</option>
-                        {statuses?.map((status) => (
-                          <option key={status.id} value={status.id}>
-                            {status.Wartosc}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="flex gap-2 flex-wrap">
+                        {statuses?.map((status) => {
+                          const config = getStatusConfig(status);
+                          const IconComponent = config.icon;
+                          const isActive = statusByStudent[student.id] === status.id;
+                          
+                          return (
+                            <button
+                              key={status.id}
+                              onClick={() => handleStatusChange(student.id, status.id)}
+                              className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                                isActive
+                                  ? `${config.bgActive} text-white shadow-md`
+                                  : config.bgInactive
+                              }`}
+                              title={status.Wartosc}
+                            >
+                              <IconComponent size={14} />
+                              <span className="hidden sm:inline">{status.Wartosc}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </td>
                   </tr>
                 ))}

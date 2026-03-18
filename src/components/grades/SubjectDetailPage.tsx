@@ -10,6 +10,7 @@ import { EmptyState } from "../ui/EmptyState";
 import GradeModal from "./GradeModal";
 import type { Grade } from "../../types/api";
 import { computeWeightedAverage, formatGradeValue, getGradeColor, getSuggestedGrade } from "../../utils/gradeUtils";
+import { formatDate } from "../../utils/dateUtils";
 
 export default function SubjectDetailPage() {
   const { subjectId } = useParams<{ subjectId: string }>();
@@ -94,7 +95,7 @@ export default function SubjectDetailPage() {
                   {formatGradeValue(grade.wartosc)}
                 </span>
                 <span className="text-xs text-muted-foreground tabular-nums mt-1">
-                  {new Date(grade.data_wystawienia).toLocaleDateString("pl-PL")}
+                  {formatDate(grade.data_wystawienia)}
                 </span>
               </div>
               <p className="mt-2 text-sm font-medium text-foreground line-clamp-2">

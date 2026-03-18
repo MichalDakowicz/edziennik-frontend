@@ -367,11 +367,7 @@ export default function DashboardHome() {
                             {user.firstName}
                         </span>
                         <span className="text-xs text-muted-foreground mt-1">
-                            {new Date().toLocaleDateString("pl-PL", {
-                                weekday: "long",
-                                day: "numeric",
-                                month: "long",
-                            })}
+                            {formatDate(new Date().toISOString())}
                         </span>
                     </div>
                 </div>

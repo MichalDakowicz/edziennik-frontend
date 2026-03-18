@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import type { Attendance, LessonHour } from "../../types/api";
 import { Badge } from "../ui/Badge";
+import { formatDate } from "../../utils/dateUtils";
 
 export default function AttendanceAbsencesView({
   records,
@@ -65,12 +66,7 @@ export default function AttendanceAbsencesView({
   const groupedByDate = useMemo(() => {
     const map = new Map<string, Attendance[]>();
     absencesOnly.forEach((record) => {
-      const date = new Date(record.Data).toLocaleDateString("pl-PL", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
+      const date = formatDate(record.Data);
       const existing = map.get(date) ?? [];
       map.set(date, [...existing, record]);
     });

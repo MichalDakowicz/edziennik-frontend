@@ -17,10 +17,37 @@ import {
   getStudents,
   updateAttendance,
 } from "../../services/api";
-import type { AttendanceStatus, Attendance } from "../../types/api";
+import type { AttendanceStatus, Attendance, LessonHour } from "../../types/api";
 import { formatClassDisplay } from "../../utils/classUtils";
 
 const normalizeDate = (value: string) => value.split("T")[0];
+
+const parseTimeToMinutes = (value: string) => {
+  const [hours, minutes] = value.split(":").map((part) => Number(part));
+  return hours * 60 + minutes;
+};
+
+const getAutoSelectedHourId = (lessonHours: LessonHour[]) => {
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const normalized = lessonHours
+    .map((hour) => ({
+      id: hour.id,
+      start: parseTimeToMinutes(hour.CzasOd),
+      end: parseTimeToMinutes(hour.CzasDo),
+    }))
+    .filter((hour) => Number.isFinite(hour.start) && Number.isFinite(hour.end))
+    .sort((left, right) => left.start - right.start);
+
+  const current = normalized.find((hour) => nowMinutes >= hour.start && nowMinutes <= hour.end);
+  if (current) return current.id;
+
+  const upcoming = normalized.find((hour) => nowMinutes < hour.start);
+  if (upcoming) return upcoming.id;
+
+  return normalized.length ? normalized[normalized.length - 1].id : null;
+};
 
 const getStatusId = (status: Attendance["status"]) => {
   if (status == null) return null;
@@ -73,6 +100,7 @@ export default function TeacherAttendancePage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
   const [selectedHourId, setSelectedHourId] = useState<number | null>(null);
+  const [hourManuallyChanged, setHourManuallyChanged] = useState(false);
   const [statusByStudent, setStatusByStudent] = useState<Record<number, number | null>>({});
 
   const { data: classes, isLoading: classesLoading, error: classesError } = useQuery({
@@ -89,6 +117,23 @@ export default function TeacherAttendancePage() {
     queryKey: ["lesson-hours"],
     queryFn: getLessonHours,
   });
+
+  useEffect(() => {
+    setHourManuallyChanged(false);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (!hours?.length) return;
+    if (hourManuallyChanged) return;
+
+    const today = new Date().toISOString().split("T")[0];
+    if (selectedDate !== today) return;
+
+    const autoHourId = getAutoSelectedHourId(hours);
+    if (autoHourId != null) {
+      setSelectedHourId(autoHourId);
+    }
+  }, [hours, hourManuallyChanged, selectedDate]);
 
   const { data: students, isLoading: studentsLoading, error: studentsError } = useQuery({
     queryKey: keys.students?.() ?? ["students"],
@@ -232,7 +277,10 @@ export default function TeacherAttendancePage() {
             <label className="block text-sm font-medium text-zinc-300 mb-2">Godzina lekcji</label>
             <select
               value={selectedHourId ?? ""}
-              onChange={(e) => setSelectedHourId(e.target.value ? Number(e.target.value) : null)}
+              onChange={(e) => {
+                setHourManuallyChanged(true);
+                setSelectedHourId(e.target.value ? Number(e.target.value) : null);
+              }}
               className="input-base"
             >
               <option value="">Wybierz godzinę</option>

@@ -1,5 +1,6 @@
 import type { Grade } from "../../types/api";
 import { computeWeightedAverage, formatGradeValue, getGradeColor, getSuggestedGrade } from "../../utils/gradeUtils";
+import { formatDate } from "../../utils/dateUtils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/Table";
 
 interface GradeCardProps {
@@ -50,14 +51,14 @@ export default function GradeCard({ subjectName, grades, onSelect }: GradeCardPr
                 <TableCell className="p-3">
                   <span className="block text-sm font-medium text-foreground">{grade.opis || "Ocena cząstkowa"}</span>
                   <span className="md:hidden text-xs text-muted-foreground mt-1 block">
-                    {new Date(grade.data_wystawienia).toLocaleDateString("pl-PL")} · Waga: {grade.waga}
+                    {formatDate(grade.data_wystawienia)} · Waga: {grade.waga}
                   </span>
                 </TableCell>
                 <TableCell className="text-right tabular-nums text-muted-foreground hidden md:table-cell p-3 font-medium">
                   {grade.waga}
                 </TableCell>
                 <TableCell className="text-right tabular-nums text-muted-foreground hidden md:table-cell p-3">
-                  {new Date(grade.data_wystawienia).toLocaleDateString("pl-PL")}
+                  {formatDate(grade.data_wystawienia)}
                 </TableCell>
               </TableRow>
             ))}

@@ -1,6 +1,7 @@
 import type { Attendance, LessonHour } from "../../types/api";
 import { Badge } from "../ui/Badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/Table";
+import { formatDate } from "../../utils/dateUtils";
 
 export default function AttendanceTable({
   records,
@@ -56,7 +57,7 @@ export default function AttendanceTable({
               return (
                 <TableRow key={record.id} className="hover:bg-muted/50 border-b border-border last:border-0">
                   <TableCell className="tabular-nums font-medium">
-                    {new Date(record.Data).toLocaleDateString("pl-PL")}
+                    {formatDate(record.Data)}
                   </TableCell>
                   <TableCell className="tabular-nums">
                     {hour?.Numer ?? record.godzina_lekcyjna}

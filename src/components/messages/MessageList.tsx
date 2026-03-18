@@ -1,5 +1,5 @@
 import type { Message } from "../../types/api";
-import { formatRelative } from "../../utils/dateUtils";
+import { formatDate } from "../../utils/dateUtils";
 
 export default function MessageList({
   messages,
@@ -27,7 +27,7 @@ export default function MessageList({
                 <p className="text-sm text-muted-foreground">{message.tresc.slice(0, 120)}</p>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">{formatRelative(message.data_wyslania)}</p>
+            <p className="text-xs text-muted-foreground">{formatDate(message.data_wyslania)}</p>
           </div>
         </button>
       ))}

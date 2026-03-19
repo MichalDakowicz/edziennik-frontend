@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     Link,
     NavLink,
@@ -19,13 +19,16 @@ import {
     User,
     ClipboardList,
     CheckSquare,
+    PanelLeftClose,
+    PanelLeftOpen,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "../services/auth";
-import { getInboxMessages, getLuckyNumber } from "../services/api";
+import { getInboxMessages, getLuckyNumber, getStudents } from "../services/api";
 import { keys } from "../services/queryKeys";
 import { Badge } from "./ui/Badge";
 import { cn } from "../utils/cn";
+import { getClassJournalNumberMap } from "../utils/classUtils";
 
 type NavItem = {
     label: string;
@@ -82,14 +85,6 @@ const navItems: NavItem[] = [
         teacher: true,
     },
     {
-        label: "Profil",
-        to: "/dashboard/profile",
-        icon: User,
-        student: true,
-        parent: true,
-        teacher: true,
-    },
-    {
         label: "Wystawianie ocen",
         to: "/dashboard/teacher/grades",
         icon: GraduationCap,
@@ -107,6 +102,14 @@ const navItems: NavItem[] = [
         icon: ClipboardList,
         teacher: true,
     },
+    {
+        label: "Profil",
+        to: "/dashboard/profile",
+        icon: User,
+        student: true,
+        parent: true,
+        teacher: true,
+    },
 ];
 
 const isRoleAllowed = (role: string, item: NavItem): boolean => {
@@ -121,6 +124,16 @@ export default function Layout() {
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+    useEffect(() => {
+        const stored = localStorage.getItem("layout:sidebar-collapsed");
+        setSidebarCollapsed(stored === "1");
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem("layout:sidebar-collapsed", sidebarCollapsed ? "1" : "0");
+    }, [sidebarCollapsed]);
 
     const { data: inbox } = useQuery({
         queryKey: user ? keys.inbox(user.id) : ["inbox", "guest"],
@@ -136,6 +149,24 @@ export default function Layout() {
                 : Promise.resolve(null),
         enabled: Boolean(user?.role === "uczen" && user?.classId),
     });
+
+    const { data: studentsList } = useQuery({
+        queryKey: user?.role === "uczen" ? ["students", "for-current-user", user?.id] : ["students", "na"],
+        queryFn: getStudents,
+        enabled: Boolean(user?.role === "uczen"),
+    });
+
+    const currentStudent = studentsList?.find((student) =>
+        user?.studentId ? student.id === user.studentId : student.user?.id === user?.id,
+    );
+    const currentClassId = currentStudent?.klasa ?? user?.classId ?? null;
+    const classJournalNumbers = getClassJournalNumberMap(studentsList ?? [], currentClassId);
+    const studentJournalNumber = currentStudent ? classJournalNumbers.get(currentStudent.id) ?? null : null;
+    const displayName = user
+        ? user.role === "uczen" && studentJournalNumber !== null
+            ? `${user.firstName} ${user.lastName} (${studentJournalNumber})`
+            : `${user.firstName} ${user.lastName}`
+        : "";
 
     const unreadCount = useMemo(
         () => inbox?.filter((m) => !m.przeczytana).length ?? 0,
@@ -180,13 +211,16 @@ export default function Layout() {
             <div
                 className={`fixed inset-y-0 left-0 z-40 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
             >
-                <aside className="h-full w-72 bg-card border-r border-border flex flex-col">
-                    <div className="p-6 border-b border-border/50">
-                        <div className="flex items-center justify-between">
-                            <h1 className="text-2xl font-bold text-foreground">
-                                Modéa
-                            </h1>
-                            {lucky?.lucky_number && (
+                <aside className={cn(
+                    "h-full w-72 md:w-72 bg-card border-r border-border flex flex-col transition-[width] duration-300",
+                    sidebarCollapsed && "md:w-20"
+                )}>
+                    <div className={cn("border-b border-border/50", sidebarCollapsed ? "p-3" : "p-6")}>
+                        <div className={cn("flex items-center", sidebarCollapsed ? "justify-center" : "justify-between")}>
+                            {!sidebarCollapsed && (
+                                <h1 className="text-2xl font-bold text-foreground">Modéa</h1>
+                            )}
+                            {!sidebarCollapsed && lucky?.lucky_number && (
                                 <div
                                     className="bg-primary/20 text-primary w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold border border-primary/30"
                                     title={`Szczęśliwy numerek to: ${lucky.lucky_number}`}
@@ -194,14 +228,29 @@ export default function Layout() {
                                     {lucky.lucky_number}
                                 </div>
                             )}
+                            <button
+                                className={cn(
+                                    "hidden md:inline-flex p-2 hover:bg-accent rounded-md",
+                                    sidebarCollapsed && "h-10 w-10 items-center justify-center"
+                                )}
+                                aria-label={sidebarCollapsed ? "Rozwiń sidebar" : "Zwiń sidebar"}
+                                title={sidebarCollapsed ? "Rozwiń sidebar" : "Zwiń sidebar"}
+                                onClick={() => setSidebarCollapsed((prev) => !prev)}
+                            >
+                                {sidebarCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+                            </button>
                         </div>
-                        <div className="mt-2 text-sm text-muted-foreground flex flex-col">
-                            <span className="font-medium text-foreground">{user.firstName} {user.lastName}</span>
-                            <span className="text-xs capitalize">{user.role}</span>
-                        </div>
+                        {!sidebarCollapsed && (
+                            <div className="mt-2 text-sm text-muted-foreground flex flex-col">
+                                <span className="font-medium text-foreground">{displayName}</span>
+                                <span className="text-xs capitalize">{user.role}</span>
+                            </div>
+                        )}
                     </div>
-                    <nav className="p-4 space-y-1.5 flex-1 overflow-y-auto">
-                        <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-3">Menu</div>
+                    <nav className={cn("space-y-1.5 flex-1 overflow-y-auto", sidebarCollapsed ? "p-2" : "p-4")}>
+                        {!sidebarCollapsed && (
+                            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-3">Menu</div>
+                        )}
                         {items.map((item) => {
                             const active =
                                 location.pathname === item.to ||
@@ -213,26 +262,32 @@ export default function Layout() {
                                     to={item.to}
                                     className={cn(
                                         "flex items-center justify-between px-3 py-2.5 rounded-md transition-all text-sm font-medium group relative overflow-hidden",
+                                        sidebarCollapsed && "md:justify-center md:px-0 md:h-12 md:w-12 md:mx-auto",
                                         active
                                             ? "bg-primary text-primary-foreground shadow-sm"
                                             : "text-muted-foreground hover:bg-muted hover:text-foreground",
                                     )}
                                     onClick={() => setMobileOpen(false)}
+                                    title={sidebarCollapsed ? item.label : undefined}
                                 >
-                                    <div className="flex items-center gap-3 relative z-10">
+                                    <div className={cn("flex items-center gap-3 relative z-10", sidebarCollapsed && "md:gap-0 md:w-full md:justify-center")}>
                                         <item.icon size={18} className={cn(active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground")} />
-                                        <span>{item.label}</span>
+                                        {!sidebarCollapsed && <span>{item.label}</span>}
                                     </div>
                                     {item.to === "/dashboard/messages" &&
                                     unreadCount > 0 ? (
-                                        <Badge
-                                            variant={
-                                                active ? "secondary" : "default"
-                                            }
-                                            className="ml-auto shrink-0 relative z-10 px-1.5 py-0.5"
-                                        >
-                                            {unreadCount}
-                                        </Badge>
+                                        sidebarCollapsed ? (
+                                            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary-foreground" />
+                                        ) : (
+                                            <Badge
+                                                variant={
+                                                    active ? "secondary" : "default"
+                                                }
+                                                className="ml-auto shrink-0 relative z-10 px-1.5 py-0.5"
+                                            >
+                                                {unreadCount}
+                                            </Badge>
+                                        )
                                     ) : null}
                                 </NavLink>
                             );
@@ -240,11 +295,15 @@ export default function Layout() {
                     </nav>
                     <div className="p-4 border-t border-border bg-muted/20">
                         <button
-                            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md border border-border bg-background hover:bg-muted/50 transition-colors text-sm font-medium text-foreground"
+                            className={cn(
+                                "w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md border border-border bg-background hover:bg-muted/50 transition-colors text-sm font-medium text-foreground",
+                                sidebarCollapsed && "md:px-2"
+                            )}
                             onClick={handleLogout}
+                            title={sidebarCollapsed ? "Wyloguj się" : undefined}
                         >
                             <LogOut size={16} className="text-muted-foreground" />
-                            Wyloguj się
+                            {!sidebarCollapsed && "Wyloguj się"}
                         </button>
                     </div>
                 </aside>

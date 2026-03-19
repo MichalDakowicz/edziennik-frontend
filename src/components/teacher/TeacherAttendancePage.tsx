@@ -18,7 +18,7 @@ import {
   updateAttendance,
 } from "../../services/api";
 import type { AttendanceStatus, Attendance, LessonHour } from "../../types/api";
-import { formatClassDisplay } from "../../utils/classUtils";
+import { formatClassDisplay, getClassJournalNumberMap, sortStudentsAlphabetically } from "../../utils/classUtils";
 
 const normalizeDate = (value: string) => value.split("T")[0];
 
@@ -142,18 +142,13 @@ export default function TeacherAttendancePage() {
 
   const classStudents = useMemo(() => {
     if (!students || !selectedClassId) return [];
-    return students
-      .filter((student) => student.klasa === selectedClassId)
-      .sort((left, right) => {
-        const lastNameComparison = left.user.last_name.localeCompare(right.user.last_name, "pl", {
-          sensitivity: "base",
-        });
-        if (lastNameComparison !== 0) return lastNameComparison;
-        return left.user.first_name.localeCompare(right.user.first_name, "pl", {
-          sensitivity: "base",
-        });
-      });
+    return sortStudentsAlphabetically(students.filter((student) => student.klasa === selectedClassId));
   }, [students, selectedClassId]);
+
+  const classJournalNumbers = useMemo(
+    () => getClassJournalNumberMap(students ?? [], selectedClassId),
+    [students, selectedClassId],
+  );
 
   const existingAttendanceQuery = useQuery({
     queryKey: [
@@ -323,10 +318,10 @@ export default function TeacherAttendancePage() {
                 </tr>
               </thead>
               <tbody>
-                {classStudents.map((student, index) => (
+                {classStudents.map((student) => (
                   <tr key={student.id} className="border-b border-zinc-800 hover:bg-zinc-900/50">
                     <td className="py-3 px-4 font-medium text-muted-foreground">
-                      {index + 1}
+                      {classJournalNumbers.get(student.id) ?? "-"}
                     </td>
                     <td className="py-3 px-4">
                       {student.user.first_name} {student.user.last_name}

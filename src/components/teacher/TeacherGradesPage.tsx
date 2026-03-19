@@ -14,7 +14,7 @@ import { formatGradeValue, getGradeColor } from "../../utils/gradeUtils";
 import { formatDateTime } from "../../utils/dateUtils";
 import { getCurrentUser } from "../../services/auth";
 import AddPeriodGradeModal from "./AddPeriodGradeModal";
-import { formatClassDisplay } from "../../utils/classUtils";
+import { formatClassDisplay, getClassJournalNumberMap, sortStudentsAlphabetically } from "../../utils/classUtils";
 
 function RecentGradesCell({ studentId, selectedSubjectId }: { studentId: number; selectedSubjectId: number | null }) {
   const { data: grades, isLoading } = useQuery({
@@ -158,18 +158,13 @@ export default function TeacherGradesPage() {
   const filteredStudents = useMemo(() => {
     if (!students) return [];
     if (!selectedClassId) return [];
-    return students
-      .filter((s: any) => s.klasa === selectedClassId)
-      .sort((left: any, right: any) => {
-        const lastNameComparison = (left.user?.last_name ?? "").localeCompare(right.user?.last_name ?? "", "pl", {
-          sensitivity: "base",
-        });
-        if (lastNameComparison !== 0) return lastNameComparison;
-        return (left.user?.first_name ?? "").localeCompare(right.user?.first_name ?? "", "pl", {
-          sensitivity: "base",
-        });
-      });
+    return sortStudentsAlphabetically(students.filter((s: any) => s.klasa === selectedClassId));
   }, [students, selectedClassId]);
+
+  const classJournalNumbers = useMemo(
+    () => getClassJournalNumberMap(students ?? [], selectedClassId),
+    [students, selectedClassId],
+  );
 
   const canShowStudents = Boolean(selectedClassId && (gradeMode === "behavior" || selectedSubjectId));
 
@@ -434,9 +429,9 @@ export default function TeacherGradesPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredStudents.map((student: any, index: number) => (
+                {filteredStudents.map((student: any) => (
                   <tr key={student.id} className="border-b border-zinc-800 hover:bg-zinc-900/50">
-                    <td className="py-3 px-4 font-medium text-muted-foreground">{index + 1}</td>
+                    <td className="py-3 px-4 font-medium text-muted-foreground">{classJournalNumbers.get(student.id) ?? "-"}</td>
                     <td className="py-3 px-4">{student.user?.first_name} {student.user?.last_name}</td>
                     <td className="py-3 px-4">
                       {gradeMode === 'behavior' ? (

@@ -45,7 +45,7 @@ export function ThreeDayView({ date, timetable, events, homework, onItemClick }:
         <div className="w-full">
         
           {/* Header */}
-          <div className="grid grid-cols-[48px_repeat(3,1fr)] gap-2 mb-2 sticky top-0 bg-background/95 backdrop-blur z-30 pb-2 border-b border-border/50">
+          <div className="grid grid-cols-[48px_repeat(3,minmax(0,1fr))] gap-2 mb-2 sticky top-0 bg-background/95 backdrop-blur z-30 pb-2 border-b border-border/50">
             <div />
             {days.map((day) => {
               const isToday = isSameDay(day, now);
@@ -57,7 +57,7 @@ export function ThreeDayView({ date, timetable, events, homework, onItemClick }:
                 <div
                   key={day.toISOString()}
                   className={cn(
-                    "p-2 rounded-lg flex flex-col",
+                    "p-2 rounded-lg flex flex-col min-w-0",
                     isToday
                       ? "bg-primary/20 border border-primary/30"
                       : "bg-card/50 border border-border/50",
@@ -69,7 +69,7 @@ export function ThreeDayView({ date, timetable, events, homework, onItemClick }:
                   <div className="text-sm font-medium text-center mb-1">{format(day, "d MMM", { locale: pl })}</div>
                   
                   {hasItems && (
-                    <div className="flex flex-col gap-1 mt-auto">
+                    <div className="flex flex-col gap-1 mt-auto min-w-0">
                       {dayEvents.map((item) => (
                         <ItemCard key={item.id} item={item} compact onClick={onItemClick} />
                       ))}
@@ -84,7 +84,7 @@ export function ThreeDayView({ date, timetable, events, homework, onItemClick }:
           </div>
           
           {/* Main Calendar Space */}
-          <div className="relative grid grid-cols-[48px_1fr] mt-2">
+          <div className="relative grid grid-cols-[48px_minmax(0,1fr)] mt-2">
              
              {/* Left Time Axis */}
              <div className="relative border-r border-border/40" style={{ height: `${totalMinutes}px` }}>
@@ -100,7 +100,7 @@ export function ThreeDayView({ date, timetable, events, homework, onItemClick }:
              </div>
 
              {/* Days columns */}
-             <div className="relative grid grid-cols-3 gap-2" style={{ height: `${totalMinutes}px` }}>
+             <div className="relative grid grid-cols-3 gap-2 min-w-0" style={{ height: `${totalMinutes}px` }}>
                 
                 {/* Background Grid Lines across all columns */}
                 <div className="absolute inset-0 pointer-events-none">
@@ -128,7 +128,7 @@ export function ThreeDayView({ date, timetable, events, homework, onItemClick }:
                    const dayEvents = getEventsForDate(day, events, timetable.subjects).filter(e => !e.isAllDay);
                    
                    return (
-                     <div key={day.toISOString()} className="relative h-full border-r border-border/10 last:border-0 ml-1 mr-1">
+                     <div key={day.toISOString()} className="relative h-full border-r border-border/10 last:border-0 ml-1 mr-1 min-w-0">
                         
                         {/* Day's Lessons */}
                         {lessons.map(lesson => {

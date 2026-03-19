@@ -26,13 +26,13 @@ export function ItemCard({ item, compact = false, onClick, fill = false }: { ite
       <div
         onClick={() => onClick?.(item)}
         className={cn(
-          "px-2 py-1 rounded border-l-2 text-[10px] md:text-xs flex items-start gap-1.5 truncate",
+          "px-2 py-1 rounded border-l-2 text-[10px] md:text-xs flex items-start gap-1.5 min-w-0 overflow-hidden",
           onClick && "cursor-pointer hover:opacity-80 transition-opacity",
           colorCls,
         )}
       >
         {icon}
-        <span className="truncate font-medium">
+        <span className="block flex-1 min-w-0 truncate font-medium">
           {item.kind === "lesson" ? `${item.startTime} ${item.subject}` : item.title}
         </span>
       </div>

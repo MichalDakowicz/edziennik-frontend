@@ -135,6 +135,36 @@ export default function Layout() {
         localStorage.setItem("layout:sidebar-collapsed", sidebarCollapsed ? "1" : "0");
     }, [sidebarCollapsed]);
 
+    useEffect(() => {
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.defaultPrevented) return;
+            if (!(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey) return;
+            if (event.key.toLowerCase() !== "b") return;
+
+            const target = event.target as HTMLElement | null;
+            const isEditable = Boolean(
+                target &&
+                    (target.tagName === "INPUT" ||
+                        target.tagName === "TEXTAREA" ||
+                        target.tagName === "SELECT" ||
+                        target.isContentEditable),
+            );
+            if (isEditable) return;
+
+            event.preventDefault();
+
+            if (window.matchMedia("(min-width: 768px)").matches) {
+                setSidebarCollapsed((prev) => !prev);
+                return;
+            }
+
+            setMobileOpen((prev) => !prev);
+        };
+
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, []);
+
     const { data: inbox } = useQuery({
         queryKey: user ? keys.inbox(user.id) : ["inbox", "guest"],
         queryFn: () => (user ? getInboxMessages(user.id) : Promise.resolve([])),
@@ -230,7 +260,7 @@ export default function Layout() {
                             )}
                             <button
                                 className={cn(
-                                    "hidden md:inline-flex p-2 hover:bg-accent rounded-md",
+                                    "hidden md:inline-flex p-2 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors",
                                     sidebarCollapsed && "h-10 w-10 items-center justify-center"
                                 )}
                                 aria-label={sidebarCollapsed ? "Rozwiń sidebar" : "Zwiń sidebar"}
@@ -293,16 +323,16 @@ export default function Layout() {
                             );
                         })}
                     </nav>
-                    <div className="p-4 border-t border-border bg-muted/20">
+                    <div className="p-4 pt-3 border-t border-border">
                         <button
                             className={cn(
-                                "w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md border border-border bg-background hover:bg-muted/50 transition-colors text-sm font-medium text-foreground",
-                                sidebarCollapsed && "md:px-2"
+                                "w-full flex items-center justify-start gap-2 px-3 py-2.5 rounded-md transition-all text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground",
+                                sidebarCollapsed && "md:justify-center md:px-0 md:h-12 md:w-12 md:mx-auto"
                             )}
                             onClick={handleLogout}
                             title={sidebarCollapsed ? "Wyloguj się" : undefined}
                         >
-                            <LogOut size={16} className="text-muted-foreground" />
+                            <LogOut size={16} />
                             {!sidebarCollapsed && "Wyloguj się"}
                         </button>
                     </div>

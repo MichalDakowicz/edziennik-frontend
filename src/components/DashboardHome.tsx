@@ -178,48 +178,184 @@ export default function DashboardHome() {
         const unread =
             data.inbox?.filter((message: any) => !message.przeczytana).length ??
             0;
+        const unreadInbox = [...(data.inbox ?? [])]
+            .filter((message: any) => !message.przeczytana)
+            .sort(
+                (a: any, b: any) =>
+                    Date.parse(b.data_wyslania) - Date.parse(a.data_wyslania),
+            );
         
         if (user.role === "nauczyciel" || user.role === "admin") {
             return (
-                <div>
-                    <h1 className="page-title mb-6">Pulpit</h1>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <Card className="md:col-span-3">
-                            <h2 className="section-title mb-4">Szybkie akcje</h2>
-                            <div className="space-y-3">
-                                <Link to="/dashboard/teacher/grades" className="block p-3 bg-blue-900/20 border border-blue-900/30 rounded-lg hover:bg-blue-900/30 transition-colors">
-                                    <h3 className="font-medium text-blue-400">Wystawianie ocen</h3>
-                                    <p className="text-sm text-blue-300">Dodaj i edytuj oceny uczniów</p>
-                                </Link>
-                                <Link to="/dashboard/teacher/attendance" className="block p-3 bg-green-900/20 border border-green-900/30 rounded-lg hover:bg-green-900/30 transition-colors">
-                                    <h3 className="font-medium text-green-400">Sprawdzanie obecności</h3>
-                                    <p className="text-sm text-green-300">Zaznacz obecność uczniów</p>
-                                </Link>
-                                <Link to="/dashboard/teacher/homework" className="block p-3 bg-purple-900/20 border border-purple-900/30 rounded-lg hover:bg-purple-900/30 transition-colors">
-                                    <h3 className="font-medium text-purple-400">Zadania domowe</h3>
-                                    <p className="text-sm text-purple-300">Zarządzaj pracami domowymi</p>
-                                </Link>
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="bg-card border border-border rounded-xl p-5 shadow-sm relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-primary/10" />
+                            <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2">
+                                Panel nauczyciela
                             </div>
-                        </Card>
+                            <div className="flex flex-col relative z-10">
+                                <span className="text-xl font-bold text-foreground truncate">
+                                    {user.firstName}
+                                </span>
+                                <span className="text-xs text-muted-foreground mt-1">
+                                    {formatDate(new Date().toISOString())}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2">
+                                Nieprzeczytane
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-3xl font-bold tabular-nums text-foreground">
+                                    {unread}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                    wiadomości
+                                </span>
+                            </div>
+                        </div>
+
+                        <Link
+                            to="/dashboard/messages"
+                            className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow block group cursor-pointer"
+                        >
+                            <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2 group-hover:text-primary transition-colors">
+                                Wiadomości
+                            </div>
+                            <div className="text-sm text-muted-foreground group-hover:text-primary transition-colors">
+                                Przejdź do skrzynki odbiorczej
+                            </div>
+                        </Link>
                     </div>
 
-                    <Card>
-                        <h2 className="section-title mb-4">Ostatnie wiadomości</h2>
-                        {unread > 0 ? (
-                            <div className="flex items-center gap-2">
-                                <span className="text-lg font-bold text-yellow-400">{unread}</span>
-                                <span className="text-zinc-300">nieprzeczytane wiadomości</span>
-                                <Link
-                                    className="ml-auto text-primary hover:text-primary/80"
-                                    to="/dashboard/messages"
-                                >
-                                    Przejdź do wiadomości →
-                                </Link>
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                        <div className="xl:col-span-2 space-y-6">
+                            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+                                <div className="flex items-center justify-between p-5 border-b border-border bg-muted/30">
+                                    <h3 className="section-title text-base font-bold">
+                                        Szybkie akcje
+                                    </h3>
+                                </div>
+
+                                <div className="divide-y divide-border/60">
+                                    <Link
+                                        to="/dashboard/teacher/grades"
+                                        className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group"
+                                    >
+                                        <div>
+                                            <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                                                Wystawianie ocen
+                                            </p>
+                                            <p className="text-xs text-muted-foreground mt-0.5">
+                                                Dodaj i edytuj oceny uczniów
+                                            </p>
+                                        </div>
+                                        <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
+                                            Otwórz
+                                        </span>
+                                    </Link>
+
+                                    <Link
+                                        to="/dashboard/teacher/attendance"
+                                        className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group"
+                                    >
+                                        <div>
+                                            <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                                                Sprawdzanie obecności
+                                            </p>
+                                            <p className="text-xs text-muted-foreground mt-0.5">
+                                                Zaznacz obecność uczniów
+                                            </p>
+                                        </div>
+                                        <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
+                                            Otwórz
+                                        </span>
+                                    </Link>
+
+                                    <Link
+                                        to="/dashboard/teacher/homework"
+                                        className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group"
+                                    >
+                                        <div>
+                                            <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                                                Zadania domowe
+                                            </p>
+                                            <p className="text-xs text-muted-foreground mt-0.5">
+                                                Twórz i aktualizuj zadania
+                                            </p>
+                                        </div>
+                                        <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
+                                            Otwórz
+                                        </span>
+                                    </Link>
+                                </div>
                             </div>
-                        ) : (
-                            <p className="text-zinc-400">Brak nowych wiadomości</p>
-                        )}
-                    </Card>
+
+                        </div>
+
+                        <div className="space-y-6 flex flex-col">
+                            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+                                <div className="flex items-center justify-between p-5 border-b border-border bg-muted/30">
+                                    <h3 className="section-title text-base font-bold">
+                                        Nieodczytane wiadomości
+                                    </h3>
+                                    <Link
+                                        to="/dashboard/messages"
+                                        className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide"
+                                    >
+                                        Wszystkie
+                                    </Link>
+                                </div>
+
+                                <div className="p-4 space-y-3 flex-1 overflow-y-auto">
+                                    {unreadInbox.length ? (
+                                        unreadInbox.map((message: any) => (
+                                            <div
+                                                key={message.id}
+                                                onClick={() => handleOpenMessage(message)}
+                                                className="block group cursor-pointer"
+                                            >
+                                                <div className="bg-background border border-border rounded-lg p-3 hover:border-primary/50 hover:shadow-sm transition-all relative overflow-hidden group-hover:bg-accent/5">
+                                                    <div
+                                                        className={`absolute top-0 left-0 w-1 h-full ${message.przeczytana ? "bg-border" : "bg-primary"}`}
+                                                    />
+                                                    <div className="pl-3">
+                                                        <div className="flex justify-between items-start mb-1">
+                                                            <p className="font-semibold text-sm text-foreground truncate pr-2 group-hover:text-primary transition-colors">
+                                                                {message.temat || "(bez tematu)"}
+                                                            </p>
+                                                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                                                {formatDate(message.data_wyslania)}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-muted-foreground line-clamp-2">
+                                                            {message.tresc}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
+                                            <p className="text-sm">
+                                                Brak nieodczytanych wiadomości
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <MessageDetail
+                        message={selectedMessage}
+                        open={Boolean(selectedMessage)}
+                        onClose={() => setSelectedMessage(null)}
+                        resolveUserName={resolveUserName}
+                    />
                 </div>
             );
         }
@@ -298,7 +434,7 @@ export default function DashboardHome() {
     );
 
     // Resolve user name using users query cache or teachers cache
-    const resolveUserName = (id: number) => {
+    function resolveUserName(id: number) {
         if (!id) return "Nieznany";
         if (id === user?.id) return "Ja";
 
@@ -311,7 +447,7 @@ export default function DashboardHome() {
             return `${teacher.user.first_name} ${teacher.user.last_name}`;
 
         return `Użytkownik #${id}`;
-    };
+    }
 
     const handleOpenMessage = (message: any) => {
         setSelectedMessage(message);

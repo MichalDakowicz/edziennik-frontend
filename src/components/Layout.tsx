@@ -307,7 +307,14 @@ export default function Layout() {
                                     {item.to === "/dashboard/messages" &&
                                     unreadCount > 0 ? (
                                         sidebarCollapsed ? (
-                                            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary-foreground" />
+                                            <span
+                                                className={cn(
+                                                    "absolute right-2 top-2 h-2 w-2 rounded-full ring-2",
+                                                    active
+                                                        ? "bg-primary-foreground ring-primary/60"
+                                                        : "bg-primary ring-card",
+                                                )}
+                                            />
                                         ) : (
                                             <Badge
                                                 variant={

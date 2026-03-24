@@ -2,17 +2,20 @@ import { useMemo } from "react";
 import { formatDate } from "../../utils/dateUtils";
 import { computeWeightedAverage } from "../../utils/gradeUtils";
 import type { Attendance, BehaviorPoint, Event, Grade, Homework, Message } from "../../types/api";
+import type { LiveItem } from "./student/types";
 
 type UseStudentDashboardModelArgs = {
     studentData: any;
     teachers: any[];
     onOpenMessage: (message: any) => void;
+    maxLiveItems?: number;
 };
 
 export function useStudentDashboardModel({
     studentData,
     teachers,
     onOpenMessage,
+    maxLiveItems = 10,
 }: UseStudentDashboardModelArgs) {
     const zajeciaMap = useMemo(
         () => new Map((studentData.zajecia || []).map((z: any) => [z.id, z])),
@@ -226,7 +229,7 @@ export function useStudentDashboardModel({
     };
 
     const liveItems = useMemo(() => {
-        const messageItems = latestInboxMessages.map((message: Message) => ({
+        const messageItems: LiveItem[] = latestInboxMessages.map((message: Message) => ({
             id: `msg-${message.id}`,
             kind: "message" as const,
             date: message.data_wyslania,
@@ -237,27 +240,29 @@ export function useStudentDashboardModel({
             to: "/dashboard/messages",
         }));
 
-        const gradeItems = recentGrades.map((grade: Grade) => ({
+        const gradeItems: LiveItem[] = recentGrades.map((grade: Grade) => ({
             id: `grade-${grade.id}`,
             kind: "grade" as const,
             date: grade.data_wystawienia,
             label: "Nowa ocena",
             title: `${getGradeSubjectName(grade.przedmiot)} • ${grade.wartosc}`,
             body: grade.opis || "Dodano nową ocenę cząstkową.",
+            onClick: undefined,
             to: "/dashboard/grades",
         }));
 
-        const homeworkItems = upcomingHomework.map((item: Homework) => ({
+        const homeworkItems: LiveItem[] = upcomingHomework.map((item: Homework) => ({
             id: `homework-${item.id}`,
             kind: "homework" as const,
             date: item.data_wystawienia || item.termin,
             label: "Praca domowa",
             title: getGradeSubjectName(item.przedmiot),
             body: item.opis,
+            onClick: undefined,
             to: "/dashboard/homework",
         }));
 
-        const attendanceItems = recentAttendance.map((record: Attendance) => {
+        const attendanceItems: LiveItem[] = recentAttendance.map((record: Attendance) => {
             const statusObj =
                 typeof record.status === "object" && record.status
                     ? record.status
@@ -273,11 +278,12 @@ export function useStudentDashboardModel({
                 label: "Frekwencja",
                 title: `Lekcja ${record.godzina_lekcyjna}`,
                 body: `Status: ${statusText}`,
+                onClick: undefined,
                 to: "/dashboard/attendance",
             };
         });
 
-        const behaviorItems = recentBehaviorPoints.map((point: BehaviorPoint) => {
+        const behaviorItems: LiveItem[] = recentBehaviorPoints.map((point: BehaviorPoint) => {
             const pointsLabel = point.punkty > 0 ? `+${point.punkty}` : `${point.punkty}`;
             return {
                 id: `behavior-${point.id}`,
@@ -286,17 +292,19 @@ export function useStudentDashboardModel({
                 label: "Zachowanie",
                 title: `Punkty: ${pointsLabel}`,
                 body: point.opis || "Zaktualizowano punkty zachowania.",
+                onClick: undefined,
                 to: "/dashboard/grades",
             };
         });
 
-        const eventItems = recentEvents.map((event: Event) => ({
+        const eventItems: LiveItem[] = recentEvents.map((event: Event) => ({
             id: `event-${event.id}`,
             kind: "event" as const,
             date: event.data,
             label: "Wydarzenie",
             title: event.tytul,
             body: event.opis,
+            onClick: undefined,
             to: "/dashboard/events",
         }));
 
@@ -310,9 +318,10 @@ export function useStudentDashboardModel({
         ]
             .filter((item) => Boolean(item.date))
             .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
-            .slice(0, 10);
+            .slice(0, maxLiveItems);
     }, [
         latestInboxMessages,
+        maxLiveItems,
         onOpenMessage,
         recentAttendance,
         recentBehaviorPoints,

@@ -60,6 +60,14 @@ const navItems: NavItem[] = [
         parent: true,
     },
     {
+        label: "Powiadomienia",
+        to: "/dashboard/notifications",
+        icon: "notifications",
+        student: true,
+        parent: true,
+        teacher: true,
+    },
+    {
         label: "Wiadomości",
         to: "/dashboard/messages",
         icon: "mail",
@@ -305,7 +313,7 @@ export default function Layout() {
                         </button>
                         <button 
                             className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant relative group flex"
-                            onClick={() => navigate("/dashboard/messages")}
+                            onClick={() => navigate("/dashboard/notifications")}
                             title="Powiadomienia"
                         >
                             <span className="material-symbols-outlined group-hover:text-primary transition-colors">notifications</span>

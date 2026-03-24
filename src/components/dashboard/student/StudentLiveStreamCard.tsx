@@ -50,13 +50,18 @@ export default function StudentLiveStreamCard({
                     {liveItems.length > 0 ? (
                         liveItems.map((item) => {
                             const dotClass = dotClassMap[item.kind];
-                            const isClickable = Boolean(item.onClick || item.to);
+                            const isClickable = Boolean(
+                                item.onClick || item.to,
+                            );
                             const hoverClass = isClickable
                                 ? "hover:bg-surface-container-high cursor-pointer"
                                 : "";
 
                             return (
-                                <div key={item.id} className="flex items-start gap-3">
+                                <div
+                                    key={item.id}
+                                    className="flex items-start gap-3"
+                                >
                                     <span
                                         className={`mt-1.5 w-2.5 h-2.5 rounded-full ${dotClass}`}
                                     ></span>
@@ -68,7 +73,11 @@ export default function StudentLiveStreamCard({
                                             className={`flex-1 p-3 rounded-xl bg-surface-container-low ${hoverClass}`}
                                         >
                                             <p className="text-[10px] text-outline font-bold uppercase tracking-wider mb-1 font-body">
-                                                {item.label || kindLabelMap[item.kind]} • {formatRelativeDay(item.date)}
+                                                {item.label ||
+                                                    kindLabelMap[
+                                                        item.kind
+                                                    ]}{" "}
+                                                • {formatRelativeDay(item.date)}
                                             </p>
                                             <p className="text-sm font-semibold text-on-surface font-body">
                                                 {item.title}
@@ -83,7 +92,11 @@ export default function StudentLiveStreamCard({
                                             onClick={item.onClick}
                                         >
                                             <p className="text-[10px] text-outline font-bold uppercase tracking-wider mb-1 font-body">
-                                                {item.label || kindLabelMap[item.kind]} • {formatRelativeDay(item.date)}
+                                                {item.label ||
+                                                    kindLabelMap[
+                                                        item.kind
+                                                    ]}{" "}
+                                                • {formatRelativeDay(item.date)}
                                             </p>
                                             <p className="text-sm font-semibold text-on-surface font-body">
                                                 {item.title}
@@ -104,7 +117,7 @@ export default function StudentLiveStreamCard({
                 </div>
 
                 <Link
-                    to="/dashboard/messages"
+                    to="/dashboard/notifications"
                     className="mt-6 w-full py-2 text-sm font-bold text-primary bg-primary-fixed/30 rounded-xl hover:bg-primary-fixed/50 transition-all text-center font-body"
                 >
                     Zobacz wszystkie powiadomienia

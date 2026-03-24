@@ -24,7 +24,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
     {
-        label: "Inteligentny Kokpit",
+        label: "Pulpit",
         to: "/dashboard",
         icon: "dashboard",
         student: true,
@@ -195,11 +195,11 @@ export default function Layout() {
             
             {/* SideNavBar (Desktop) */}
             <nav className={cn(
-                "fixed left-0 top-0 h-full hidden md:flex flex-col p-4 gap-2 bg-surface-bright border-r border-outline-variant/20 transition-[width] duration-300 z-40",
-                sidebarCollapsed ? "w-20" : "w-64 pt-20"
+                "fixed left-0 top-0 h-full hidden md:flex flex-col p-4 gap-2 bg-surface-bright transition-[width] duration-300 z-40",
+                sidebarCollapsed ? "w-20" : "w-64 pt-4"
             )}>
                 {/* Brand */}
-                <div className={cn("mb-6 px-4 flex items-center justify-between", sidebarCollapsed && "pt-6 px-0 justify-center")}>
+                <div className={cn("p-4 flex items-center justify-between", sidebarCollapsed && "pt-0 px-0 justify-center")}>
                     <div className={cn("flex items-center gap-3", sidebarCollapsed && "justify-center")}>
                         <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shrink-0">
                             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>school</span>
@@ -207,7 +207,6 @@ export default function Layout() {
                         {!sidebarCollapsed && (
                             <div>
                                 <h2 className="text-xl font-black text-primary font-headline leading-tight">Modéa</h2>
-                                <p className="text-[10px] uppercase tracking-widest text-outline font-bold leading-none">Academic Excellence</p>
                             </div>
                         )}
                     </div>
@@ -297,6 +296,13 @@ export default function Layout() {
                         >
                             <span className="material-symbols-outlined group-hover:text-primary transition-colors">person</span>
                         </button>
+                        <button
+                            className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant group flex relative"
+                            onClick={() => navigate("/dashboard/profile")}
+                            title="Ustawienia"
+                        >
+                            <span className="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+                        </button>
                         <button 
                             className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant relative group flex"
                             onClick={() => navigate("/dashboard/messages")}
@@ -328,7 +334,7 @@ export default function Layout() {
             </nav>
 
             {/* Mobile Bottom NavBar */}
-            <nav className="fixed bottom-0 left-0 w-full bg-surface-container-lowest/95 backdrop-blur-md flex md:hidden justify-around items-center h-16 z-50 px-4 border-t border-outline-variant/20 pb-safe">
+            <nav className="fixed bottom-0 left-0 w-full bg-surface-container-lowest/95 backdrop-blur-md flex md:hidden justify-around items-center h-16 z-50 px-4 pb-safe">
                 {items.slice(0, 4).map((item) => {
                     const active = location.pathname === item.to || (item.to !== "/dashboard" && location.pathname.startsWith(item.to));
                     return (

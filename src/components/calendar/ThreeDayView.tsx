@@ -45,7 +45,7 @@ export function ThreeDayView({ date, timetable, events, homework, onItemClick }:
         <div className="w-full">
         
           {/* Header */}
-          <div className="grid grid-cols-[48px_repeat(3,minmax(0,1fr))] gap-2 mb-2 sticky top-0 bg-background/95 backdrop-blur z-30 pb-2 border-b border-border/50">
+          <div className="grid grid-cols-[48px_repeat(3,minmax(0,1fr))] gap-2 mb-2 sticky top-0 bg-background/95 backdrop-blur z-30 pb-2 pb-2">
             <div />
             {days.map((day) => {
               const isToday = isSameDay(day, now);
@@ -60,10 +60,10 @@ export function ThreeDayView({ date, timetable, events, homework, onItemClick }:
                     "p-2 rounded-lg flex flex-col min-w-0",
                     isToday
                       ? "bg-primary/20 border border-primary/30"
-                      : "bg-card/50 border border-border/50",
+                      : "bg-card/50 /50",
                   )}
                 >
-                  <div className="text-xs text-muted-foreground text-center">
+                  <div className="text-xs text-on-surface-variant font-body text-center">
                     {cap(format(day, "EEE", { locale: pl }))}
                   </div>
                   <div className="text-sm font-medium text-center mb-1">{format(day, "d MMM", { locale: pl })}</div>
@@ -91,7 +91,7 @@ export function ThreeDayView({ date, timetable, events, homework, onItemClick }:
                 {Array.from({ length: END_HOUR - START_HOUR + 1 }).map((_, i) => (
                   <div 
                     key={`hour-label-${i}`} 
-                    className="absolute right-2 text-[10px] text-muted-foreground"
+                    className="absolute right-2 text-[10px] text-on-surface-variant font-body"
                     style={{ top: `${i * MIN_PER_HOUR - 8}px` }}
                   >
                      {String(START_HOUR + i).padStart(2, '0')}:00

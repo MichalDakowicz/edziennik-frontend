@@ -53,7 +53,7 @@ export function MonthView({ date, timetable, events, homework }: MonthViewProps)
             {WEEK_DAYS.map((d) => (
               <div
                 key={d}
-                className="text-center py-2 text-xs font-medium text-muted-foreground bg-muted/50 rounded-md"
+                className="text-center py-2 text-xs font-medium text-on-surface-variant font-body bg-surface-container-highest/50 rounded-md"
               >
                 {d}
               </div>
@@ -79,7 +79,7 @@ export function MonthView({ date, timetable, events, homework }: MonthViewProps)
                   className={cn(
                     "min-h-[80px] sm:min-h-[90px] p-1 rounded-lg border transition-all",
                     inMonth
-                      ? "bg-card/30 border-border/50 cursor-pointer hover:bg-muted/30"
+                      ? "bg-card/30 border-border/50 cursor-pointer hover:bg-surface-container-low"
                       : "bg-background border-border/20 opacity-40 cursor-default",
                     isToday && "ring-2 ring-primary",
                   )}
@@ -90,8 +90,8 @@ export function MonthView({ date, timetable, events, homework }: MonthViewProps)
                       isToday
                         ? "bg-primary text-primary-foreground font-bold"
                         : inMonth
-                          ? "text-foreground"
-                          : "text-muted-foreground",
+                          ? "text-on-surface font-body"
+                          : "text-on-surface-variant font-body",
                     )}
                   >
                     {format(day, "d")}
@@ -101,12 +101,12 @@ export function MonthView({ date, timetable, events, homework }: MonthViewProps)
                       <ItemChip key={item.id} item={item as EventItem | HomeworkItem} />
                     ))}
                     {visibleItems.length > 2 && (
-                      <div className="text-[10px] text-muted-foreground pl-0.5">
+                      <div className="text-[10px] text-on-surface-variant font-body pl-0.5">
                         +{visibleItems.length - 2}
                       </div>
                     )}
                     {hasLessons && visibleItems.length === 0 && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 mx-auto mt-2" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-surface-container-highest-foreground/30 mx-auto mt-2" />
                     )}
                   </div>
                 </div>
@@ -129,14 +129,14 @@ export function MonthView({ date, timetable, events, homework }: MonthViewProps)
       >
         <div className="space-y-4">
           {selectedItems.length === 0 && (
-            <p className="text-muted-foreground text-sm text-center py-4">
+            <p className="text-on-surface-variant font-body text-sm text-center py-4">
               Brak zajęć w tym dniu
             </p>
           )}
 
           {selectedEvents.length > 0 && (
             <section className="space-y-2">
-              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <div className="text-xs font-semibold text-on-surface-variant font-body uppercase tracking-wider">
                 Wydarzenia
               </div>
               {selectedEvents.map((item) => (
@@ -147,7 +147,7 @@ export function MonthView({ date, timetable, events, homework }: MonthViewProps)
 
           {selectedHomework.length > 0 && (
             <section className="space-y-2">
-              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <div className="text-xs font-semibold text-on-surface-variant font-body uppercase tracking-wider">
                 Prace domowe
               </div>
               {selectedHomework.map((item) => (
@@ -158,7 +158,7 @@ export function MonthView({ date, timetable, events, homework }: MonthViewProps)
 
           {selectedLessons.length > 0 && (
             <section className="space-y-2">
-              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <div className="text-xs font-semibold text-on-surface-variant font-body uppercase tracking-wider">
                 Plan lekcji
               </div>
               {selectedLessons.map((item) => (

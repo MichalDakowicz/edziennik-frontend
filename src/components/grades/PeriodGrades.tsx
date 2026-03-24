@@ -80,20 +80,20 @@ export default function PeriodGrades({ periodGrades, finalGrades, subjects, grad
         if (values.avg !== undefined && values.avg > 0) rows.push({ label: "Średnia ważona", value: values.avg.toFixed(2) });
 
         return (
-          <div key={subjectId} className="bg-card border border-border rounded-xl overflow-hidden flex flex-col">
-            <div className="flex-1 divide-y divide-border">
+          <div key={subjectId} className="bg-surface-container-lowest shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] rounded-xl overflow-hidden flex flex-col">
+            <div className="flex-1 space-y-2">
               {rows.length === 0 ? (
-                <div className="px-4 py-3 text-sm text-muted-foreground">Brak danych</div>
+                <div className="px-4 py-3 text-sm text-on-surface-variant font-body">Brak danych</div>
               ) : (
                 rows.map((row) => (
                   <div key={row.label} className="flex items-center justify-between px-4 py-3 gap-4">
-                    <span className="text-sm text-muted-foreground">{row.label}</span>
+                    <span className="text-sm text-on-surface-variant font-body">{row.label}</span>
                     {row.isGrade && row.value !== undefined ? (
                       <span className={`inline-flex items-center justify-center w-8 h-8 rounded-md font-bold text-sm ${getGradeColor(row.value as string)}`}>
                         {formatGradeValue(row.value as string)}
                       </span>
                     ) : (
-                      <span className="text-sm font-semibold tabular-nums text-foreground">{row.value ?? "—"}</span>
+                      <span className="text-sm font-semibold tabular-nums text-on-surface font-body">{row.value ?? "—"}</span>
                     )}
                   </div>
                 ))

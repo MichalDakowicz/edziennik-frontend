@@ -48,9 +48,9 @@ export default function HomeworkPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="page-title">Prace domowe</h1>
-      <div className="bg-card/50 border border-border/50 rounded-xl p-4 flex flex-wrap gap-4 items-end">
-        <label className="text-sm text-muted-foreground">
+      <h1 className="page-title font-headline">Prace domowe</h1>
+      <div className="bg-card/50 /50 rounded-xl p-4 flex flex-wrap gap-4 items-end">
+        <label className="text-sm text-on-surface-variant font-body">
           Przedmiot
           <select className="input-base mt-1" value={subjectId} onChange={(event) => setSubjectId(event.target.value === "all" ? "all" : Number(event.target.value))}>
             <option value="all">Wszystkie</option>
@@ -61,19 +61,19 @@ export default function HomeworkPage() {
 
       <section className="space-y-3">
         <h2 className="section-title">Nadchodzące</h2>
-        {displayUpcoming.length ? displayUpcoming.map((item) => <HomeworkCard key={item.id} item={item} subject={subjects.find((s) => s.id === item.przedmiot)} onClick={() => setSelectedHomework(item)} />) : <p className="text-muted-foreground">Brak nadchodzących prac</p>}
+        {displayUpcoming.length ? displayUpcoming.map((item) => <HomeworkCard key={item.id} item={item} subject={subjects.find((s) => s.id === item.przedmiot)} onClick={() => setSelectedHomework(item)} />) : <p className="text-on-surface-variant font-body">Brak nadchodzących prac</p>}
       </section>
 
       <section className="space-y-3">
         <button
           onClick={() => setShowPast((v) => !v)}
-          className="flex items-center gap-2 font-medium text-foreground hover:text-primary transition-colors"
+          className="flex items-center gap-2 font-medium text-on-surface font-body hover:text-primary transition-colors"
         >
           <ChevronDown size={20} className={`transition-transform ${showPast ? "rotate-180" : ""}`} />
           {showPast ? "Ukryj" : "Pokaż"} zaległe ({past.filter((item) => subjectId === "all" || item.przedmiot === subjectId).length})
         </button>
         {showPast ? displayPast.map((item) => <HomeworkCard key={item.id} item={item} subject={subjects.find((s) => s.id === item.przedmiot)} onClick={() => setSelectedHomework(item)} />) : null}
-        {showPast && displayPast.length === 0 ? <p className="text-muted-foreground">Brak zaległych prac</p> : null}
+        {showPast && displayPast.length === 0 ? <p className="text-on-surface-variant font-body">Brak zaległych prac</p> : null}
       </section>
 
       <HomeworkModal

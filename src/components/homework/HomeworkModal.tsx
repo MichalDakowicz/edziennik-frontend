@@ -34,15 +34,15 @@ export default function HomeworkModal({
         </div>
 
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-muted-foreground">Polecenie:</h4>
-          <p className="text-foreground whitespace-pre-wrap leading-relaxed">{item.opis}</p>
+          <h4 className="text-sm font-semibold text-on-surface-variant font-body">Polecenie:</h4>
+          <p className="text-on-surface font-body whitespace-pre-wrap leading-relaxed">{item.opis}</p>
         </div>
 
         <div className="pt-4 border-t border-border/50">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-on-surface-variant font-body">
             Dodane przez: {teacher ? `${teacher.user.first_name} ${teacher.user.last_name}` : `#${item.nauczyciel}`}
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-on-surface-variant font-body">
             Dodano: {formatDateTime(item.data_wystawienia)}
           </p>
         </div>

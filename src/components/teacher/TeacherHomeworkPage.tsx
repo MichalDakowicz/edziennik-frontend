@@ -57,7 +57,7 @@ export default function TeacherHomeworkPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <h1 className="page-title">Zarządzanie Pracami Domowymi</h1>
+      <h1 className="page-title font-headline">Zarządzanie Pracami Domowymi</h1>
 
       <Card>
         <h2 className="section-title mb-4">Filtry</h2>

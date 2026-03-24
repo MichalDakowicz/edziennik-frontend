@@ -17,7 +17,7 @@ export default function MessageDetail({
 
   return (
     <Modal open={open} onClose={onClose} title={message.temat}>
-      <div className="space-y-3 text-sm text-muted-foreground">
+      <div className="space-y-3 text-sm text-on-surface-variant font-body">
         <p>Od: {resolveUserName(message.nadawca)}</p>
         <p>Do: {resolveUserName(message.odbiorca)}</p>
         <p>Data: {formatDateTime(message.data_wyslania)}</p>

@@ -29,7 +29,7 @@ export default function TimetableGrid({ days, hours, entries, zajecia, subjects 
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-[700px] w-full border border-border/50 rounded-xl overflow-hidden text-sm">
+      <table className="min-w-[700px] w-full /50 rounded-xl overflow-hidden text-sm">
         <thead className="bg-card/50">
           <tr>
             <th className="p-3 text-left">Godzina</th>
@@ -41,7 +41,7 @@ export default function TimetableGrid({ days, hours, entries, zajecia, subjects 
         <tbody>
           {hourRows.map((hour) => (
             <tr key={hour.id} className="border-t border-border/50">
-              <td className="p-3 text-muted-foreground">{hour.Numer}. {hour.CzasOd.slice(0, 5)}-{hour.CzasDo.slice(0, 5)}</td>
+              <td className="p-3 text-on-surface-variant font-body">{hour.Numer}. {hour.CzasOd.slice(0, 5)}-{hour.CzasDo.slice(0, 5)}</td>
               {dayColumns.map((day) => {
                 const inCurrentLesson = day.Numer === currentDay && hour.CzasOd <= currentTime && hour.CzasDo >= currentTime;
                 return (

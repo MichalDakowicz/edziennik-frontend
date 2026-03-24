@@ -18,7 +18,7 @@ const getGradeValue = (num: number, mod: Modifier): number => {
 };
 
 const getGradeStyles = (num: number | null, mod: Modifier) => {
-  if (num === null) return "bg-muted text-muted-foreground border-border";
+  if (num === null) return "bg-surface-container-highest text-on-surface-variant font-body border-border";
 
   const value = getGradeValue(num, mod);
 
@@ -318,7 +318,7 @@ export default function AddPeriodGradeModal({
                 } bg-background`}
               >
                 {baseGrade === null && modifier === "" ? (
-                  <Plus size={36} strokeWidth={1.5} className="text-muted-foreground" />
+                  <Plus size={36} strokeWidth={1.5} className="text-on-surface-variant font-body" />
                 ) : (
                   <div className="flex items-baseline text-4xl md:text-5xl font-bold tabular-nums">
                     {baseGrade}
@@ -329,7 +329,7 @@ export default function AddPeriodGradeModal({
 
               <div
                 ref={gradeMenuRef}
-                className={`absolute bottom-full right-full mb-2 mr-2 p-2 rounded-3xl border border-border shadow-lg z-50 w-72 bg-popover text-popover-foreground origin-bottom-right transition-all duration-150 ${
+                className={`absolute bottom-full right-full mb-2 mr-2 p-2 rounded-3xl  shadow-lg z-50 w-72 bg-popover text-popover-foreground origin-bottom-right transition-all duration-150 ${
                   isGradeMenuOpen ? "opacity-100 scale-100 translate-x-0 translate-y-0 pointer-events-auto" : "opacity-0 scale-95 translate-x-2 translate-y-2 pointer-events-none"
                 }`}
               >
@@ -346,7 +346,7 @@ export default function AddPeriodGradeModal({
                           className={`h-14 rounded-xl text-2xl font-bold transition-all border ${
                             isActive
                               ? `${styles} shadow-sm scale-[1.03] z-10 border-current`
-                              : "bg-muted text-muted-foreground hover:bg-muted/80 border-border"
+                              : "bg-surface-container-highest text-on-surface-variant font-body hover:bg-surface-container-highest/80 border-border"
                           }`}
                         >
                           {n}
@@ -359,7 +359,7 @@ export default function AddPeriodGradeModal({
                     {(["+", "-"] as Modifier[]).map((mod) => {
                       const isActive = modifier === mod;
                       const isDisabled = !baseGrade || (mod === "+" && baseGrade === 6) || (mod === "-" && baseGrade === 1);
-                      const styles = baseGrade !== null ? getGradeStyles(baseGrade, mod) : "bg-muted text-muted-foreground border-border";
+                      const styles = baseGrade !== null ? getGradeStyles(baseGrade, mod) : "bg-surface-container-highest text-on-surface-variant font-body border-border";
                       return (
                         <button
                           key={mod}
@@ -369,7 +369,7 @@ export default function AddPeriodGradeModal({
                           className={`flex-1 rounded-xl text-2xl font-bold transition-all border disabled:opacity-20 disabled:cursor-not-allowed ${
                             isActive
                               ? `${styles} shadow-sm scale-[1.03] z-10 border-current`
-                              : "bg-muted text-muted-foreground hover:bg-muted/80 border-border"
+                              : "bg-surface-container-highest text-on-surface-variant font-body hover:bg-surface-container-highest/80 border-border"
                           }`}
                         >
                           {mod}
@@ -381,8 +381,8 @@ export default function AddPeriodGradeModal({
               </div>
             </div>
 
-            <div className="flex flex-col items-center justify-center w-24 h-24 rounded-xl border border-border bg-muted/30">
-              <span className="text-3xl font-bold tabular-nums text-foreground">
+            <div className="flex flex-col items-center justify-center w-24 h-24 rounded-xl  bg-surface-container-low">
+              <span className="text-3xl font-bold tabular-nums text-on-surface font-body">
                 {wartosc || "-"}
               </span>
             </div>

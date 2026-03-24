@@ -62,10 +62,10 @@ export default function ComposeMessage({
   return (
     <Modal open={open} onClose={onClose} title="Nowa wiadomość">
       <form className="space-y-3" onSubmit={submit}>
-        <label htmlFor="teacher-search" className="block text-sm text-muted-foreground">Wyszukaj nauczyciela</label>
+        <label htmlFor="teacher-search" className="block text-sm text-on-surface-variant font-body">Wyszukaj nauczyciela</label>
         <input id="teacher-search" className="input-base" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Np. Jan Kowalski" />
 
-        <label htmlFor="odbiorca" className="block text-sm text-muted-foreground">Odbiorca</label>
+        <label htmlFor="odbiorca" className="block text-sm text-on-surface-variant font-body">Odbiorca</label>
         <select
           id="odbiorca"
           className="input-base"
@@ -86,11 +86,11 @@ export default function ComposeMessage({
         </select>
         {errors.odbiorca ? <p className="text-red-400 text-xs">{errors.odbiorca}</p> : null}
 
-        <label htmlFor="temat" className="block text-sm text-muted-foreground">Temat</label>
+        <label htmlFor="temat" className="block text-sm text-on-surface-variant font-body">Temat</label>
         <input id="temat" className="input-base" {...register("temat")} />
         {errors.temat ? <p className="text-red-400 text-xs">{errors.temat}</p> : null}
 
-        <label htmlFor="tresc" className="block text-sm text-muted-foreground">Treść</label>
+        <label htmlFor="tresc" className="block text-sm text-on-surface-variant font-body">Treść</label>
         <textarea id="tresc" className="input-base min-h-36" {...register("tresc")} />
         {errors.tresc ? <p className="text-red-400 text-xs">{errors.tresc}</p> : null}
 

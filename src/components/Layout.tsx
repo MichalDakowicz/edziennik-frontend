@@ -6,34 +6,17 @@ import {
     useLocation,
     useNavigate,
 } from "react-router-dom";
-import { 
-    Menu, 
-    X, 
-    LogOut, 
-    LayoutDashboard, 
-    GraduationCap, 
-    UserCheck, 
-    CalendarRange, 
-    BookOpen, 
-    Mail, 
-    User,
-    ClipboardList,
-    CheckSquare,
-    PanelLeftClose,
-    PanelLeftOpen,
-} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "../services/auth";
 import { getInboxMessages, getLuckyNumber, getStudents } from "../services/api";
 import { keys } from "../services/queryKeys";
-import { Badge } from "./ui/Badge";
 import { cn } from "../utils/cn";
 import { getClassJournalNumberMap } from "../utils/classUtils";
 
 type NavItem = {
     label: string;
     to: string;
-    icon: React.ElementType;
+    icon: string; // Changed to string for material symbols
     student?: boolean;
     parent?: boolean;
     teacher?: boolean;
@@ -41,9 +24,9 @@ type NavItem = {
 
 const navItems: NavItem[] = [
     {
-        label: "Pulpit",
+        label: "Inteligentny Kokpit",
         to: "/dashboard",
-        icon: LayoutDashboard,
+        icon: "dashboard",
         student: true,
         parent: true,
         teacher: true,
@@ -51,35 +34,35 @@ const navItems: NavItem[] = [
     { 
         label: "Oceny", 
         to: "/dashboard/grades", 
-        icon: GraduationCap, 
+        icon: "grade", 
         student: true, 
         parent: true 
     },
     {
-        label: "Obecność",
+        label: "Frekwencja",
         to: "/dashboard/attendance",
-        icon: UserCheck,
+        icon: "rule",
         student: true,
         parent: true,
     },
     {
-        label: "Kalendarz",
+        label: "Plan Lekcji",
         to: "/dashboard/calendar",
-        icon: CalendarRange,
+        icon: "calendar_today",
         student: true,
         parent: true,
     },
     {
-        label: "Prace domowe",
+        label: "Zadania Domowe",
         to: "/dashboard/homework",
-        icon: BookOpen,
+        icon: "assignment",
         student: true,
         parent: true,
     },
     {
         label: "Wiadomości",
         to: "/dashboard/messages",
-        icon: Mail,
+        icon: "mail",
         student: true,
         parent: true,
         teacher: true,
@@ -87,27 +70,19 @@ const navItems: NavItem[] = [
     {
         label: "Wystawianie ocen",
         to: "/dashboard/teacher/grades",
-        icon: GraduationCap,
+        icon: "grade",
         teacher: true,
     },
     {
         label: "Sprawdzanie obecności",
         to: "/dashboard/teacher/attendance",
-        icon: CheckSquare,
+        icon: "rule",
         teacher: true,
     },
     {
         label: "Zadania domowe",
         to: "/dashboard/teacher/homework",
-        icon: ClipboardList,
-        teacher: true,
-    },
-    {
-        label: "Profil",
-        to: "/dashboard/profile",
-        icon: User,
-        student: true,
-        parent: true,
+        icon: "assignment",
         teacher: true,
     },
 ];
@@ -123,7 +98,6 @@ export default function Layout() {
     const user = getCurrentUser();
     const navigate = useNavigate();
     const location = useLocation();
-    const [mobileOpen, setMobileOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     useEffect(() => {
@@ -157,8 +131,6 @@ export default function Layout() {
                 setSidebarCollapsed((prev) => !prev);
                 return;
             }
-
-            setMobileOpen((prev) => !prev);
         };
 
         window.addEventListener("keydown", onKeyDown);
@@ -219,142 +191,173 @@ export default function Layout() {
     };
 
     return (
-        <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans">
-            <div className="md:hidden p-4 border-b border-border bg-card flex items-center justify-between z-10 w-full fixed top-0 h-16">
-                <div className="flex items-center gap-2">
-                    <h2 className="font-semibold text-lg">Modéa</h2>
-                    {lucky?.lucky_number && (
-                        <div className="bg-primary/20 text-primary w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold border border-primary/30" title={`Szczęśliwy numerek to: ${lucky.lucky_number}`}>
-                            {lucky.lucky_number}
-                        </div>
-                    )}
-                </div>
-                <button
-                    className="p-2 hover:bg-accent rounded-md"
-                    onClick={() => setMobileOpen((v) => !v)}
-                    aria-label="Menu"
-                >
-                    {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-                </button>
-            </div>
-
-            <div
-                className={`fixed inset-y-0 left-0 z-40 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
-            >
-                <aside className={cn(
-                    "h-full w-72 md:w-72 bg-card border-r border-border flex flex-col transition-[width] duration-300",
-                    sidebarCollapsed && "md:w-20"
-                )}>
-                    <div className={cn("border-b border-border/50", sidebarCollapsed ? "p-3" : "p-6")}>
-                        <div className={cn("flex items-center", sidebarCollapsed ? "justify-center" : "justify-between")}>
-                            {!sidebarCollapsed && (
-                                <h1 className="text-2xl font-bold text-foreground">Modéa</h1>
-                            )}
-                            {!sidebarCollapsed && lucky?.lucky_number && (
-                                <div
-                                    className="bg-primary/20 text-primary w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold border border-primary/30"
-                                    title={`Szczęśliwy numerek to: ${lucky.lucky_number}`}
-                                >
-                                    {lucky.lucky_number}
-                                </div>
-                            )}
-                            <button
-                                className={cn(
-                                    "hidden md:inline-flex p-2 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors",
-                                    sidebarCollapsed && "h-10 w-10 items-center justify-center"
-                                )}
-                                aria-label={sidebarCollapsed ? "Rozwiń sidebar" : "Zwiń sidebar"}
-                                title={sidebarCollapsed ? "Rozwiń sidebar" : "Zwiń sidebar"}
-                                onClick={() => setSidebarCollapsed((prev) => !prev)}
-                            >
-                                {sidebarCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-                            </button>
+        <div className="flex h-screen bg-background text-on-surface overflow-hidden font-body">
+            
+            {/* SideNavBar (Desktop) */}
+            <nav className={cn(
+                "fixed left-0 top-0 h-full hidden md:flex flex-col p-4 gap-2 bg-surface-bright border-r border-outline-variant/20 transition-[width] duration-300 z-40",
+                sidebarCollapsed ? "w-20" : "w-64 pt-20"
+            )}>
+                {/* Brand */}
+                <div className={cn("mb-6 px-4 flex items-center justify-between", sidebarCollapsed && "pt-6 px-0 justify-center")}>
+                    <div className={cn("flex items-center gap-3", sidebarCollapsed && "justify-center")}>
+                        <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shrink-0">
+                            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>school</span>
                         </div>
                         {!sidebarCollapsed && (
-                            <div className="mt-2 text-sm text-muted-foreground flex flex-col">
-                                <span className="font-medium text-foreground">{displayName}</span>
-                                <span className="text-xs capitalize">{user.role}</span>
+                            <div>
+                                <h2 className="text-xl font-black text-primary font-headline leading-tight">Modéa</h2>
+                                <p className="text-[10px] uppercase tracking-widest text-outline font-bold leading-none">Academic Excellence</p>
                             </div>
                         )}
                     </div>
-                    <nav className={cn("space-y-1.5 flex-1 overflow-y-auto", sidebarCollapsed ? "p-2" : "p-4")}>
-                        {!sidebarCollapsed && (
-                            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-3">Menu</div>
-                        )}
-                        {items.map((item) => {
-                            const active =
-                                location.pathname === item.to ||
-                                (item.to !== "/dashboard" &&
-                                    location.pathname.startsWith(item.to));
-                            return (
-                                <NavLink
-                                    key={item.to}
-                                    to={item.to}
-                                    className={cn(
-                                        "flex items-center justify-between px-3 py-2.5 rounded-md transition-all text-sm font-medium group relative overflow-hidden",
-                                        sidebarCollapsed && "md:justify-center md:px-0 md:h-12 md:w-12 md:mx-auto",
-                                        active
-                                            ? "bg-primary text-primary-foreground shadow-sm"
-                                            : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                                    )}
-                                    onClick={() => setMobileOpen(false)}
-                                    title={sidebarCollapsed ? item.label : undefined}
-                                >
-                                    <div className={cn("flex items-center gap-3 relative z-10", sidebarCollapsed && "md:gap-0 md:w-full md:justify-center")}>
-                                        <item.icon size={18} className={cn(active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground")} />
-                                        {!sidebarCollapsed && <span>{item.label}</span>}
-                                    </div>
-                                    {item.to === "/dashboard/messages" &&
-                                    unreadCount > 0 ? (
-                                        sidebarCollapsed ? (
-                                            <span
-                                                className={cn(
-                                                    "absolute right-2 top-2 h-2 w-2 rounded-full ring-2",
-                                                    active
-                                                        ? "bg-primary-foreground ring-primary/60"
-                                                        : "bg-primary ring-card",
-                                                )}
-                                            />
-                                        ) : (
-                                            <Badge
-                                                variant={
-                                                    active ? "secondary" : "default"
-                                                }
-                                                className="ml-auto shrink-0 relative z-10 px-1.5 py-0.5"
-                                            >
-                                                {unreadCount}
-                                            </Badge>
-                                        )
-                                    ) : null}
-                                </NavLink>
-                            );
-                        })}
-                    </nav>
-                    <div className="p-4 pt-3 border-t border-border">
-                        <button
-                            className={cn(
-                                "w-full flex items-center justify-start gap-2 px-3 py-2.5 rounded-md transition-all text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground",
-                                sidebarCollapsed && "md:justify-center md:px-0 md:h-12 md:w-12 md:mx-auto"
+                </div>
+
+                {/* Profile Display */}
+                {!sidebarCollapsed && (
+                    <div className="px-4 mb-4 mt-2">
+                        <div className="flex items-center gap-3">
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-bold text-on-surface truncate">{displayName}</p>
+                                <p className="text-xs text-on-surface-variant capitalize">{user.role}</p>
+                            </div>
+                            {lucky?.lucky_number && user.role === "uczen" && (
+                                <div className="bg-tertiary-fixed text-on-tertiary-fixed w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0" title="Twój szczęśliwy numerek">
+                                    {lucky.lucky_number}
+                                </div>
                             )}
-                            onClick={handleLogout}
-                            title={sidebarCollapsed ? "Wyloguj się" : undefined}
+                        </div>
+                    </div>
+                )}
+
+                {/* Nav Links */}
+                <div className="flex-1 overflow-y-auto space-y-1.5 no-scrollbar flex flex-col items-center w-full">
+                    {items.map((item) => {
+                        const active =
+                            location.pathname === item.to ||
+                            (item.to !== "/dashboard" &&
+                                location.pathname.startsWith(item.to));
+                        
+                        return (
+                            <NavLink
+                                key={item.to}
+                                to={item.to}
+                                className={cn(
+                                    "flex items-center w-full rounded-xl transition-all active:scale-95 group relative",
+                                    sidebarCollapsed ? "justify-center p-3" : "px-4 py-3 gap-3",
+                                    active
+                                        ? "text-primary font-bold bg-surface-container-lowest shadow-sm"
+                                        : "text-on-surface-variant hover:text-primary hover:translate-x-1"
+                                )}
+                                title={sidebarCollapsed ? item.label : undefined}
+                            >
+                                <span className="material-symbols-outlined shrink-0" style={active ? { fontVariationSettings: "'FILL' 1" } : {}}>
+                                    {item.icon}
+                                </span>
+                                {!sidebarCollapsed && (
+                                    <span className="font-headline text-sm w-full flex justify-between items-center">
+                                        {item.label}
+                                        {item.to === "/dashboard/messages" && unreadCount > 0 && (
+                                            <span className="bg-error text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                                                {unreadCount}
+                                            </span>
+                                        )}
+                                    </span>
+                                )}
+                                {sidebarCollapsed && item.to === "/dashboard/messages" && unreadCount > 0 && (
+                                    <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full ring-2 ring-surface-bright"></span>
+                                )}
+                            </NavLink>
+                        );
+                    })}
+                </div>
+
+                {/* Bottom Actions */}
+                <div className="mt-auto pt-4 flex flex-col gap-2 w-full">
+                    {!sidebarCollapsed && (
+                        <div className="mb-4">
+                            <div className="relative w-full">
+                                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                    <span className="material-symbols-outlined text-outline text-sm">search</span>
+                                </div>
+                                <input 
+                                    className="w-full bg-surface-container-highest border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all font-body outline-none text-on-surface placeholder-outline/70" 
+                                    placeholder="Szukaj..." 
+                                    type="text"
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    <div className={cn("flex items-center", sidebarCollapsed ? "flex-col gap-4" : "justify-between px-2 mb-4")}>
+                        <button 
+                            className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant group flex relative"
+                            onClick={() => navigate("/dashboard/profile")}
+                            title="Profil"
                         >
-                            <LogOut size={16} />
-                            {!sidebarCollapsed && "Wyloguj się"}
+                            <span className="material-symbols-outlined group-hover:text-primary transition-colors">person</span>
+                        </button>
+                        <button 
+                            className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant relative group flex"
+                            onClick={() => navigate("/dashboard/messages")}
+                            title="Powiadomienia"
+                        >
+                            <span className="material-symbols-outlined group-hover:text-primary transition-colors">notifications</span>
+                            {unreadCount > 0 && (
+                                <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full ring-2 ring-surface-bright"></span>
+                            )}
+                        </button>
+                        <button 
+                            className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant group flex relative"
+                            onClick={handleLogout}
+                            title="Wyloguj"
+                        >
+                            <span className="material-symbols-outlined group-hover:text-error transition-colors">logout</span>
+                        </button>
+                        <button 
+                            className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant group flex relative"
+                            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                            title={sidebarCollapsed ? "Rozwiń" : "Zwiń"}
+                        >
+                            <span className="material-symbols-outlined group-hover:text-primary transition-colors">
+                                {sidebarCollapsed ? 'dock_to_right' : 'dock_to_left'}
+                            </span>
                         </button>
                     </div>
-                </aside>
-            </div>
+                </div>
+            </nav>
 
-            {mobileOpen ? (
-                <div
-                    className="fixed inset-0 z-30 bg-background/80 backdrop-blur-sm md:hidden"
-                    onClick={() => setMobileOpen(false)}
-                />
-            ) : null}
+            {/* Mobile Bottom NavBar */}
+            <nav className="fixed bottom-0 left-0 w-full bg-surface-container-lowest/95 backdrop-blur-md flex md:hidden justify-around items-center h-16 z-50 px-4 border-t border-outline-variant/20 pb-safe">
+                {items.slice(0, 4).map((item) => {
+                    const active = location.pathname === item.to || (item.to !== "/dashboard" && location.pathname.startsWith(item.to));
+                    return (
+                        <NavLink
+                            key={item.to}
+                            to={item.to}
+                            className={cn(
+                                "flex flex-col items-center gap-1",
+                                active ? "text-primary" : "text-outline"
+                            )}
+                        >
+                            <span className="material-symbols-outlined" style={active ? { fontVariationSettings: "'FILL' 1" } : {}}>
+                                {item.icon}
+                            </span>
+                            <span className={cn("text-[10px]", active ? "font-bold" : "font-medium")}>
+                                {item.label}
+                            </span>
+                        </NavLink>
+                    );
+                })}
+            </nav>
 
-            <main className="flex-1 overflow-y-auto pt-16 md:pt-0 bg-slate-50 dark:bg-background">
-                <div className="container p-4 md:p-8 max-w-6xl mx-auto">
+            {/* Main Canvas */}
+            <main className={cn(
+                "flex-1 overflow-y-auto bg-background transition-[margin] duration-300",
+                sidebarCollapsed ? "md:ml-20" : "md:ml-64",
+                "pb-20 md:pb-0" // Add bottom padding on mobile for navbar
+            )}>
+                <div className="container mx-auto p-4 md:p-8 max-w-7xl">
                     <Outlet />
                 </div>
             </main>

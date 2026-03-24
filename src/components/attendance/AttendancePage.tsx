@@ -126,7 +126,7 @@ export default function AttendancePage() {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <h1 className="page-title">Obecność</h1>
+                <h1 className="page-title font-headline">Obecność</h1>
             </div>
 
             <AttendanceStats
@@ -136,7 +136,7 @@ export default function AttendancePage() {
             />
 
             {monthlyData.length >= 2 ? (
-                <div className="bg-card border border-border rounded-[var(--radius)] p-4 h-80">
+                <div className="bg-surface-container-lowest shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] rounded-[var(--radius)] p-4 h-80">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart
                             data={monthlyData}

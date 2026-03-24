@@ -79,8 +79,8 @@ export default function GradesPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="page-title">Oceny</h1>
-      <div className="flex gap-4 border-b border-border/50">
+      <h1 className="page-title font-headline">Oceny</h1>
+      <div className="flex gap-4 pb-2">
         <button className={tab === "partial" ? "tab-active" : "tab-inactive"} onClick={() => setTab("partial")}>Oceny cząstkowe</button>
         <button className={tab === "period" ? "tab-active" : "tab-inactive"} onClick={() => setTab("period")}>Oceny okresowe</button>
         <button className={tab === "behavior" ? "tab-active" : "tab-inactive"} onClick={() => setTab("behavior")}>Zachowanie</button>
@@ -100,7 +100,7 @@ export default function GradesPage() {
               className={`px-4 py-2 rounded-md font-medium transition-colors ${
                 showLastWeekOnly
                   ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  : "bg-surface-container-highest text-on-surface-variant font-body hover:bg-surface-container-highest/80"
               }`}
             >
               Ostatni tydzień
@@ -133,14 +133,14 @@ export default function GradesPage() {
                   <Link
                     key={subjectId}
                     to={`/dashboard/grades/${subjectId}`}
-                    className={`flex items-center gap-4 p-4 rounded-xl bg-card border border-border border-l-4 ${borderColor} hover:bg-muted/40 transition-colors`}
+                    className={`flex items-center gap-4 p-4 rounded-xl bg-surface-container-lowest shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] border-l-4 ${borderColor} hover:bg-surface-container-highest/40 transition-colors`}
                   >
                     {/* Average + subject name */}
                     <div className="min-w-[64px]">
-                      <div className="text-3xl font-bold tabular-nums leading-none text-foreground">
+                      <div className="text-3xl font-bold tabular-nums leading-none text-on-surface font-body">
                         {avg > 0 ? avg.toFixed(2) : "—"}
                       </div>
-                      <div className="text-sm text-muted-foreground mt-1 leading-tight">{subjectName}</div>
+                      <div className="text-sm text-on-surface-variant font-body mt-1 leading-tight">{subjectName}</div>
                     </div>
 
                     {/* Grade chips */}
@@ -154,7 +154,7 @@ export default function GradesPage() {
                         </span>
                       ))}
                       {gradesInOrder.length > 12 && (
-                        <span className="inline-flex items-center justify-center h-8 px-2 rounded-md text-sm font-medium bg-muted text-muted-foreground">
+                        <span className="inline-flex items-center justify-center h-8 px-2 rounded-md text-sm font-medium bg-surface-container-highest text-on-surface-variant font-body">
                           +{gradesInOrder.length - 12}
                         </span>
                       )}

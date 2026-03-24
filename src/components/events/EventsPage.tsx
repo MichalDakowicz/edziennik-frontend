@@ -48,7 +48,7 @@ export default function EventsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="page-title">Terminarz</h1>
+      <h1 className="page-title font-headline">Terminarz</h1>
       <div className="flex gap-2">
         <button className={view === "list" ? "btn-primary" : "btn-ghost"} onClick={() => setView("list")}>Lista</button>
         <button className={view === "calendar" ? "btn-primary" : "btn-ghost"} onClick={() => setView("calendar")}>Kalendarz</button>
@@ -65,16 +65,16 @@ export default function EventsPage() {
                 const open = expanded.includes(event.id);
                 const subject = subjects.find((s) => s.id === event.przedmiot);
                 return (
-                  <div key={event.id} className="bg-card/50 border border-border/50 rounded-xl p-4">
+                  <div key={event.id} className="bg-card/50 /50 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold">{event.tytul}</h3>
                       {subject ? <Badge variant="info">{subject.nazwa ?? subject.Nazwa}</Badge> : null}
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">{formatDateTime(event.data)}</p>
+                    <p className="text-sm text-on-surface-variant font-body mb-2">{formatDateTime(event.data)}</p>
                     <button className="text-sm text-primary hover:text-primary/80" onClick={() => setExpanded((current) => (open ? current.filter((id) => id !== event.id) : [...current, event.id]))}>
                       {open ? "Ukryj opis" : "Pokaż opis"}
                     </button>
-                    {open ? <p className="mt-2 text-foreground whitespace-pre-wrap">{event.opis}</p> : null}
+                    {open ? <p className="mt-2 text-on-surface font-body whitespace-pre-wrap">{event.opis}</p> : null}
                   </div>
                 );
               })}
@@ -83,7 +83,7 @@ export default function EventsPage() {
           {past.length ? (
             <section>
               <h2 className="section-title">Minione</h2>
-              <p className="text-muted-foreground text-sm">Liczba minionych wydarzeń: {past.length}</p>
+              <p className="text-on-surface-variant font-body text-sm">Liczba minionych wydarzeń: {past.length}</p>
             </section>
           ) : null}
         </div>

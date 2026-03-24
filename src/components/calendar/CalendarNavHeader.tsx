@@ -49,8 +49,8 @@ export function CalendarNavHeader({
             : cap(format(currentDate, "LLLL yyyy", { locale: pl }));
 
     return (
-        <div className="space-y-3 pb-4 border-b border-border/50">
-            <h1 className="page-title">Kalendarz</h1>
+        <div className="space-y-3 pb-4 pb-2">
+            <h1 className="page-title font-headline">Kalendarz</h1>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <div className="text-base sm:text-lg font-medium">{label}</div>
                 <div className="flex items-center gap-1">
@@ -84,7 +84,7 @@ export function CalendarNavHeader({
                     </button>
                 </div>
             </div>
-            <div className="bg-muted rounded-lg p-1 grid grid-cols-4 gap-1">
+            <div className="bg-surface-container-highest rounded-lg p-1 grid grid-cols-4 gap-1">
                 {VIEWS.map((v) => (
                     <button
                         key={v.key}
@@ -92,8 +92,8 @@ export function CalendarNavHeader({
                         className={cn(
                             "rounded-md px-2 py-1.5 text-sm font-medium transition-colors",
                             viewMode === v.key
-                                ? "bg-background text-foreground shadow-sm"
-                                : "text-muted-foreground hover:text-foreground",
+                                ? "bg-background text-on-surface font-body shadow-sm"
+                                : "text-on-surface-variant font-body hover:text-on-surface font-body",
                         )}
                     >
                         {v.label}

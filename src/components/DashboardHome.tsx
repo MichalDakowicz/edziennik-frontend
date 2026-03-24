@@ -189,30 +189,30 @@ export default function DashboardHome() {
             return (
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="bg-card border border-border rounded-xl p-5 shadow-sm relative overflow-hidden group">
+                        <div className="bg-surface-container-lowest rounded-xl p-5 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-primary/10" />
-                            <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2">
+                            <div className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-2 font-body">
                                 Panel nauczyciela
                             </div>
                             <div className="flex flex-col relative z-10">
-                                <span className="text-xl font-bold text-foreground truncate">
+                                <span className="text-xl font-bold text-on-surface truncate font-headline">
                                     {user.firstName}
                                 </span>
-                                <span className="text-xs text-muted-foreground mt-1">
+                                <span className="text-xs text-on-surface-variant mt-1 font-body">
                                     {formatDate(new Date().toISOString())}
                                 </span>
                             </div>
                         </div>
 
-                        <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2">
+                        <div className="bg-surface-container-lowest rounded-xl p-5 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] hover:shadow-md transition-shadow">
+                            <div className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-2 font-body">
                                 Nieprzeczytane
                             </div>
                             <div className="flex items-baseline gap-2">
-                                <span className="text-3xl font-bold tabular-nums text-foreground">
+                                <span className="text-3xl font-bold tabular-nums text-on-surface font-headline">
                                     {unread}
                                 </span>
-                                <span className="text-xs text-muted-foreground">
+                                <span className="text-xs text-on-surface-variant font-body">
                                     wiadomości
                                 </span>
                             </div>
@@ -220,12 +220,12 @@ export default function DashboardHome() {
 
                         <Link
                             to="/dashboard/messages"
-                            className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow block group cursor-pointer"
+                            className="bg-surface-container-lowest rounded-xl p-5 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] hover:shadow-md transition-shadow block group cursor-pointer"
                         >
-                            <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2 group-hover:text-primary transition-colors">
+                            <div className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-2 group-hover:text-primary transition-colors font-body">
                                 Wiadomości
                             </div>
-                            <div className="text-sm text-muted-foreground group-hover:text-primary transition-colors">
+                            <div className="text-sm text-on-surface-variant group-hover:text-primary transition-colors font-body">
                                 Przejdź do skrzynki odbiorczej
                             </div>
                         </Link>
@@ -233,61 +233,61 @@ export default function DashboardHome() {
 
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         <div className="xl:col-span-2 space-y-6">
-                            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-                                <div className="flex items-center justify-between p-5 border-b border-border bg-muted/30">
-                                    <h3 className="section-title text-base font-bold">
+                            <div className="bg-surface-container-lowest rounded-xl shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] overflow-hidden">
+                                <div className="flex items-center justify-between p-5 bg-surface-container-low">
+                                    <h3 className="section-title text-base font-bold font-headline">
                                         Szybkie akcje
                                     </h3>
                                 </div>
 
-                                <div className="divide-y divide-border/60">
+                                <div className="space-y-1">
                                     <Link
                                         to="/dashboard/teacher/grades"
-                                        className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group"
+                                        className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group"
                                     >
                                         <div>
-                                            <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                                            <p className="font-semibold text-sm text-on-surface group-hover:text-primary transition-colors font-body">
                                                 Wystawianie ocen
                                             </p>
-                                            <p className="text-xs text-muted-foreground mt-0.5">
+                                            <p className="text-xs text-on-surface-variant mt-0.5 font-body">
                                                 Dodaj i edytuj oceny uczniów
                                             </p>
                                         </div>
-                                        <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
+                                        <span className="text-xs font-medium text-on-surface-variant group-hover:text-primary transition-colors font-body">
                                             Otwórz
                                         </span>
                                     </Link>
 
                                     <Link
                                         to="/dashboard/teacher/attendance"
-                                        className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group"
+                                        className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group"
                                     >
                                         <div>
-                                            <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                                            <p className="font-semibold text-sm text-on-surface group-hover:text-primary transition-colors font-body">
                                                 Sprawdzanie obecności
                                             </p>
-                                            <p className="text-xs text-muted-foreground mt-0.5">
+                                            <p className="text-xs text-on-surface-variant mt-0.5 font-body">
                                                 Zaznacz obecność uczniów
                                             </p>
                                         </div>
-                                        <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
+                                        <span className="text-xs font-medium text-on-surface-variant group-hover:text-primary transition-colors font-body">
                                             Otwórz
                                         </span>
                                     </Link>
 
                                     <Link
                                         to="/dashboard/teacher/homework"
-                                        className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group"
+                                        className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group"
                                     >
                                         <div>
-                                            <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                                            <p className="font-semibold text-sm text-on-surface group-hover:text-primary transition-colors font-body">
                                                 Zadania domowe
                                             </p>
-                                            <p className="text-xs text-muted-foreground mt-0.5">
+                                            <p className="text-xs text-on-surface-variant mt-0.5 font-body">
                                                 Twórz i aktualizuj zadania
                                             </p>
                                         </div>
-                                        <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
+                                        <span className="text-xs font-medium text-on-surface-variant group-hover:text-primary transition-colors font-body">
                                             Otwórz
                                         </span>
                                     </Link>
@@ -297,14 +297,14 @@ export default function DashboardHome() {
                         </div>
 
                         <div className="space-y-6 flex flex-col">
-                            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
-                                <div className="flex items-center justify-between p-5 border-b border-border bg-muted/30">
-                                    <h3 className="section-title text-base font-bold">
+                            <div className="bg-surface-container-lowest rounded-xl shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] overflow-hidden flex flex-col h-full">
+                                <div className="flex items-center justify-between p-5 bg-surface-container-low">
+                                    <h3 className="section-title text-base font-bold font-headline">
                                         Nieodczytane wiadomości
                                     </h3>
                                     <Link
                                         to="/dashboard/messages"
-                                        className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide"
+                                        className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide font-body"
                                     >
                                         Wszystkie
                                     </Link>
@@ -318,20 +318,20 @@ export default function DashboardHome() {
                                                 onClick={() => handleOpenMessage(message)}
                                                 className="block group cursor-pointer"
                                             >
-                                                <div className="bg-background border border-border rounded-lg p-3 hover:border-primary/50 hover:shadow-sm transition-all relative overflow-hidden group-hover:bg-accent/5">
+                                                <div className="bg-background rounded-lg p-3 hover:border-primary/50 hover:shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] transition-all relative overflow-hidden group-hover:bg-accent/5">
                                                     <div
                                                         className={`absolute top-0 left-0 w-1 h-full ${message.przeczytana ? "bg-border" : "bg-primary"}`}
                                                     />
                                                     <div className="pl-3">
                                                         <div className="flex justify-between items-start mb-1">
-                                                            <p className="font-semibold text-sm text-foreground truncate pr-2 group-hover:text-primary transition-colors">
+                                                            <p className="font-semibold text-sm text-on-surface truncate pr-2 group-hover:text-primary transition-colors font-body">
                                                                 {message.temat || "(bez tematu)"}
                                                             </p>
-                                                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                                            <span className="text-[10px] text-on-surface-variant whitespace-nowrap">
                                                                 {formatDate(message.data_wyslania)}
                                                             </span>
                                                         </div>
-                                                        <p className="text-xs text-muted-foreground line-clamp-2">
+                                                        <p className="text-xs text-on-surface-variant line-clamp-2 font-body">
                                                             {message.tresc}
                                                         </p>
                                                     </div>
@@ -339,8 +339,8 @@ export default function DashboardHome() {
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
-                                            <p className="text-sm">
+                                        <div className="flex flex-col items-center justify-center h-48 text-on-surface-variant">
+                                            <p className="text-sm font-body">
                                                 Brak nieodczytanych wiadomości
                                             </p>
                                         </div>
@@ -362,9 +362,9 @@ export default function DashboardHome() {
 
         return (
             <div>
-                <h1 className="page-title mb-6">Pulpit</h1>
+                <h1 className="page-title mb-6 font-headline">Pulpit</h1>
                 <Card>
-                    <p className="text-foreground">
+                    <p className="text-on-surface font-body">
                         Nieprzeczytane wiadomości: {unread}
                     </p>
                     <Link
@@ -493,39 +493,39 @@ export default function DashboardHome() {
             {/* 4 Cards Grid - Replaced Header & Lucky Number */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Card 1: Welcome */}
-                <div className="bg-card border border-border rounded-xl p-5 shadow-sm relative overflow-hidden group">
+                <div className="bg-surface-container-lowest rounded-xl p-5 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-primary/10" />
-                    <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2">
+                    <div className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-2 font-body">
                         Dzień dobry
                     </div>
                     <div className="flex flex-col relative z-10">
-                        <span className="text-xl font-bold text-foreground truncate">
+                        <span className="text-xl font-bold text-on-surface truncate font-headline">
                             {user.firstName}
                         </span>
-                        <span className="text-xs text-muted-foreground mt-1">
+                        <span className="text-xs text-on-surface-variant mt-1 font-body">
                             {formatDate(new Date().toISOString())}
                         </span>
                     </div>
                 </div>
 
                 {/* Card 2: Average */}
-                <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2">
+                <div className="bg-surface-container-lowest rounded-xl p-5 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] hover:shadow-md transition-shadow">
+                    <div className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-2 font-body">
                         Średnia ocen
                     </div>
                     <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold tabular-nums text-foreground">
+                        <span className="text-3xl font-bold tabular-nums text-on-surface font-headline">
                             {weighted.toFixed(2)}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-on-surface-variant font-body">
                             ważona
                         </span>
                     </div>
                 </div>
 
                 {/* Card 3: Attendance */}
-                <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2">
+                <div className="bg-surface-container-lowest rounded-xl p-5 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] hover:shadow-md transition-shadow">
+                    <div className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-2 font-body">
                         Frekwencja
                     </div>
                     <div className="flex items-baseline gap-2">
@@ -534,7 +534,7 @@ export default function DashboardHome() {
                         >
                             {Math.round(attendancePercentage)}%
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-on-surface-variant font-body">
                             obecności
                         </span>
                     </div>
@@ -543,18 +543,18 @@ export default function DashboardHome() {
                 {/* Card 4: Messages */}
                 <Link
                     to="/dashboard/messages"
-                    className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow block group cursor-pointer"
+                    className="bg-surface-container-lowest rounded-xl p-5 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] hover:shadow-md transition-shadow block group cursor-pointer"
                 >
-                    <div className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-2 group-hover:text-primary transition-colors">
+                    <div className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-2 group-hover:text-primary transition-colors font-body">
                         Wiadomości
                     </div>
                     <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold tabular-nums text-foreground group-hover:text-primary transition-colors">
+                        <span className="text-3xl font-bold tabular-nums text-on-surface group-hover:text-primary transition-colors font-headline">
                             {studentData.inbox?.filter(
                                 (message: any) => !message.przeczytana,
                             ).length ?? 0}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-on-surface-variant font-body">
                             nieprzeczytane
                         </span>
                     </div>
@@ -565,14 +565,14 @@ export default function DashboardHome() {
                 {/* Left Column: Schedule & Grades */}
                 <div className="xl:col-span-2 space-y-6">
                     {/* Today's Schedule Details */}
-                    <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-                        <div className="flex items-center justify-between p-5 border-b border-border bg-muted/30">
-                            <h3 className="section-title text-base font-bold">
+                    <div className="bg-surface-container-lowest rounded-xl shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] overflow-hidden">
+                        <div className="flex items-center justify-between p-5 bg-surface-container-low">
+                            <h3 className="section-title text-base font-bold font-headline">
                                 Dzisiejszy plan
                             </h3>
                             <Link
                                 to="/dashboard/timetable"
-                                className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide"
+                                className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide font-body"
                             >
                                 Pełny plan
                             </Link>
@@ -581,16 +581,16 @@ export default function DashboardHome() {
                         <div className="p-0">
                             {/* Next Lesson Highlight */}
                             {nextLesson && (
-                                <div className="p-4 bg-primary/5 border border-primary/20 flex items-center gap-4 relative overflow-hidden">
+                                <div className="p-4 bg-primary/5 flex items-center gap-4 relative overflow-hidden">
                                     <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-                                    <div className="w-12 h-12 rounded-xl bg-background border border-border flex items-center justify-center text-primary font-bold shadow-sm relative z-10">
-                                        <span className="text-xl">
+                                    <div className="w-12 h-12 rounded-xl bg-background flex items-center justify-center text-primary font-bold shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] relative z-10">
+                                        <span className="text-xl font-headline">
                                             {nextLesson.hour?.Numer}
                                         </span>
                                     </div>
                                     <div className="flex-1 min-w-0 relative z-10">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-xs text-muted-foreground font-mono tabular-nums">
+                                            <span className="text-xs text-on-surface-variant font-mono tabular-nums font-body">
                                                 {nextLesson.hour?.CzasOd?.substring(
                                                     0,
                                                     5,
@@ -602,7 +602,7 @@ export default function DashboardHome() {
                                                 )}
                                             </span>
                                         </div>
-                                        <p className="font-bold text-foreground truncate text-lg leading-tight">
+                                        <p className="font-bold text-on-surface truncate text-lg leading-tight font-body">
                                             {getSubjectName(nextLesson.zajecia)}
                                         </p>
                                     </div>
@@ -610,10 +610,10 @@ export default function DashboardHome() {
                                         <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary text-primary-foreground uppercase tracking-wide">
                                             Teraz
                                         </span>
-                                        <div className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">
+                                        <div className="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1 font-body">
                                             Sala
                                         </div>
-                                        <div className="bg-background border border-border px-3 py-1 rounded-md font-mono text-sm shadow-sm inline-block">
+                                        <div className="bg-background px-3 py-1 rounded-md font-mono text-sm shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] inline-block font-body">
                                             {nextLesson.sala ?? "—"}
                                         </div>
                                     </div>
@@ -623,8 +623,8 @@ export default function DashboardHome() {
                             {/* Schedule List */}
                             <div className="overflow-x-auto">
                                 {todayLessons.length > 0 ? (
-                                    <table className="w-full text-sm text-left">
-                                        <thead className="bg-muted/50 text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                                    <table className="w-full text-sm text-left font-body">
+                                        <thead className="bg-surface-container-low text-xs text-on-surface-variant uppercase tracking-wider font-semibold font-body">
                                             <tr>
                                                 <th className="px-5 py-3 w-16 text-center">
                                                     Nr
@@ -640,7 +640,7 @@ export default function DashboardHome() {
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-border">
+                                        <tbody className="">
                                             {todayLessons.map((lesson: any) => {
                                                 const isNext =
                                                     nextLesson &&
@@ -654,12 +654,12 @@ export default function DashboardHome() {
                                                 return (
                                                     <tr
                                                         key={lesson.id}
-                                                        className={`group hover:bg-muted/30 transition-colors ${isPast ? "opacity-40" : ""} ${isNext ? "bg-primary/5" : ""}`}
+                                                        className={`group hover:bg-surface-container-low transition-colors ${isPast ? "opacity-40" : ""} ${isNext ? "bg-primary/5" : "even:bg-surface-container-low"} font-body`}
                                                     >
-                                                        <td className="px-5 py-3 text-center font-mono font-medium text-muted-foreground group-hover:text-foreground transition-colors border-r border-border/40">
+                                                        <td className="px-5 py-3 text-center font-mono font-medium text-on-surface-variant group-hover:text-on-surface transition-colors">
                                                             {lesson.hour?.Numer}
                                                         </td>
-                                                        <td className="px-5 py-3 font-mono text-muted-foreground tabular-nums">
+                                                        <td className="px-5 py-3 font-mono text-on-surface-variant tabular-nums">
                                                             {lesson.hour?.CzasOd?.substring(
                                                                 0,
                                                                 5,
@@ -670,12 +670,12 @@ export default function DashboardHome() {
                                                                 5,
                                                             )}
                                                         </td>
-                                                        <td className="px-5 py-3 font-medium text-foreground">
+                                                        <td className="px-5 py-3 font-medium text-on-surface">
                                                             {getSubjectName(
                                                                 lesson.zajecia,
                                                             )}
                                                         </td>
-                                                        <td className="px-5 py-3 text-right text-muted-foreground font-medium">
+                                                        <td className="px-5 py-3 text-right text-on-surface-variant font-medium">
                                                             {lesson.sala ?? "-"}
                                                         </td>
                                                     </tr>
@@ -684,8 +684,8 @@ export default function DashboardHome() {
                                         </tbody>
                                     </table>
                                 ) : (
-                                    <div className="p-12 text-center flex flex-col items-center justify-center text-muted-foreground bg-card/50">
-                                        <p className="text-sm">
+                                    <div className="p-12 text-center flex flex-col items-center justify-center text-on-surface-variant bg-surface-container-lowest/50">
+                                        <p className="text-sm font-body">
                                             Brak zaplanowanych lekcji na dzisiaj
                                         </p>
                                     </div>
@@ -695,51 +695,51 @@ export default function DashboardHome() {
                     </div>
 
                     {/* Recent Grades Block */}
-                    <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-                        <div className="flex items-center justify-between p-5 border-b border-border bg-muted/30">
-                            <h3 className="section-title text-base font-bold">
+                    <div className="bg-surface-container-lowest rounded-xl shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] overflow-hidden">
+                        <div className="flex items-center justify-between p-5 bg-surface-container-low">
+                            <h3 className="section-title text-base font-bold font-headline">
                                 Ostatnie oceny
                             </h3>
                             <Link
                                 to="/dashboard/grades"
-                                className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide"
+                                className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide font-body"
                             >
                                 Wszystkie oceny
                             </Link>
                         </div>
                         <div>
                             {recentGrades.length ? (
-                                <div className="divide-y divide-border/60">
+                                <div className="space-y-1">
                                     {recentGrades.map((grade: any) => (
                                         <div
                                             key={grade.id}
-                                            className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group"
+                                            className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group"
                                         >
                                             <div className="flex items-center gap-4 overflow-hidden">
                                                 <span
-                                                    className={`flex shrink-0 w-10 h-10 rounded-lg font-bold tabular-nums text-lg items-center justify-center shadow-sm border border-black/5 ${getGradeColor(grade.wartosc)}`}
+                                                    className={`flex shrink-0 w-10 h-10 rounded-lg font-bold tabular-nums text-lg items-center justify-center shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)]  ${getGradeColor(grade.wartosc)}`}
                                                 >
                                                     {formatGradeValue(
                                                         grade.wartosc,
                                                     )}
                                                 </span>
                                                 <div className="min-w-0">
-                                                    <p className="font-semibold text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                                                    <p className="font-semibold text-sm text-on-surface truncate group-hover:text-primary transition-colors font-body">
                                                         {getGradeSubjectName(
                                                             grade.przedmiot,
                                                         )}
                                                     </p>
-                                                    <p className="text-xs text-muted-foreground truncate">
+                                                    <p className="text-xs text-on-surface-variant truncate font-body">
                                                         {grade.opis ||
                                                             "Ocena cząstkowa"}
                                                     </p>
                                                 </div>
                                             </div>
                                             <div className="text-right shrink-0">
-                                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">
+                                                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-0.5 font-body">
                                                     Waga: {grade.waga}
                                                 </p>
-                                                <p className="text-xs text-muted-foreground tabular-nums">
+                                                <p className="text-xs text-on-surface-variant tabular-nums font-body">
                                                     {formatDate(
                                                         grade.data_wystawienia,
                                                     )}
@@ -749,7 +749,7 @@ export default function DashboardHome() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-8 text-center text-muted-foreground italic">
+                                <div className="p-8 text-center text-on-surface-variant italic">
                                     Brak ostatnich ocen
                                 </div>
                             )}
@@ -759,14 +759,14 @@ export default function DashboardHome() {
 
                 {/* Right Column: Messages (Inbox Preview) */}
                 <div className="space-y-6 flex flex-col">
-                    <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
-                        <div className="flex items-center justify-between p-5 border-b border-border bg-muted/30">
-                            <h3 className="section-title text-base font-bold">
+                    <div className="bg-surface-container-lowest rounded-xl shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] overflow-hidden flex flex-col h-full">
+                        <div className="flex items-center justify-between p-5 bg-surface-container-low">
+                            <h3 className="section-title text-base font-bold font-headline">
                                 Wiadomości
                             </h3>
                             <Link
                                 to="/dashboard/messages"
-                                className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide"
+                                className="text-xs font-medium text-primary hover:text-primary/80 uppercase tracking-wide font-body"
                             >
                                 Skrzynka
                             </Link>
@@ -781,20 +781,20 @@ export default function DashboardHome() {
                                         }
                                         className="block group cursor-pointer"
                                     >
-                                        <div className="bg-background border border-border rounded-lg p-3 hover:border-primary/50 hover:shadow-sm transition-all relative overflow-hidden group-hover:bg-accent/5">
+                                        <div className="bg-background rounded-lg p-3 hover:border-primary/50 hover:shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] transition-all relative overflow-hidden group-hover:bg-accent/5">
                                             <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
                                             <div className="pl-3">
                                                 <div className="flex justify-between items-start mb-1">
-                                                    <p className="font-semibold text-sm text-foreground truncate pr-2 group-hover:text-primary transition-colors">
+                                                    <p className="font-semibold text-sm text-on-surface truncate pr-2 group-hover:text-primary transition-colors font-body">
                                                         {message.temat}
                                                     </p>
-                                                    <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                                    <span className="text-[10px] text-on-surface-variant whitespace-nowrap">
                                                         {formatDate(
                                                             message.data_wyslania,
                                                         )}
                                                     </span>
                                                 </div>
-                                                <p className="text-xs text-muted-foreground line-clamp-2">
+                                                <p className="text-xs text-on-surface-variant line-clamp-2 font-body">
                                                     {message.tresc.substring(
                                                         0,
                                                         60,
@@ -806,8 +806,8 @@ export default function DashboardHome() {
                                     </div>
                                 ))
                             ) : (
-                                <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
-                                    <p className="text-sm">
+                                <div className="flex flex-col items-center justify-center h-48 text-on-surface-variant">
+                                    <p className="text-sm font-body">
                                         Brak nowych wiadomości
                                     </p>
                                 </div>

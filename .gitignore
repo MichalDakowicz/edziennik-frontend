@@ -29,3 +29,9 @@ Thumbs.db
 
 edziennik-archive
 *.cache
+
+.agent
+.cursor
+.github
+.kiro
+.opencode

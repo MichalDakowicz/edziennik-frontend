@@ -64,17 +64,17 @@ export default function TimetablePage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="page-title">Plan lekcji</h1>
-      <p className="text-muted-foreground">Klasa: {classDisplay}</p>
+      <h1 className="page-title font-headline">Plan lekcji</h1>
+      <p className="text-on-surface-variant font-body">Klasa: {classDisplay}</p>
       <TimetableGrid days={data.days} hours={data.hours} entries={data.entries} zajecia={data.zajecia} subjects={data.subjects} />
-      <div className="bg-card/50 border border-border/50 rounded-xl p-4">
+      <div className="bg-card/50 /50 rounded-xl p-4">
         <h2 className="section-title mb-3">Dzisiaj</h2>
         {todayLessons.length ? (
           <ul className="space-y-2">
-            {todayLessons.map((lesson) => <li key={lesson.id} className="text-foreground">{lesson.hour} · {lesson.subject}</li>)}
+            {todayLessons.map((lesson) => <li key={lesson.id} className="text-on-surface font-body">{lesson.hour} · {lesson.subject}</li>)}
           </ul>
         ) : (
-          <p className="text-muted-foreground">Brak lekcji</p>
+          <p className="text-on-surface-variant font-body">Brak lekcji</p>
         )}
       </div>
     </div>

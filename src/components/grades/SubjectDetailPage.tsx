@@ -49,28 +49,28 @@ export default function SubjectDetailPage() {
       <div className="flex items-center gap-3">
         <Link
           to="/dashboard/grades"
-          className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground text-lg leading-none"
+          className="p-2 rounded-lg hover:bg-surface-container-highest transition-colors text-on-surface-variant font-body hover:text-on-surface font-body text-lg leading-none"
           aria-label="Wróć do ocen"
         >
           ←
         </Link>
         <div className="flex-1">
-          <h1 className="page-title">{subjectName}</h1>
+          <h1 className="page-title font-headline">{subjectName}</h1>
         </div>
       </div>
 
       {/* Stats */}
       {grades.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div className="bg-card border border-border rounded-xl p-4">
+          <div className="bg-surface-container-lowest shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] rounded-xl p-4">
             <p className="stat-label">Średnia ważona</p>
             <p className="stat-value mt-1 tabular-nums">{avg.toFixed(2)}</p>
           </div>
-          <div className="bg-card border border-border rounded-xl p-4">
+          <div className="bg-surface-container-lowest shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] rounded-xl p-4">
             <p className="stat-label">Propozycja oceny</p>
             <p className={`stat-value mt-1 tabular-nums ${getGradeColor(suggested)}`}>{suggested}</p>
           </div>
-          <div className="bg-card border border-border rounded-xl p-4 col-span-2 sm:col-span-1">
+          <div className="bg-surface-container-lowest shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] rounded-xl p-4 col-span-2 sm:col-span-1">
             <p className="stat-label">Liczba ocen</p>
             <p className="stat-value mt-1 tabular-nums">{grades.length}</p>
           </div>
@@ -86,7 +86,7 @@ export default function SubjectDetailPage() {
             <button
               key={grade.id}
               onClick={() => setSelectedGrade(grade)}
-              className="bg-card border border-border rounded-xl p-4 text-left hover:border-primary/50 hover:shadow-sm transition-all"
+              className="bg-surface-container-lowest shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] rounded-xl p-4 text-left hover:border-primary/50 hover:shadow-sm transition-all"
             >
               <div className="flex items-start justify-between gap-3">
                 <span
@@ -94,17 +94,17 @@ export default function SubjectDetailPage() {
                 >
                   {formatGradeValue(grade.wartosc)}
                 </span>
-                <span className="text-xs text-muted-foreground tabular-nums mt-1">
+                <span className="text-xs text-on-surface-variant font-body tabular-nums mt-1">
                   {formatDate(grade.data_wystawienia)}
                 </span>
               </div>
-              <p className="mt-2 text-sm font-medium text-foreground line-clamp-2">
+              <p className="mt-2 text-sm font-medium text-on-surface font-body line-clamp-2">
                 {grade.opis || "Ocena cząstkowa"}
               </p>
               <div className="mt-2 flex items-center gap-2 flex-wrap">
-                <span className="text-xs text-muted-foreground">Waga: {grade.waga}</span>
+                <span className="text-xs text-on-surface-variant font-body">Waga: {grade.waga}</span>
                 {!grade.czy_do_sredniej && (
-                  <span className="text-xs text-muted-foreground italic">(nie do średniej)</span>
+                  <span className="text-xs text-on-surface-variant font-body italic">(nie do średniej)</span>
                 )}
               </div>
             </button>

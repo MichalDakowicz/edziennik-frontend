@@ -66,7 +66,7 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="page-title">Profil</h1>
+      <h1 className="page-title font-headline">Profil</h1>
 
       <Card>
         <h2 className="section-title mb-3">Dane osobowe</h2>
@@ -98,13 +98,13 @@ export default function ProfilePage() {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">Brak ustawień profilu</p>
+          <p className="text-on-surface-variant font-body">Brak ustawień profilu</p>
         )}
       </Card>
 
       <Card>
         <h2 className="section-title mb-3">Bezpieczeństwo</h2>
-        <p className="text-muted-foreground">Zmiana hasła jest możliwa poprzez administratora systemu.</p>
+        <p className="text-on-surface-variant font-body">Zmiana hasła jest możliwa poprzez administratora systemu.</p>
       </Card>
     </div>
   );

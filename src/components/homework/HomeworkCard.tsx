@@ -21,7 +21,7 @@ export default function HomeworkCard({
   return (
     <button
       onClick={onClick}
-      className="bg-card/50 border border-border/50 rounded-xl p-4 space-y-2 text-left hover:border-border/80 transition-colors w-full"
+      className="bg-card/50 /50 rounded-xl p-4 space-y-2 text-left hover:border-border/80 transition-colors w-full"
     >
       <div className="flex items-center gap-2 flex-wrap justify-between">
         <Badge variant="info">{subject?.nazwa ?? subject?.Nazwa ?? `#${item.przedmiot}`}</Badge>
@@ -30,7 +30,7 @@ export default function HomeworkCard({
           {isOverdue ? <Badge variant="danger">ZALEGŁE</Badge> : null}
         </div>
       </div>
-      <p className="text-foreground text-sm line-clamp-2">{item.opis}</p>
+      <p className="text-on-surface font-body text-sm line-clamp-2">{item.opis}</p>
     </button>
   );
 }

@@ -50,7 +50,7 @@ export function DayView({ date, timetable, events, homework, onItemClick }: DayV
 
   return (
     <div className="space-y-4">
-      <div className="bg-card/50 border border-border/50 rounded-xl p-4 flex flex-col gap-3">
+      <div className="bg-card/50 /50 rounded-xl p-4 flex flex-col gap-3">
         <div className="text-base font-medium">
           {cap(format(date, "EEEE, d MMMM yyyy", { locale: pl }))}
         </div>
@@ -78,7 +78,7 @@ export function DayView({ date, timetable, events, homework, onItemClick }: DayV
               className="absolute left-0 right-0 border-t border-border/40 flex items-start"
               style={{ top: `${i * MIN_PER_HOUR}px` }}
             >
-               <span className="text-[10px] text-muted-foreground w-12 text-right pr-2 -mt-2.5 bg-background">
+               <span className="text-[10px] text-on-surface-variant font-body w-12 text-right pr-2 -mt-2.5 bg-background">
                   {String(START_HOUR + i).padStart(2, '0')}:00
                </span>
             </div>

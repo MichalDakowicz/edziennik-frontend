@@ -7,7 +7,7 @@ export function itemColorClass(kind: DisplayItem["kind"]): string {
     return "bg-teal-500/10 border-teal-500/30 text-teal-800 dark:text-teal-300 dark:border-teal-400/30";
   if (kind === "homework")
     return "bg-violet-500/10 border-violet-500/30 text-violet-800 dark:text-violet-300 dark:border-violet-400/30";
-  return "bg-muted/60 border-border text-foreground";
+  return "bg-surface-container-highest/60 border-border text-on-surface font-body";
 }
 
 export function ItemCard({ item, compact = false, onClick, fill = false }: { item: DisplayItem; compact?: boolean; onClick?: (item: DisplayItem) => void; fill?: boolean }) {

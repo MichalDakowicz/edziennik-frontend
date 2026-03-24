@@ -254,7 +254,7 @@ export default function TeacherAttendancePage() {
 
   return (
     <div className="space-y-6 p-6">
-      <h1 className="page-title">Sprawdzanie Obecności</h1>
+      <h1 className="page-title font-headline">Sprawdzanie Obecności</h1>
 
       <Card>
         <h2 className="section-title mb-4">Ustawienia</h2>
@@ -320,7 +320,7 @@ export default function TeacherAttendancePage() {
               <tbody>
                 {classStudents.map((student) => (
                   <tr key={student.id} className="border-b border-zinc-800 hover:bg-zinc-900/50">
-                    <td className="py-3 px-4 font-medium text-muted-foreground">
+                    <td className="py-3 px-4 font-medium text-on-surface-variant font-body">
                       {classJournalNumbers.get(student.id) ?? "-"}
                     </td>
                     <td className="py-3 px-4">
@@ -356,7 +356,7 @@ export default function TeacherAttendancePage() {
               </tbody>
             </table>
             <div className="mt-2 flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-on-surface-variant font-body">
                 Data: {selectedDate} • Lekcja: {selectedHourId ?? "-"}
               </span>
               <Button

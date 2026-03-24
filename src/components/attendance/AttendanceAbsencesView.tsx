@@ -84,15 +84,15 @@ export default function AttendanceAbsencesView({
       case "info":
         return "text-primary dark:text-primary/80";
       default:
-        return "text-muted-foreground";
+        return "text-on-surface-variant font-body";
     }
   };
 
   return (
     <div className="space-y-4">
-      <div className="bg-card border border-border rounded-[var(--radius)] p-4 space-y-4">
+      <div className="bg-surface-container-lowest shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] rounded-[var(--radius)] p-4 space-y-4">
         <div>
-          <h2 className="font-semibold text-foreground mb-2">Typ absencji</h2>
+          <h2 className="font-semibold text-on-surface font-body mb-2">Typ absencji</h2>
           <div className="flex flex-wrap gap-2">
             {["Wszystkie", "Nieobecność", "Obecność", "Spóźnienie", "Usprawiedliwienie", "Zwolnienie"].map((status) => (
               <button
@@ -101,7 +101,7 @@ export default function AttendanceAbsencesView({
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   selectedStatus === status
                     ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    : "bg-surface-container-highest text-on-surface-variant font-body hover:bg-surface-container-highest/80"
                 }`}
               >
                 {status}
@@ -111,9 +111,9 @@ export default function AttendanceAbsencesView({
         </div>
 
         <div>
-          <h2 className="font-semibold text-foreground mb-2">Filtr daty</h2>
+          <h2 className="font-semibold text-on-surface font-body mb-2">Filtr daty</h2>
           <div className="grid md:grid-cols-2 gap-3">
-            <label className="text-sm text-muted-foreground">
+            <label className="text-sm text-on-surface-variant font-body">
               Od
               <input
               className="input-base mt-1"
@@ -122,7 +122,7 @@ export default function AttendanceAbsencesView({
               onChange={(event) => onDateFromChange(event.target.value)}
             />
           </label>
-          <label className="text-sm text-muted-foreground">
+          <label className="text-sm text-on-surface-variant font-body">
             Do
             <input
               className="input-base mt-1"
@@ -137,14 +137,14 @@ export default function AttendanceAbsencesView({
 
       <div className="space-y-3">
         {absencesOnly.length === 0 ? (
-          <div className="bg-card border border-border rounded-[var(--radius)] p-8 text-center text-muted-foreground">
+          <div className="bg-surface-container-lowest shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] rounded-[var(--radius)] p-8 text-center text-on-surface-variant font-body">
             Brak absencji w wybranym okresie
           </div>
         ) : (
           Array.from(groupedByDate.entries()).map(([date, dateRecords]) => (
             <div key={date}>
               <div className="flex items-center gap-4 py-4">
-                <h3 className="font-semibold text-foreground capitalize">{date}</h3>
+                <h3 className="font-semibold text-on-surface font-body capitalize">{date}</h3>
                 <div className="flex-1 h-px bg-border" />
               </div>
               <div className="space-y-2 mb-6">
@@ -156,14 +156,14 @@ export default function AttendanceAbsencesView({
                   return (
                     <div
                       key={record.id}
-                      className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50 hover:bg-muted/50 transition-colors"
+                      className="flex items-center justify-between p-3 bg-surface-container-low rounded-lg /50 hover:bg-surface-container-highest/50 transition-colors"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="text-sm font-medium text-muted-foreground min-w-16">
+                        <div className="text-sm font-medium text-on-surface-variant font-body min-w-16">
                           Lekcja {hour?.Numer ?? record.godzina_lekcyjna}
                         </div>
                         {hour && (
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-sm text-on-surface-variant font-body">
                             {hour.CzasOd} - {hour.CzasDo}
                           </div>
                         )}

@@ -8,6 +8,7 @@ import DashboardHome from "./components/DashboardHome";
 import GradesPage from "./components/grades/GradesPage";
 import SubjectDetailPage from "./components/grades/SubjectDetailPage";
 import AttendancePage from "./components/attendance/AttendancePage";
+import AttendanceHistoryPage from "./components/attendance/AttendanceHistoryPage";
 import MessagesPage from "./components/messages/MessagesPage";
 import HomeworkPage from "./components/homework/HomeworkPage";
 import KalendarzPage from "./components/calendar/KalendarzPage";
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="grades" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><GradesPage /></RoleGuard>} />
           <Route path="grades/:subjectId" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><SubjectDetailPage /></RoleGuard>} />
           <Route path="attendance" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><AttendancePage /></RoleGuard>} />
+          <Route path="attendance/history" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><AttendanceHistoryPage /></RoleGuard>} />
           <Route path="calendar" element={<RoleGuard allow={["uczen", "rodzic", "admin"]}><KalendarzPage /></RoleGuard>} />
           <Route path="timetable" element={<Navigate to="/dashboard/calendar" replace />} />
           <Route path="events" element={<Navigate to="/dashboard/calendar" replace />} />

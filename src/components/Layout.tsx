@@ -60,14 +60,6 @@ const navItems: NavItem[] = [
         parent: true,
     },
     {
-        label: "Powiadomienia",
-        to: "/dashboard/notifications",
-        icon: "notifications",
-        student: true,
-        parent: true,
-        teacher: true,
-    },
-    {
         label: "Wiadomości",
         to: "/dashboard/messages",
         icon: "mail",

@@ -71,22 +71,11 @@ export default function StudentScheduleCard({
                                 </div>
 
                                 <div className="flex-shrink-0">
-                                    {lesson.isCurrent ? (
-                                        <span
-                                            className="material-symbols-outlined text-primary"
-                                            style={{ fontVariationSettings: "'FILL' 1" }}
-                                        >
-                                            play_circle
-                                        </span>
-                                    ) : lesson.minutesToStart !== null ? (
+                                    {lesson.minutesToStart !== null ? (
                                         <span className="text-xs font-semibold text-outline font-body">
                                             za {lesson.minutesToStart} min
                                         </span>
-                                    ) : (
-                                        <span className="text-xs font-semibold text-on-surface-variant font-body">
-                                            zakończona
-                                        </span>
-                                    )}
+                                    ) : null}
                                 </div>
                             </div>
                         );

@@ -238,7 +238,7 @@ export default function Layout() {
                 )}
 
                 {/* Nav Links */}
-                <div className="flex-1 overflow-y-auto space-y-1.5 no-scrollbar flex flex-col items-center w-full">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-1.5 no-scrollbar flex flex-col items-center w-full">
                     {items.map((item) => {
                         const active =
                             location.pathname === item.to ||

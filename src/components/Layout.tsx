@@ -67,6 +67,14 @@ const navItems: NavItem[] = [
         teacher: true,
     },
     {
+        label: "Powiadomienia",
+        to: "/dashboard/notifications",
+        icon: "notifications",
+        student: true,
+        parent: true,
+        teacher: true,
+    },
+    {
         label: "Wystawianie ocen",
         to: "/dashboard/teacher/grades",
         icon: "grade",

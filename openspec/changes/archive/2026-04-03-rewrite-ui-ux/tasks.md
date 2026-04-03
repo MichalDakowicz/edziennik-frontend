@@ -41,8 +41,8 @@
 
 ## 7. Messages Page Rewrite
 
-- [ ] 7.1 Refactor MessagesPage header with unified style matching calendar pattern and inbox/sent tab toggle.
-- [ ] 7.2 Rewrite MessageList cards with unread indicator, subject, sender/recipient, preview, and date.
-- [ ] 7.3 Update ComposeMessage modal with teacher search, recipient dropdown, and form validation.
-- [ ] 7.4 Update MessageDetail modal with sender/recipient info, date, and full message body.
-- [ ] 7.5 Add floating compose button (FAB) with pencil icon at bottom-right corner.
+- [x] 7.1 Refactor MessagesPage header with unified style matching calendar pattern and inbox/sent tab toggle.
+- [x] 7.2 Rewrite MessageList cards with unread indicator, subject, sender/recipient, preview, and date.
+- [x] 7.3 Update ComposeMessage modal with teacher search, recipient dropdown, and form validation.
+- [x] 7.4 Update MessageDetail modal with sender/recipient info, date, and full message body.
+- [x] 7.5 Add floating compose button (FAB) with pencil icon at bottom-right corner.

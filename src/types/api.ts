@@ -171,7 +171,7 @@ export interface Event {
 export interface UserProfile {
   id: number;
   user: number;
-  theme_preference: "light" | "dark" | "system";
+  theme_preference: "light" | "dark" | "oled" | "system";
 }
 
 export interface LuckyNumber {

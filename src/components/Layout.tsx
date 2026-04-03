@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     Link,
     NavLink,
@@ -8,10 +8,9 @@ import {
 } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "../services/auth";
-import { getInboxMessages, getLuckyNumber, getStudents } from "../services/api";
+import { getInboxMessages, getLuckyNumber } from "../services/api";
 import { keys } from "../services/queryKeys";
 import { cn } from "../utils/cn";
-import { getClassJournalNumberMap } from "../utils/classUtils";
 
 type NavItem = {
     label: string;
@@ -99,6 +98,8 @@ export default function Layout() {
     const navigate = useNavigate();
     const location = useLocation();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const profileMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const stored = localStorage.getItem("layout:sidebar-collapsed");
@@ -137,6 +138,17 @@ export default function Layout() {
         return () => window.removeEventListener("keydown", onKeyDown);
     }, []);
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+                setProfileMenuOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const { data: inbox } = useQuery({
         queryKey: user ? keys.inbox(user.id) : ["inbox", "guest"],
         queryFn: () => (user ? getInboxMessages(user.id) : Promise.resolve([])),
@@ -151,24 +163,6 @@ export default function Layout() {
                 : Promise.resolve(null),
         enabled: Boolean(user?.role === "uczen" && user?.classId),
     });
-
-    const { data: studentsList } = useQuery({
-        queryKey: user?.role === "uczen" ? ["students", "for-current-user", user?.id] : ["students", "na"],
-        queryFn: getStudents,
-        enabled: Boolean(user?.role === "uczen"),
-    });
-
-    const currentStudent = studentsList?.find((student) =>
-        user?.studentId ? student.id === user.studentId : student.user?.id === user?.id,
-    );
-    const currentClassId = currentStudent?.klasa ?? user?.classId ?? null;
-    const classJournalNumbers = getClassJournalNumberMap(studentsList ?? [], currentClassId);
-    const studentJournalNumber = currentStudent ? classJournalNumbers.get(currentStudent.id) ?? null : null;
-    const displayName = user
-        ? user.role === "uczen" && studentJournalNumber !== null
-            ? `${user.firstName} ${user.lastName} (${studentJournalNumber})`
-            : `${user.firstName} ${user.lastName}`
-        : "";
 
     const unreadCount = useMemo(
         () => inbox?.filter((m) => !m.przeczytana).length ?? 0,
@@ -199,7 +193,7 @@ export default function Layout() {
                 sidebarCollapsed ? "w-20" : "w-64 pt-4"
             )}>
                 {/* Brand */}
-                <div className={cn("p-4 flex items-center justify-between", sidebarCollapsed && "pt-0 px-0 justify-center")}>
+                <div className={cn("flex items-center justify-between", sidebarCollapsed && "pt-0 px-0 justify-center")}>
                     <div className={cn("flex items-center gap-3", sidebarCollapsed && "justify-center")}>
                         <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shrink-0">
                             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>school</span>
@@ -210,24 +204,16 @@ export default function Layout() {
                             </div>
                         )}
                     </div>
+                    {!sidebarCollapsed && (
+                        <button
+                            className="rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant shrink-0"
+                            onClick={() => setSidebarCollapsed(true)}
+                            title="Zwiń"
+                        >
+                            <span className="material-symbols-outlined">dock_to_left</span>
+                        </button>
+                    )}
                 </div>
-
-                {/* Profile Display */}
-                {!sidebarCollapsed && (
-                    <div className="px-4 mb-4 mt-2">
-                        <div className="flex items-center gap-3">
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-bold text-on-surface truncate">{displayName}</p>
-                                <p className="text-xs text-on-surface-variant capitalize">{user.role}</p>
-                            </div>
-                            {lucky?.lucky_number && user.role === "uczen" && (
-                                <div className="bg-tertiary-fixed text-on-tertiary-fixed w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0" title="Twój szczęśliwy numerek">
-                                    {lucky.lucky_number}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
 
                 {/* Nav Links */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-1.5 no-scrollbar flex flex-col items-center w-full">
@@ -273,7 +259,21 @@ export default function Layout() {
 
                 {/* Bottom Actions */}
                 <div className="mt-auto pt-4 flex flex-col gap-2 w-full">
-                    {!sidebarCollapsed && (
+                    {sidebarCollapsed ? (
+                        <button
+                            className="w-full flex items-center justify-center p-3 rounded-xl hover:bg-surface-container-high transition-colors text-on-surface-variant hover:text-primary"
+                            onClick={() => {
+                                setSidebarCollapsed(false);
+                                setTimeout(() => {
+                                    const searchInput = document.querySelector('input[placeholder="Szukaj..."]') as HTMLInputElement;
+                                    searchInput?.focus();
+                                }, 300);
+                            }}
+                            title="Szukaj"
+                        >
+                            <span className="material-symbols-outlined">search</span>
+                        </button>
+                    ) : (
                         <div className="mb-4">
                             <div className="relative w-full">
                                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
@@ -288,47 +288,62 @@ export default function Layout() {
                         </div>
                     )}
 
-                    <div className={cn("flex items-center", sidebarCollapsed ? "flex-col gap-4" : "justify-between px-2 mb-4")}>
+                    <div className="relative" ref={profileMenuRef}>
                         <button 
-                            className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant group flex relative"
-                            onClick={() => navigate("/dashboard/profile")}
-                            title="Profil"
+                            className={cn(
+                                "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all active:scale-95 group",
+                                sidebarCollapsed ? "justify-center" : "hover:text-primary hover:translate-x-1"
+                            )}
+                            onClick={() => sidebarCollapsed ? setSidebarCollapsed(false) : setProfileMenuOpen(!profileMenuOpen)}
+                            title={sidebarCollapsed ? "Rozwiń" : "Profil"}
                         >
-                            <span className="material-symbols-outlined group-hover:text-primary transition-colors">person</span>
-                        </button>
-                        <button
-                            className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant group flex relative"
-                            onClick={() => navigate("/dashboard/profile")}
-                            title="Ustawienia"
-                        >
-                            <span className="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
-                        </button>
-                        <button 
-                            className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant relative group flex"
-                            onClick={() => navigate("/dashboard/notifications")}
-                            title="Powiadomienia"
-                        >
-                            <span className="material-symbols-outlined group-hover:text-primary transition-colors">notifications</span>
-                            {unreadCount > 0 && (
-                                <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full ring-2 ring-surface-bright"></span>
+                            <div className="relative shrink-0">
+                                <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-primary">person</span>
+                                </div>
+                                {lucky?.lucky_number && user.role === "uczen" && (
+                                    <div className="absolute -top-1 -right-1 bg-tertiary-fixed text-on-tertiary-fixed w-4 h-4 rounded-full flex items-center justify-center font-bold text-[10px] ring-2 ring-surface-bright" title="Twój szczęśliwy numerek">
+                                        {lucky.lucky_number}
+                                    </div>
+                                )}
+                            </div>
+                            {!sidebarCollapsed && (
+                                <>
+                                    <div className="flex-1 min-w-0 text-left">
+                                        <p className="text-sm font-bold text-on-surface truncate">{user.firstName}</p>
+                                        <p className="text-sm font-bold text-on-surface truncate">{user.lastName}</p>
+                                    </div>
+                                    <span className="material-symbols-outlined text-on-surface-variant text-sm shrink-0">
+                                        {profileMenuOpen ? 'expand_less' : 'expand_more'}
+                                    </span>
+                                </>
                             )}
                         </button>
-                        <button 
-                            className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant group flex relative"
-                            onClick={handleLogout}
-                            title="Wyloguj"
-                        >
-                            <span className="material-symbols-outlined group-hover:text-error transition-colors">logout</span>
-                        </button>
-                        <button 
-                            className="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant group flex relative"
-                            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                            title={sidebarCollapsed ? "Rozwiń" : "Zwiń"}
-                        >
-                            <span className="material-symbols-outlined group-hover:text-primary transition-colors">
-                                {sidebarCollapsed ? 'dock_to_right' : 'dock_to_left'}
-                            </span>
-                        </button>
+
+                        {profileMenuOpen && (
+                            <div className="absolute bottom-full left-0 right-0 mb-2 bg-surface rounded-xl shadow-lg border border-outline/10 overflow-hidden z-50">
+                                <button
+                                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-container transition-colors"
+                                    onClick={() => {
+                                        setProfileMenuOpen(false);
+                                        navigate("/dashboard/profile");
+                                    }}
+                                >
+                                    <span className="material-symbols-outlined text-on-surface">settings</span>
+                                    Ustawienia
+                                </button>
+                                <button
+                                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-surface-container transition-colors"
+                                    onClick={() => {
+                                        setProfileMenuOpen(false);
+                                        handleLogout();
+                                    }}
+                                >
+                                    <span className="material-symbols-outlined">logout</span>
+                                    Wyloguj
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </nav>

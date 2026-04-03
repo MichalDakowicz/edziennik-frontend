@@ -15,8 +15,8 @@ export default function GradeCard({ subjectName, grades, onSelect }: GradeCardPr
 
   return (
     <div className="bg-card rounded-xl overflow-hidden h-full flex flex-col hover:border-border/80 transition-shadow">
-      <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
-        <h3 className="font-semibold text-foreground">{subjectName}</h3>
+      <div className="flex items-center justify-between p-4 pb-2 bg-surface-container-low">
+        <h3 className="font-semibold text-on-surface font-body">{subjectName}</h3>
         <div className="flex gap-2">
           <span className="text-xs px-2.5 py-1 rounded-md tabular-nums font-bold text-primary bg-primary/10 border border-primary/20 dark:bg-primary/20 dark:border-primary/30">
             Średnia: {avg.toFixed(2)}
@@ -28,19 +28,19 @@ export default function GradeCard({ subjectName, grades, onSelect }: GradeCardPr
       </div>
       <div className="overflow-x-auto flex-1">
         <Table>
-          <TableHeader className="bg-muted/50 hidden md:table-header-group">
-            <TableRow className="hover:bg-transparent border-b border-border">
-              <TableHead className="w-[80px] text-xs uppercase tracking-wider font-bold text-muted-foreground p-3">Ocena</TableHead>
-              <TableHead className="text-xs uppercase tracking-wider font-bold text-muted-foreground p-3">Opis</TableHead>
-              <TableHead className="text-right text-xs uppercase tracking-wider font-bold text-muted-foreground w-[80px] p-3">Waga</TableHead>
-              <TableHead className="text-right text-xs uppercase tracking-wider font-bold text-muted-foreground w-[120px] p-3">Data</TableHead>
+          <TableHeader className="bg-surface-container-highest/50 hidden md:table-header-group">
+            <TableRow className="hover:bg-transparent pb-2">
+              <TableHead className="w-[80px] text-xs uppercase tracking-wider font-bold text-on-surface-variant font-body p-3">Ocena</TableHead>
+              <TableHead className="text-xs uppercase tracking-wider font-bold text-on-surface-variant font-body p-3">Opis</TableHead>
+              <TableHead className="text-right text-xs uppercase tracking-wider font-bold text-on-surface-variant font-body w-[80px] p-3">Waga</TableHead>
+              <TableHead className="text-right text-xs uppercase tracking-wider font-bold text-on-surface-variant font-body w-[120px] p-3">Data</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {grades.map((grade) => (
               <TableRow 
                 key={grade.id} 
-                className="cursor-pointer hover:bg-muted/50 border-b border-border/50 last:border-0 transition-colors"
+                className="cursor-pointer hover:bg-surface-container-highest/50 pb-2 last:border-0 transition-colors"
                 onClick={() => onSelect(grade)}
               >
                 <TableCell className="font-medium p-3">
@@ -49,15 +49,15 @@ export default function GradeCard({ subjectName, grades, onSelect }: GradeCardPr
                   </span>
                 </TableCell>
                 <TableCell className="p-3">
-                  <span className="block text-sm font-medium text-foreground">{grade.opis || "Ocena cząstkowa"}</span>
-                  <span className="md:hidden text-xs text-muted-foreground mt-1 block">
+                  <span className="block text-sm font-medium text-on-surface font-body">{grade.opis || "Ocena cząstkowa"}</span>
+                  <span className="md:hidden text-xs text-on-surface-variant font-body mt-1 block">
                     {formatDate(grade.data_wystawienia)} · Waga: {grade.waga}
                   </span>
                 </TableCell>
-                <TableCell className="text-right tabular-nums text-muted-foreground hidden md:table-cell p-3 font-medium">
+                <TableCell className="text-right tabular-nums text-on-surface-variant font-body hidden md:table-cell p-3 font-medium">
                   {grade.waga}
                 </TableCell>
-                <TableCell className="text-right tabular-nums text-muted-foreground hidden md:table-cell p-3">
+                <TableCell className="text-right tabular-nums text-on-surface-variant font-body hidden md:table-cell p-3">
                   {formatDate(grade.data_wystawienia)}
                 </TableCell>
               </TableRow>

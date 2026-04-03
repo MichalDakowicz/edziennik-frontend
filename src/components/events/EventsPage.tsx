@@ -47,11 +47,15 @@ export default function EventsPage() {
   if (firstError?.isError) return <ErrorState message={firstError.error.message} />;
 
   return (
-    <div className="space-y-4">
-      <h1 className="page-title">Terminarz</h1>
-      <div className="flex gap-2">
-        <button className={view === "list" ? "btn-primary" : "btn-ghost"} onClick={() => setView("list")}>Lista</button>
-        <button className={view === "calendar" ? "btn-primary" : "btn-ghost"} onClick={() => setView("calendar")}>Kalendarz</button>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Terminarz</h1>
+        </div>
+        <div className="flex bg-surface-container-low p-1 rounded-full">
+          <button className={view === "list" ? "px-4 py-1.5 text-sm font-semibold rounded-full bg-white dark:bg-surface-container-high text-primary shadow-sm transition-all" : "px-4 py-1.5 text-sm font-semibold rounded-full text-on-surface-variant hover:text-primary transition-all"} onClick={() => setView("list")}>Lista</button>
+          <button className={view === "calendar" ? "px-4 py-1.5 text-sm font-semibold rounded-full bg-white dark:bg-surface-container-high text-primary shadow-sm transition-all" : "px-4 py-1.5 text-sm font-semibold rounded-full text-on-surface-variant hover:text-primary transition-all"} onClick={() => setView("calendar")}>Kalendarz</button>
+        </div>
       </div>
 
       {view === "calendar" ? <EventCalendar events={events} /> : null}
@@ -65,16 +69,16 @@ export default function EventsPage() {
                 const open = expanded.includes(event.id);
                 const subject = subjects.find((s) => s.id === event.przedmiot);
                 return (
-                  <div key={event.id} className="bg-card/50 border border-border/50 rounded-xl p-4">
+                  <div key={event.id} className="bg-card/50 /50 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold">{event.tytul}</h3>
                       {subject ? <Badge variant="info">{subject.nazwa ?? subject.Nazwa}</Badge> : null}
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">{formatDateTime(event.data)}</p>
+                    <p className="text-sm text-on-surface-variant font-body mb-2">{formatDateTime(event.data)}</p>
                     <button className="text-sm text-primary hover:text-primary/80" onClick={() => setExpanded((current) => (open ? current.filter((id) => id !== event.id) : [...current, event.id]))}>
                       {open ? "Ukryj opis" : "Pokaż opis"}
                     </button>
-                    {open ? <p className="mt-2 text-foreground whitespace-pre-wrap">{event.opis}</p> : null}
+                    {open ? <p className="mt-2 text-on-surface font-body whitespace-pre-wrap">{event.opis}</p> : null}
                   </div>
                 );
               })}
@@ -83,7 +87,7 @@ export default function EventsPage() {
           {past.length ? (
             <section>
               <h2 className="section-title">Minione</h2>
-              <p className="text-muted-foreground text-sm">Liczba minionych wydarzeń: {past.length}</p>
+              <p className="text-on-surface-variant font-body text-sm">Liczba minionych wydarzeń: {past.length}</p>
             </section>
           ) : null}
         </div>

@@ -23,15 +23,15 @@ function RecentGradesCell({ studentId, selectedSubjectId }: { studentId: number;
     enabled: !!selectedSubjectId,
   });
 
-  if (!selectedSubjectId) return <span className="text-xs text-muted-foreground">Wybierz filtr</span>;
-  if (isLoading) return <span className="text-xs text-muted-foreground">Ładowanie...</span>;
-  if (!grades || grades.length === 0) return <span className="text-xs text-muted-foreground">Brak ocen</span>;
+  if (!selectedSubjectId) return <span className="text-xs text-on-surface-variant font-body">Wybierz filtr</span>;
+  if (isLoading) return <span className="text-xs text-on-surface-variant font-body">Ładowanie...</span>;
+  if (!grades || grades.length === 0) return <span className="text-xs text-on-surface-variant font-body">Brak ocen</span>;
 
   const filtered = grades
     .filter((g) => g.przedmiot === selectedSubjectId)
     .sort((a, b) => new Date(b.data_wystawienia).getTime() - new Date(a.data_wystawienia).getTime());
 
-  if (filtered.length === 0) return <span className="text-xs text-muted-foreground">Brak ocen</span>;
+  if (filtered.length === 0) return <span className="text-xs text-on-surface-variant font-body">Brak ocen</span>;
 
   return (
     <div className="flex gap-1">
@@ -44,7 +44,7 @@ function RecentGradesCell({ studentId, selectedSubjectId }: { studentId: number;
           >
             {formatGradeValue(g.wartosc)}
           </span>
-          <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 w-max -translate-x-1/2 rounded-md border border-border bg-popover px-2 py-1 text-[10px] leading-tight text-popover-foreground opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100">
+          <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 w-max -translate-x-1/2 rounded-md  bg-popover px-2 py-1 text-[10px] leading-tight text-popover-foreground opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100">
             <div><span className="font-semibold">Wartość:</span> {g.wartosc}</div>
             <div><span className="font-semibold">Waga:</span> {g.waga}</div>
             {g.opis && <div><span className="font-semibold">Opis:</span> {g.opis}</div>}
@@ -62,7 +62,7 @@ function BehaviorTotalCell({ studentId }: { studentId: number }) {
     queryFn: () => getBehaviorPoints(studentId),
   });
 
-  if (isLoading) return <span className="text-xs text-muted-foreground">Ładowanie...</span>;
+  if (isLoading) return <span className="text-xs text-on-surface-variant font-body">Ładowanie...</span>;
 
   const total = (behavior ?? []).reduce((sum, item) => sum + item.punkty, 0);
   return (
@@ -235,7 +235,7 @@ export default function TeacherGradesPage() {
   };
 
   const getGradeStyles = (num: number | null, mod: '+' | '-' | '') => {
-    if (num === null) return "bg-muted text-muted-foreground border-border";
+    if (num === null) return "bg-surface-container-highest text-on-surface-variant font-body border-border";
 
     const value = getGradeValue(num, mod);
 
@@ -252,14 +252,19 @@ export default function TeacherGradesPage() {
   if (classesError) return <ErrorState message={`Błąd: ${(classesError as Error).message}`} />;
 
   return (
-    <div className="space-y-6 p-6">
-      <h1 className="page-title">Wystawianie Ocen</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Wystawianie Ocen</h1>
+          <p className="text-on-surface-variant font-body text-sm mt-1">Wybierz przedmiot i klasę, aby wystawić oceny.</p>
+        </div>
+      </div>
 
       <Card>
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-2">
           <div>
             <h2 className="section-title">Filtry</h2>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-on-surface-variant font-body mt-1">
               Wybierz przedmiot i klasę, aby wystawić oceny.
             </p>
           </div>
@@ -283,8 +288,8 @@ export default function TeacherGradesPage() {
               </span>
             )}
             {gradeMode !== "behavior" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-muted-foreground">
-                Waga: <span className="font-semibold text-foreground">{selectedWeight}</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-surface-container-highest px-2.5 py-1 text-on-surface-variant font-body">
+                Waga: <span className="font-semibold text-on-surface font-body">{selectedWeight}</span>
               </span>
             )}
           </div>
@@ -331,7 +336,7 @@ export default function TeacherGradesPage() {
               <div
                 className={`inline-flex rounded-lg p-1 border ${
                   gradeMode === "behavior"
-                    ? "bg-muted/40 border-border/60 opacity-60"
+                    ? "bg-surface-container-highest/40 border-border/60 opacity-60"
                     : "bg-zinc-900/40 border-zinc-800"
                 }`}
               >
@@ -346,7 +351,7 @@ export default function TeacherGradesPage() {
                     disabled={gradeMode === "behavior"}
                     className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                       gradeMode === "behavior"
-                        ? "text-muted-foreground cursor-not-allowed bg-transparent hover:bg-transparent"
+                        ? "text-on-surface-variant font-body cursor-not-allowed bg-transparent hover:bg-transparent"
                         : selectedWeight === w
                           ? "bg-primary text-primary-foreground shadow-sm"
                           : "text-zinc-300 hover:bg-zinc-800"
@@ -431,7 +436,7 @@ export default function TeacherGradesPage() {
               <tbody>
                 {filteredStudents.map((student: any) => (
                   <tr key={student.id} className="border-b border-zinc-800 hover:bg-zinc-900/50">
-                    <td className="py-3 px-4 font-medium text-muted-foreground">{classJournalNumbers.get(student.id) ?? "-"}</td>
+                    <td className="py-3 px-4 font-medium text-on-surface-variant font-body">{classJournalNumbers.get(student.id) ?? "-"}</td>
                     <td className="py-3 px-4">{student.user?.first_name} {student.user?.last_name}</td>
                     <td className="py-3 px-4">
                       {gradeMode === 'behavior' ? (
@@ -446,7 +451,7 @@ export default function TeacherGradesPage() {
                           <button
                             type="button"
                             onClick={() => setPendingBehaviorPoint(student.id, (pendingBehaviorPoints[student.id] ?? 0) - 1)}
-                            className="h-9 w-9 rounded-md border border-border bg-card text-sm font-semibold hover:bg-muted"
+                            className="h-9 w-9 rounded-md  bg-card text-sm font-semibold hover:bg-surface-container-highest"
                           >
                             -
                           </button>
@@ -468,7 +473,7 @@ export default function TeacherGradesPage() {
                           <button
                             type="button"
                             onClick={() => setPendingBehaviorPoint(student.id, (pendingBehaviorPoints[student.id] ?? 0) + 1)}
-                            className="h-9 w-9 rounded-md border border-border bg-card text-sm font-semibold hover:bg-muted"
+                            className="h-9 w-9 rounded-md  bg-card text-sm font-semibold hover:bg-surface-container-highest"
                           >
                             +
                           </button>
@@ -523,7 +528,7 @@ export default function TeacherGradesPage() {
                             }`}
                           >
                             {!hasPreview ? (
-                              <Plus size={22} strokeWidth={1.5} className="text-muted-foreground" />
+                              <Plus size={22} strokeWidth={1.5} className="text-on-surface-variant font-body" />
                             ) : (
                               <div className="flex items-baseline text-xl font-bold tabular-nums">
                                 {previewBase}
@@ -550,7 +555,7 @@ export default function TeacherGradesPage() {
                                             top: (gradeMenuPosition?.top ?? gradeMenuAnchor.top),
                                             left: (gradeMenuPosition?.left ?? gradeMenuAnchor.left),
                                           }}
-                                          className="fixed p-2 bg-popover text-popover-foreground border border-border rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] z-[9999] w-60 origin-bottom-right"
+                                          className="fixed p-2 bg-popover text-popover-foreground  rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] z-[9999] w-60 origin-bottom-right"
                                         >
                                           <div className="grid grid-cols-4 gap-1.5">
                                             <div className="col-span-3 grid grid-cols-3 gap-1.5">
@@ -587,7 +592,7 @@ export default function TeacherGradesPage() {
                                                     className={`h-12 rounded-xl text-xl font-bold transition-all border ${
                                                       isActive
                                                         ? `${styles} shadow-sm scale-[1.03] z-10 border-2 border-current`
-                                                        : 'bg-muted text-muted-foreground hover:bg-muted/80 border-border'
+                                                        : 'bg-surface-container-highest text-on-surface-variant font-body hover:bg-surface-container-highest/80 border-border'
                                                     }`}
                                                   >
                                                     {n}
@@ -606,7 +611,7 @@ export default function TeacherGradesPage() {
                                                 const styles =
                                                   gradeBase !== null
                                                     ? getGradeStyles(gradeBase, mod)
-                                                    : 'bg-muted text-muted-foreground border-border';
+                                                    : 'bg-surface-container-highest text-on-surface-variant font-body border-border';
 
                                                 return (
                                                   <button
@@ -625,7 +630,7 @@ export default function TeacherGradesPage() {
                                                     className={`flex-1 rounded-xl text-xl font-bold transition-all disabled:opacity-20 border disabled:cursor-not-allowed ${
                                                       isActive
                                                         ? `${styles} shadow-sm scale-[1.03] z-10 border-2 border-current`
-                                                        : 'bg-muted text-muted-foreground hover:bg-muted/80 border-border'
+                                                        : 'bg-surface-container-highest text-on-surface-variant font-body hover:bg-surface-container-highest/80 border-border'
                                                     }`}
                                                   >
                                                     {mod}

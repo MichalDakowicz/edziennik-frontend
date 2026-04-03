@@ -49,56 +49,50 @@ export function CalendarNavHeader({
             : cap(format(currentDate, "LLLL yyyy", { locale: pl }));
 
     return (
-        <div className="space-y-3 pb-4 border-b border-border/50">
-            <h1 className="page-title">Kalendarz</h1>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                <div className="text-base sm:text-lg font-medium">{label}</div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+            <div>
+                <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Kalendarz</h1>
+                <p className="text-on-surface-variant mt-1 font-body text-sm">{label}</p>
+            </div>
+            <div className="flex items-center gap-2">
+                <div className="flex bg-surface-container-low p-1 rounded-full">
+                    {VIEWS.map((v) => (
+                        <button
+                            key={v.key}
+                            onClick={() => onViewModeChange(v.key)}
+                            className={cn(
+                                "px-4 py-1.5 text-sm font-semibold rounded-full transition-all",
+                                viewMode === v.key
+                                    ? "bg-white dark:bg-surface-container-high text-primary shadow-sm"
+                                    : "text-on-surface-variant hover:text-primary"
+                            )}
+                        >
+                            {v.label}
+                        </button>
+                    ))}
+                </div>
                 <div className="flex items-center gap-1">
                     <button
-                        className="btn-ghost h-9 w-9 p-0 flex items-center justify-center"
+                        className="p-1.5 rounded-full hover:bg-surface-container-high transition-colors"
                         onClick={prev}
                         aria-label="Poprzedni"
-                        style={{
-                            paddingLeft: "8px",
-                            paddingRight: "8px",
-                        }}
                     >
-                        <ChevronLeft className="size-4" />
+                        <ChevronLeft className="w-4 h-4 text-on-surface-variant" />
                     </button>
                     <button
-                        className="btn-ghost h-9 px-3 text-sm"
+                        className="px-3 py-1.5 text-sm font-medium rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant"
                         onClick={() => onDateChange(new Date())}
                     >
                         Dziś
                     </button>
                     <button
-                        className="btn-ghost h-9 w-9 p-0 flex items-center justify-center"
+                        className="p-1.5 rounded-full hover:bg-surface-container-high transition-colors"
                         onClick={next}
                         aria-label="Następny"
-                        style={{
-                            paddingLeft: "8px",
-                            paddingRight: "8px",
-                        }}
                     >
-                        <ChevronRight className="w-4 h-4" />
+                        <ChevronRight className="w-4 h-4 text-on-surface-variant" />
                     </button>
                 </div>
-            </div>
-            <div className="bg-muted rounded-lg p-1 grid grid-cols-4 gap-1">
-                {VIEWS.map((v) => (
-                    <button
-                        key={v.key}
-                        onClick={() => onViewModeChange(v.key)}
-                        className={cn(
-                            "rounded-md px-2 py-1.5 text-sm font-medium transition-colors",
-                            viewMode === v.key
-                                ? "bg-background text-foreground shadow-sm"
-                                : "text-muted-foreground hover:text-foreground",
-                        )}
-                    >
-                        {v.label}
-                    </button>
-                ))}
             </div>
         </div>
     );

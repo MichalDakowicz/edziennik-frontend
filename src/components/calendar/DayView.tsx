@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { format, isSameDay } from "date-fns";
 import { pl } from "date-fns/locale";
 import type { Event, Homework } from "../../types/api";
@@ -14,10 +15,39 @@ interface DayViewProps {
   onItemClick?: (item: DisplayItem) => void;
 }
 
-// 7:00 to 18:00 (11 hours)
 const START_HOUR = 7;
 const END_HOUR = 18;
 const MIN_PER_HOUR = 50;
+
+const SUBJECT_COLOR_MAP: Record<string, { bg: string; border: string; text: string }> = {
+  matematyka: { bg: "bg-primary/10", border: "border-l-primary", text: "text-primary" },
+  fizyka: { bg: "bg-primary/10", border: "border-l-primary", text: "text-primary" },
+  biologia: { bg: "bg-primary/10", border: "border-l-primary", text: "text-primary" },
+  informatyka: { bg: "bg-primary/10", border: "border-l-primary", text: "text-primary" },
+  chemia: { bg: "bg-primary/10", border: "border-l-primary", text: "text-primary" },
+  "język polski": { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
+  polski: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
+  historia: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
+  angielski: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
+  niemiecki: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
+  rosyjski: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
+  hiszpański: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
+  łacina: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
+  muzyka: { bg: "bg-tertiary/10", border: "border-l-tertiary", text: "text-tertiary" },
+  plastyka: { bg: "bg-tertiary/10", border: "border-l-tertiary", text: "text-tertiary" },
+  wf: { bg: "bg-emerald-500/10", border: "border-l-emerald-500", text: "text-emerald-700 dark:text-emerald-300" },
+  religia: { bg: "bg-amber-500/10", border: "border-l-amber-500", text: "text-amber-700 dark:text-amber-300" },
+  etyka: { bg: "bg-amber-500/10", border: "border-l-amber-500", text: "text-amber-700 dark:text-amber-300" },
+  godzi: { bg: "bg-surface-container-highest/50", border: "border-l-outline", text: "text-on-surface-variant" },
+};
+
+function getSubjectColor(subject: string) {
+  const lower = subject.toLowerCase();
+  for (const [key, colors] of Object.entries(SUBJECT_COLOR_MAP)) {
+    if (lower.includes(key)) return colors;
+  }
+  return null;
+}
 
 export function DayView({ date, timetable, events, homework, onItemClick }: DayViewProps) {
   const lessons = getLessonsForDate(date, timetable);
@@ -27,19 +57,23 @@ export function DayView({ date, timetable, events, homework, onItemClick }: DayV
   const dayEvents = allEvents.filter((e) => e.isAllDay);
   const timedEvents = allEvents.filter((e) => !e.isAllDay);
 
-  const now = new Date();
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const currentTimeStr = format(now, "HH:mm");
   const isToday = isSameDay(date, now);
 
   const totalMinutes = (END_HOUR - START_HOUR) * MIN_PER_HOUR;
   
-  // Calculate vertical position (pixels) based on time (HH:mm)
   const getTopOffset = (timeStr: string) => {
     const mins = timeToMinutes(timeStr) - (START_HOUR * 60);
     return Math.max(0, mins * (MIN_PER_HOUR / 60)); 
   };
   
-  // Calculate height (pixels) based on start and end time
   const getHeight = (startStr: string, endStr: string) => {
     const durationMins = timeToMinutes(endStr) - timeToMinutes(startStr);
     return Math.max(15, durationMins * (MIN_PER_HOUR / 60));
@@ -49,14 +83,15 @@ export function DayView({ date, timetable, events, homework, onItemClick }: DayV
   const isCurrentTimeVisible = currentMinutesOffset >= 0 && currentMinutesOffset <= totalMinutes;
 
   return (
-    <div className="space-y-4">
-      <div className="bg-card/50 border border-border/50 rounded-xl p-4 flex flex-col gap-3">
-        <div className="text-base font-medium">
+    <div className="space-y-6">
+      {/* Day Header */}
+      <div className="bg-surface-container-lowest rounded-3xl p-4">
+        <h2 className="text-2xl font-extrabold text-on-surface font-headline tracking-tight">
           {cap(format(date, "EEEE, d MMMM yyyy", { locale: pl }))}
-        </div>
+        </h2>
         
         {(dayEvents.length > 0 || dayHomework.length > 0) && (
-          <div className="space-y-2">
+          <div className="space-y-2 mt-3">
             {dayEvents.map((item) => (
               <ItemCard key={item.id} item={item} onClick={onItemClick} />
             ))}
@@ -67,104 +102,125 @@ export function DayView({ date, timetable, events, homework, onItemClick }: DayV
         )}
       </div>
 
-      {/* Smooth Timeline Grid */}
-      <div className="relative border-border pt-4 pb-4">
-        <div className="w-full relative" style={{ height: `${totalMinutes}px` }}>
-            
+      {/* Timeline Grid */}
+      <div className="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm border border-outline-variant/10">
+        <div className="relative" style={{ height: `${totalMinutes}px` }}>
           {/* Background Hour Lines */}
           {Array.from({ length: END_HOUR - START_HOUR + 1 }).map((_, i) => (
             <div 
               key={`hour-line-${i}`} 
-              className="absolute left-0 right-0 border-t border-border/40 flex items-start"
+              className="absolute left-0 right-0 border-t border-outline-variant/10"
               style={{ top: `${i * MIN_PER_HOUR}px` }}
+            />
+          ))}
+
+          {/* Hour Labels */}
+          {Array.from({ length: END_HOUR - START_HOUR + 1 }).map((_, i) => (
+            <div 
+              key={`hour-label-${i}`} 
+              className="absolute left-2 text-xs text-outline font-label"
+              style={{ top: `${i * MIN_PER_HOUR - 8}px` }}
             >
-               <span className="text-[10px] text-muted-foreground w-12 text-right pr-2 -mt-2.5 bg-background">
-                  {String(START_HOUR + i).padStart(2, '0')}:00
-               </span>
+              {String(START_HOUR + i).padStart(2, '0')}:00
             </div>
           ))}
 
           {/* Current Time Indicator */}
           {isToday && isCurrentTimeVisible && (
             <div 
-              className="absolute left-12 right-0 z-20 pointer-events-none flex items-center"
+              className="absolute left-8 right-0 z-30 pointer-events-none flex items-center"
               style={{ top: `${currentMinutesOffset}px` }}
             >
-              <div className="w-2 h-2 rounded-full bg-red-500 -ml-1" />
-              <div className="flex-1 h-[2px] bg-red-500 opacity-70" />
+              <div className="w-2.5 h-2.5 rounded-full bg-error -ml-1.25 ring-2 ring-error/30" />
+              <div className="flex-1 h-[2px] bg-error opacity-60" />
             </div>
           )}
 
-          <div className="absolute left-12 right-2 top-0 bottom-0 pointer-events-none">
+          {/* Content Area */}
+          <div className="absolute left-10 right-3 top-0 bottom-0">
             {/* Lessons */}
             {lessons.map(lesson => {
-               const top = getTopOffset(lesson.startTime);
-               const height = getHeight(lesson.startTime, lesson.endTime);
-               
-               // Check for overlapping events to adjust width
-               const overlappingEvents = timedEvents.filter(ev => {
-                   if (!ev.startTime || !ev.endTime) return false;
-                   return (ev.startTime < lesson.endTime && ev.endTime > lesson.startTime);
-               });
-               
-               const widthClass = overlappingEvents.length > 0 ? "w-[calc(50%-4px)]" : "w-full";
-               
-               return (
-                 <div
-                   key={lesson.id}
-                   onClick={() => onItemClick?.(lesson)}
-                   className={cn(
-                     "absolute left-0 rounded-md border p-1 text-xs overflow-hidden flex flex-col shadow-sm bg-[#5c2a85] text-white border-[#5c2a85] pointer-events-auto cursor-pointer hover:brightness-110",
-                     widthClass
-                   )}
-                   style={{ 
-                     top: `${top}px`, 
-                     height: `${height}px`,
-                   }}
-                   title={`${lesson.startTime}-${lesson.endTime} ${lesson.subject}`}
-                 >
-                   <div className="font-semibold truncate">{lesson.subject}</div>
-                   <div className="opacity-80 text-[10px] truncate">{lesson.startTime} - {lesson.endTime}</div>
-                 </div>
-               );
+              const top = getTopOffset(lesson.startTime);
+              const height = getHeight(lesson.startTime, lesson.endTime);
+              const colors = getSubjectColor(lesson.subject);
+
+              const overlappingEvents = timedEvents.filter(ev => {
+                if (!ev.startTime || !ev.endTime) return false;
+                return (ev.startTime < lesson.endTime && ev.endTime > lesson.startTime);
+              });
+
+              const widthClass = overlappingEvents.length > 0 ? "w-[calc(50%-4px)]" : "w-full";
+
+              return (
+                <div
+                  key={lesson.id}
+                  onClick={() => onItemClick?.(lesson)}
+                  className={cn(
+                    "absolute left-0 rounded-xl p-3 flex flex-col justify-between cursor-pointer hover:shadow-lg transition-all group",
+                    colors ? colors.bg : "bg-primary/10",
+                    colors ? colors.border : "border-l-primary",
+                    widthClass
+                  )}
+                  style={{ top: `${top}px`, height: `${height}px` }}
+                >
+                  <div>
+                    <h4 className={cn(
+                      "font-headline font-bold text-sm",
+                      colors ? colors.text : "text-primary"
+                    )}>
+                      {lesson.subject}
+                    </h4>
+                    <p className="text-[10px] font-medium text-on-surface-variant mt-0.5">
+                      {lesson.startTime} - {lesson.endTime}
+                    </p>
+                  </div>
+                  <span className={cn(
+                    "material-symbols-outlined text-xs opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all self-end",
+                    colors ? colors.text : "text-primary"
+                  )}>
+                    east
+                  </span>
+                </div>
+              );
             })}
-            
+
             {/* Timed Events */}
             {timedEvents.map(ev => {
-               if (!ev.startTime || !ev.endTime) return null;
-               const top = getTopOffset(ev.startTime);
-               const height = getHeight(ev.startTime, ev.endTime);
-               
-               // Check for overlapping lessons to adjust position
-               const overlappingLessons = lessons.filter(lesson => {
-                   return (ev.startTime! < lesson.endTime && ev.endTime! > lesson.startTime);
-               });
-               
-               const leftClass = overlappingLessons.length > 0 ? "left-[calc(50%+4px)]" : "left-0";
-               const widthClass = overlappingLessons.length > 0 ? "w-[calc(50%-4px)]" : "w-full";
-               
-               return (
-                 <div
-                   key={ev.id}
-                   onClick={() => onItemClick?.(ev)}
-                   className={cn(
-                     "absolute rounded-md border p-1 text-xs overflow-hidden flex flex-col shadow-sm bg-gray-600 border-gray-500 text-white z-10 pointer-events-auto cursor-pointer hover:brightness-110",
-                     leftClass,
-                     widthClass
-                   )}
-                   style={{ 
-                     top: `${top}px`, 
-                     height: `${height}px`,
-                   }}
-                   title={`${ev.startTime}-${ev.endTime} ${ev.title}`}
-                 >
-                   <div className="font-semibold truncate">{ev.title}</div>
-                   <div className="opacity-80 text-[10px] truncate">{ev.subject || "Wydarzenie"}</div>
-                 </div>
-               );
+              if (!ev.startTime || !ev.endTime) return null;
+              const top = getTopOffset(ev.startTime);
+              const height = getHeight(ev.startTime, ev.endTime);
+
+              const overlappingLessons = lessons.filter(lesson => {
+                return (ev.startTime! < lesson.endTime && ev.endTime! > lesson.startTime);
+              });
+
+              const leftClass = overlappingLessons.length > 0 ? "left-[calc(50%+4px)]" : "left-0";
+              const widthClass = overlappingLessons.length > 0 ? "w-[calc(50%-4px)]" : "w-full";
+
+              return (
+                <div
+                  key={ev.id}
+                  onClick={() => onItemClick?.(ev)}
+                  className={cn(
+                    "absolute rounded-xl p-3 border-l-4 border-error bg-error-container/30 flex flex-col justify-between cursor-pointer hover:shadow-lg transition-all z-10",
+                    leftClass,
+                    widthClass
+                  )}
+                  style={{ top: `${top}px`, height: `${height}px` }}
+                >
+                  <div>
+                    <div className="flex items-center gap-1">
+                      <span className="material-symbols-outlined text-sm text-error" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
+                      <h4 className="font-headline font-bold text-sm text-error">{ev.title}</h4>
+                    </div>
+                    <p className="text-[10px] font-medium text-on-surface-variant mt-0.5">
+                      {ev.startTime} - {ev.endTime} • {ev.subject || "Wydarzenie"}
+                    </p>
+                  </div>
+                </div>
+              );
             })}
           </div>
-
         </div>
       </div>
     </div>

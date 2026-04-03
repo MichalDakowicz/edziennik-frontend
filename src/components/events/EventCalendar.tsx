@@ -27,13 +27,13 @@ export default function EventCalendar({ events }: { events: Event[] }) {
 
   return (
     <div className="grid lg:grid-cols-[2fr,1fr] gap-4">
-      <div className="bg-card/50 border border-border/50 rounded-xl p-4">
+      <div className="bg-card/50 /50 rounded-xl p-4">
         <div className="flex items-center justify-between mb-4">
           <button className="btn-ghost" onClick={() => setMonthOffset((v) => v - 1)}>Poprzedni</button>
           <h3 className="font-semibold">{targetMonth.toLocaleDateString("pl-PL", { month: "long", year: "numeric" })}</h3>
           <button className="btn-ghost" onClick={() => setMonthOffset((v) => v + 1)}>Następny</button>
         </div>
-        <div className="grid grid-cols-7 gap-2 text-xs text-muted-foreground mb-2">
+        <div className="grid grid-cols-7 gap-2 text-xs text-on-surface-variant font-body mb-2">
           {["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"].map((d) => <div key={d}>{d}</div>)}
         </div>
         <div className="grid grid-cols-7 gap-2">
@@ -50,18 +50,18 @@ export default function EventCalendar({ events }: { events: Event[] }) {
           })}
         </div>
       </div>
-      <div className="bg-card/50 border border-border/50 rounded-xl p-4">
+      <div className="bg-card/50 /50 rounded-xl p-4">
         <h3 className="section-title mb-3">Wydarzenia dnia</h3>
         {selectedDate ? (
           selectedEvents.length ? (
             <ul className="space-y-2">
-              {selectedEvents.map((event) => <li key={event.id} className="text-sm text-foreground">{event.tytul}</li>)}
+              {selectedEvents.map((event) => <li key={event.id} className="text-sm text-on-surface font-body">{event.tytul}</li>)}
             </ul>
           ) : (
-            <p className="text-muted-foreground">Brak wydarzeń</p>
+            <p className="text-on-surface-variant font-body">Brak wydarzeń</p>
           )
         ) : (
-          <p className="text-muted-foreground">Wybierz dzień</p>
+          <p className="text-on-surface-variant font-body">Wybierz dzień</p>
         )}
       </div>
     </div>

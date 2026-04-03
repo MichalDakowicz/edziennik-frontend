@@ -27,24 +27,24 @@ export default function AttendanceTable({
       case "info":
         return "text-primary dark:text-primary/80";
       default:
-        return "text-muted-foreground";
+        return "text-on-surface-variant font-body";
     }
   };
 
   return (
-    <div className="rounded-xl border border-border overflow-hidden bg-card">
+    <div className="rounded-xl  overflow-hidden bg-card">
       <Table>
-        <TableHeader className="bg-muted/50">
-          <TableRow className="hover:bg-transparent border-b border-border">
-            <TableHead className="text-muted-foreground font-semibold">Data</TableHead>
-            <TableHead className="text-muted-foreground font-semibold">Godzina lekcyjna</TableHead>
-            <TableHead className="text-muted-foreground font-semibold">Status</TableHead>
+        <TableHeader className="bg-surface-container-highest/50">
+          <TableRow className="hover:bg-transparent pb-2">
+            <TableHead className="text-on-surface-variant font-body font-semibold">Data</TableHead>
+            <TableHead className="text-on-surface-variant font-body font-semibold">Godzina lekcyjna</TableHead>
+            <TableHead className="text-on-surface-variant font-body font-semibold">Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {records.length === 0 ? (
-            <TableRow className="border-b border-border">
-              <TableCell colSpan={3} className="text-center text-muted-foreground h-24">
+            <TableRow className="pb-2">
+              <TableCell colSpan={3} className="text-center text-on-surface-variant font-body h-24">
                 Brak danych o frekwencji
               </TableCell>
             </TableRow>
@@ -55,7 +55,7 @@ export default function AttendanceTable({
               const hour = hourMap.get(record.godzina_lekcyjna);
               
               return (
-                <TableRow key={record.id} className="hover:bg-muted/50 border-b border-border last:border-0">
+                <TableRow key={record.id} className="hover:bg-surface-container-highest/50 pb-2 last:border-0">
                   <TableCell className="tabular-nums font-medium">
                     {formatDate(record.Data)}
                   </TableCell>

@@ -43,11 +43,11 @@ export const Modal = ({
     >
       <div
         ref={contentRef}
-        className={`bg-card border border-border rounded-[var(--radius)] w-full max-h-[90vh] flex flex-col shadow-lg ${className}`}
+        className={`bg-surface-container-lowest shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] rounded-[var(--radius)] w-full max-h-[90vh] flex flex-col shadow-lg ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-border">
-          <h3 className="text-lg font-bold text-foreground">{title}</h3>
+        <div className="p-6 pb-2">
+          <h3 className="text-lg font-bold text-on-surface font-body">{title}</h3>
         </div>
         <div className="p-6 overflow-y-auto flex-1">{children}</div>
       </div>

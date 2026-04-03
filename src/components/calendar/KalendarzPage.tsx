@@ -16,13 +16,11 @@ import { ErrorState } from "../ui/ErrorState";
 import { Spinner } from "../ui/Spinner";
 import { CalendarNavHeader } from "./CalendarNavHeader";
 import { DayView } from "./DayView";
-import { Legend } from "./Legend";
 import { MonthView } from "./MonthView";
 import { ThreeDayView } from "./ThreeDayView";
 import { WeekView } from "./WeekView";
 import type { TimetableData, ViewMode, DisplayItem } from "./types";
 import { Modal } from "../ui/Modal";
-import { ItemCard } from "./ItemCard";
 
 export default function KalendarzPage() {
   const user = getCurrentUser();
@@ -92,22 +90,80 @@ export default function KalendarzPage() {
         onViewModeChange={setViewMode}
       />
       <div>{renderView()}</div>
-      <Legend />
 
       <Modal
         open={selectedItem !== null}
         onClose={() => setSelectedItem(null)}
-        title={
-          selectedItem?.kind === "lesson"
-            ? "Szczegóły lekcji"
-            : selectedItem?.kind === "event"
-              ? "Szczegóły wydarzenia"
-              : "Szczegóły pracy domowej"
-        }
+        title=""
+        className="max-w-md"
       >
         {selectedItem && (
-          <div className="space-y-4">
-            <ItemCard item={selectedItem} fill />
+          <div className="p-6 pt-0">
+            {selectedItem.kind === "lesson" && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>menu_book</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-on-surface font-headline">{selectedItem.subject}</h3>
+                    <p className="text-xs text-on-surface-variant">{selectedItem.periodNum}. lekcja</p>
+                  </div>
+                </div>
+                <div className="bg-surface-container-low rounded-xl p-3 flex items-center gap-3">
+                  <span className="material-symbols-outlined text-on-surface-variant text-sm">schedule</span>
+                  <span className="text-sm font-medium text-on-surface">{selectedItem.startTime} – {selectedItem.endTime}</span>
+                </div>
+              </div>
+            )}
+
+            {selectedItem.kind === "event" && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-error/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: "'FILL' 1" }}>event</span>
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-lg font-bold text-on-surface font-headline truncate">{selectedItem.title}</h3>
+                    {selectedItem.subject && (
+                      <p className="text-xs text-on-surface-variant">{selectedItem.subject}</p>
+                    )}
+                  </div>
+                </div>
+                {selectedItem.startTime && selectedItem.endTime && (
+                  <div className="bg-surface-container-low rounded-xl p-3 flex items-center gap-3">
+                    <span className="material-symbols-outlined text-on-surface-variant text-sm">schedule</span>
+                    <span className="text-sm font-medium text-on-surface">{selectedItem.startTime} – {selectedItem.endTime}</span>
+                  </div>
+                )}
+                {selectedItem.description && (
+                  <div className="bg-surface-container-low rounded-xl p-4">
+                    <p className="text-sm text-on-surface whitespace-pre-wrap">{selectedItem.description}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {selectedItem.kind === "homework" && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-amber-600 dark:text-amber-400" style={{ fontVariationSettings: "'FILL' 1" }}>assignment</span>
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-lg font-bold text-on-surface font-headline truncate">{selectedItem.title}</h3>
+                    {selectedItem.subject && (
+                      <p className="text-xs text-on-surface-variant">{selectedItem.subject}</p>
+                    )}
+                  </div>
+                </div>
+                {selectedItem.description && (
+                  <div className="bg-surface-container-low rounded-xl p-4">
+                    <p className="text-sm text-on-surface whitespace-pre-wrap">{selectedItem.description}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </Modal>

@@ -4,85 +4,261 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* White */
-    --foreground: 222.2 84% 4.9%; /* Very Dark Slate */
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 238 83% 60%; /* Institutional Indigo */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%; /* Slate 100 */
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%; /* Clear Red */
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%; /* Slate 200 */
-    --input: 214.3 31.8% 91.4%;
-    --ring: 238 83% 60%;
+    --background: 248 249 250;
+    --foreground: 25 28 29;
+    --card: 248 249 250;
+    --card-foreground: 25 28 29;
+    --popover: 248 249 250;
+    --popover-foreground: 25 28 29;
+    --primary: 0 64 161;
+    --primary-foreground: 255 255 255;
+    --secondary: 70 95 137;
+    --secondary-foreground: 255 255 255;
+    --muted: 225 227 228;
+    --muted-foreground: 66 70 84;
+    --accent: 225 227 228;
+    --accent-foreground: 25 28 29;
+    --destructive: 186 26 26;
+    --destructive-foreground: 255 255 255;
+    --border: 214 31 91;
+    --input: 214 31 91;
+    --ring: 0 64 161;
     --radius: 0.5rem;
+
+    --surface: 248 249 250;
+    --surface-container: 237 238 239;
+    --surface-container-lowest: 255 255 255;
+    --surface-container-low: 243 244 245;
+    --surface-container-high: 231 232 233;
+    --surface-container-highest: 225 227 228;
+    --surface-bright: 248 249 250;
+    --surface-dim: 217 218 219;
+    --surface-variant: 225 227 228;
+    --surface-tint: 0 86 210;
+
+    --on-background: 25 28 29;
+    --on-surface: 25 28 29;
+    --on-surface-variant: 66 70 84;
+    --on-primary: 255 255 255;
+    --on-primary-fixed: 0 24 71;
+    --on-primary-fixed-variant: 0 64 161;
+    --on-primary-container: 204 216 255;
+    --on-secondary: 255 255 255;
+    --on-secondary-fixed: 0 27 61;
+    --on-secondary-fixed-variant: 45 71 112;
+    --on-secondary-container: 61 87 128;
+    --on-tertiary: 255 255 255;
+    --on-tertiary-fixed: 44 23 0;
+    --on-tertiary-fixed-variant: 104 61 0;
+    --on-tertiary-container: 255 209 162;
+    --on-error: 255 255 255;
+    --on-error-container: 147 0 10;
+
+    --primary-container: 0 86 210;
+    --primary-fixed: 218 226 255;
+    --primary-fixed-dim: 178 197 255;
+    --secondary-container: 179 205 253;
+    --secondary-fixed: 214 227 255;
+    --secondary-fixed-dim: 174 199 247;
+    --tertiary-container: 137 82 0;
+    --tertiary-fixed: 255 220 188;
+    --tertiary-fixed-dim: 255 184 106;
+    --error-container: 255 218 214;
+
+    --outline: 115 119 133;
+    --outline-variant: 195 198 214;
+    --inverse-surface: 46 49 50;
+    --inverse-on-surface: 240 241 242;
+    --inverse-primary: 178 197 255;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%; /* Slate 950 */
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 238 83% 70%; /* Lighter Indigo for dark mode */
-    --primary-foreground: 222.2 47.4% 1.2%;
-    --secondary: 217.2 32.6% 17.5%; /* Slate 800 */
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%; /* Deep Red */
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%; /* Slate 800 */
-    --input: 217.2 32.6% 17.5%;
-    --ring: 238 83% 70%;
+    --background: 12 19 36;
+    --foreground: 220 225 251;
+    --card: 21 27 45;
+    --card-foreground: 220 225 251;
+    --popover: 35 41 60;
+    --popover-foreground: 220 225 251;
+    --primary: 0 64 161;
+    --primary-foreground: 255 255 255;
+    --secondary: 173 198 255;
+    --secondary-foreground: 12 19 36;
+    --muted: 35 41 60;
+    --muted-foreground: 194 198 214;
+    --accent: 35 41 60;
+    --accent-foreground: 220 225 251;
+    --destructive: 255 110 110;
+    --destructive-foreground: 12 19 36;
+    --border: 35 41 60;
+    --input: 35 41 60;
+    --ring: 0 64 161;
+
+    --surface: 12 19 36;
+    --surface-container: 21 27 45;
+    --surface-container-lowest: 7 13 31;
+    --surface-container-low: 21 27 45;
+    --surface-container-high: 35 41 60;
+    --surface-container-highest: 50 56 78;
+    --surface-bright: 21 27 45;
+    --surface-dim: 7 13 31;
+    --surface-variant: 35 41 60;
+    --surface-tint: 77 142 255;
+
+    --on-background: 220 225 251;
+    --on-surface: 220 225 251;
+    --on-surface-variant: 194 198 214;
+    --on-primary: 255 255 255;
+    --on-primary-fixed: 0 24 71;
+    --on-primary-fixed-variant: 0 64 161;
+    --on-primary-container: 204 216 255;
+    --on-secondary: 12 19 36;
+    --on-secondary-fixed: 214 227 255;
+    --on-secondary-fixed-variant: 174 199 247;
+    --on-secondary-container: 173 180 206;
+    --on-tertiary: 12 19 36;
+    --on-tertiary-fixed: 255 220 188;
+    --on-tertiary-fixed-variant: 255 184 106;
+    --on-tertiary-container: 255 184 106;
+    --on-error: 12 19 36;
+    --on-error-container: 255 180 180;
+
+    --primary-container: 0 86 210;
+    --primary-fixed: 218 226 255;
+    --primary-fixed-dim: 178 197 255;
+    --secondary-container: 30 50 90;
+    --secondary-fixed: 45 71 112;
+    --secondary-fixed-dim: 174 199 247;
+    --tertiary-container: 100 60 0;
+    --tertiary-fixed: 100 60 0;
+    --tertiary-fixed-dim: 255 184 106;
+    --error-container: 120 0 10;
+
+    --outline: 115 119 133;
+    --outline-variant: 66 71 84;
+    --inverse-surface: 220 225 251;
+    --inverse-on-surface: 35 41 60;
+    --inverse-primary: 0 64 161;
+  }
+
+  .oled {
+    --background: 0 0 0;
+    --foreground: 220 225 251;
+    --card: 10 10 10;
+    --card-foreground: 220 225 251;
+    --popover: 0 0 0;
+    --popover-foreground: 220 225 251;
+    --primary: 0 64 161;
+    --primary-foreground: 255 255 255;
+    --secondary: 173 198 255;
+    --secondary-foreground: 0 0 0;
+    --muted: 15 15 15;
+    --muted-foreground: 194 198 214;
+    --accent: 20 20 20;
+    --accent-foreground: 220 225 251;
+    --destructive: 255 110 110;
+    --destructive-foreground: 0 0 0;
+    --border: 20 20 20;
+    --input: 15 15 15;
+    --ring: 0 64 161;
+
+    --surface: 0 0 0;
+    --surface-container: 15 15 15;
+    --surface-container-lowest: 10 10 10;
+    --surface-container-low: 12 12 12;
+    --surface-container-high: 20 20 20;
+    --surface-container-highest: 30 30 30;
+    --surface-bright: 5 5 5;
+    --surface-dim: 0 0 0;
+    --surface-variant: 15 15 15;
+    --surface-tint: 77 142 255;
+
+    --on-background: 220 225 251;
+    --on-surface: 220 225 251;
+    --on-surface-variant: 194 198 214;
+    --on-primary: 255 255 255;
+    --on-primary-fixed: 0 24 71;
+    --on-primary-fixed-variant: 0 64 161;
+    --on-primary-container: 204 216 255;
+    --on-secondary: 0 0 0;
+    --on-secondary-fixed: 214 227 255;
+    --on-secondary-fixed-variant: 174 199 247;
+    --on-secondary-container: 173 180 206;
+    --on-tertiary: 0 0 0;
+    --on-tertiary-fixed: 255 220 188;
+    --on-tertiary-fixed-variant: 255 184 106;
+    --on-tertiary-container: 255 184 106;
+    --on-error: 0 0 0;
+    --on-error-container: 255 180 180;
+
+    --primary-container: 0 86 210;
+    --primary-fixed: 218 226 255;
+    --primary-fixed-dim: 178 197 255;
+    --secondary-container: 30 50 90;
+    --secondary-fixed: 45 71 112;
+    --secondary-fixed-dim: 174 199 247;
+    --tertiary-container: 100 60 0;
+    --tertiary-fixed: 100 60 0;
+    --tertiary-fixed-dim: 255 184 106;
+    --error-container: 120 0 10;
+
+    --outline: 115 119 133;
+    --outline-variant: 66 71 84;
+    --inverse-surface: 220 225 251;
+    --inverse-on-surface: 20 20 20;
+    --inverse-primary: 0 64 161;
   }
 
   body {
-    @apply font-sans bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+    @apply bg-background text-on-background antialiased selection:bg-primary/20 selection:text-primary;
+    font-family: "Inter", sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
 @layer utilities {
-  .page-title {
-    @apply text-3xl font-bold tracking-tight text-foreground;
+  .display-md {
+    font-family: "Manrope", sans-serif;
+    @apply text-5xl font-black tracking-tighter;
   }
-  .section-title {
-    @apply text-xl font-semibold text-foreground;
+  .headline-sm {
+    font-family: "Manrope", sans-serif;
+    @apply text-3xl font-bold tracking-tight;
   }
-  .stat-value {
-    @apply text-3xl font-bold;
+  .title-md {
+    font-family: "Inter", sans-serif;
+    @apply text-xl font-semibold;
   }
-  .stat-label {
-    @apply text-xs font-medium uppercase tracking-wider text-muted-foreground;
+  .body-md {
+    font-family: "Inter", sans-serif;
+    @apply text-base;
   }
-  .input-base {
-    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  .label-md {
+    font-family: "Inter", sans-serif;
+    @apply text-sm font-medium tracking-wide;
+  }
+  .shadow-floating {
+    box-shadow: 0 -4px 32px rgba(25, 28, 29, 0.06);
   }
   .tab-active {
-    @apply border-b-2 border-primary text-primary pb-2 font-medium;
+    @apply bg-primary text-inverse-on-surface px-4 py-2 rounded-full font-bold shadow-[0_4px_12px_rgba(0,64,161,0.2)] transition-all;
   }
   .tab-inactive {
-    @apply text-muted-foreground pb-2 hover:text-foreground transition-colors font-medium;
+    @apply bg-surface-tint/10 text-on-surface-variant backdrop-blur-md px-4 py-2 rounded-full font-medium hover:bg-surface-tint/20 transition-all;
   }
-  .btn-primary {
-    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2;
+  .oled-glass {
+    background: rgba(19, 19, 19, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
-  .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2;
+  .oled-shadow {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
   }
-  .btn-danger {
-    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2;
+  .dark-glass {
+    background: rgba(21, 27, 45, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .dark-shadow {
+    box-shadow: 0 32px 64px rgba(7, 13, 31, 0.08);
   }
 }

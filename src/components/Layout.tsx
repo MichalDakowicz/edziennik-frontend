@@ -46,14 +46,14 @@ const navItems: NavItem[] = [
         parent: true,
     },
     {
-        label: "Plan Lekcji",
+        label: "Kalendarz",
         to: "/dashboard/calendar",
-        icon: "calendar_today",
+        icon: "calendar_month",
         student: true,
         parent: true,
     },
     {
-        label: "Zadania Domowe",
+        label: "Zadania domowe",
         to: "/dashboard/homework",
         icon: "assignment",
         student: true,

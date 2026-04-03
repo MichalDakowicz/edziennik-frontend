@@ -55,7 +55,7 @@ export function getEventsForDate(
   return events
     .filter((e) => isSameDay(new Date(e.data), date))
     .map((e) => {
-      const subject = subjects.find((s) => s.id === e.przedmiot);
+      const subject = subjects?.find((s) => s.id === e.przedmiot);
       return {
         kind: "event" as const,
         id: `event-${e.id}`,
@@ -77,7 +77,7 @@ export function getHomeworkForDate(
   return homework
     .filter((h) => isSameDay(new Date(h.termin), date))
     .map((h) => {
-      const subject = subjects.find((s) => s.id === h.przedmiot);
+      const subject = subjects?.find((s) => s.id === h.przedmiot);
       return {
         kind: "homework" as const,
         id: `hw-${h.id}`,

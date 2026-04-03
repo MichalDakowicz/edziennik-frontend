@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pl" class="dark">
+<html lang="pl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,6 +11,22 @@
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
       }
     </style>
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('edziennik-theme');
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else if (theme === 'oled') {
+            document.documentElement.classList.add('dark', 'oled');
+          } else if (theme === 'system') {
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+              document.documentElement.classList.add('dark');
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body class="bg-surface-container-lowest text-on-background min-h-screen flex flex-col font-body">
     <div id="root"></div>

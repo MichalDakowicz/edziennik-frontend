@@ -186,7 +186,7 @@ export default function AttendanceHistoryPage() {
         const s = statusName.toLowerCase();
         let style = "bg-surface-container text-on-surface-variant";
         if (s.includes("nieobecn")) style = "bg-error-container text-on-error-container";
-        else if (s.includes("usprawiedliw")) style = "bg-green-50 text-green-700 border border-green-100";
+        else if (s.includes("usprawiedliw")) style = "bg-green-50 dark:bg-green-400/10 text-green-700 dark:text-green-300 border border-green-100 dark:border-green-400/20";
         else if (s.includes("spóźn") || s.includes("spozn")) style = "bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary-fixed-dim";
         else if (s.includes("zwoln")) style = "bg-primary/10 text-primary";
         
@@ -215,12 +215,12 @@ export default function AttendanceHistoryPage() {
 
     const getSubjectIconColor = (subject: string) => {
         const colorMap: Record<string, string> = {
-            "Matematyka": "text-blue-600 bg-blue-50",
-            "Język Polski": "text-orange-600 bg-orange-50",
-            "Język Angielski": "text-indigo-600 bg-indigo-50",
-            "Biologia": "text-emerald-600 bg-emerald-50",
-            "Geografia": "text-red-600 bg-red-50",
-            "Filozofia": "text-purple-600 bg-purple-50",
+            "Matematyka": "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-400/10",
+            "Język Polski": "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-400/10",
+            "Język Angielski": "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-400/10",
+            "Biologia": "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-400/10",
+            "Geografia": "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-400/10",
+            "Filozofia": "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-400/10",
         };
         return colorMap[subject] || "text-primary bg-primary/10";
     };
@@ -272,7 +272,7 @@ export default function AttendanceHistoryPage() {
                     {availableSubjects.length > 0 && (
                         <div className="relative flex-1 min-w-48 max-w-64">
                             <select
-                                className="w-full bg-white border border-surface-container rounded-xl px-4 py-2.5 text-sm text-on-surface appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 pr-10"
+                                className="w-full bg-surface-container-lowest dark:bg-surface-container border border-surface-container rounded-xl px-4 py-2.5 text-sm text-on-surface appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 pr-10"
                                 value={selectedSubject}
                                 onChange={(e) => { setSelectedSubject(e.target.value); setCurrentPage(1); }}
                             >
@@ -285,7 +285,7 @@ export default function AttendanceHistoryPage() {
                         </div>
                     )}
 
-                    <div className="flex items-center bg-white border border-surface-container rounded-xl overflow-hidden flex-1 min-w-64">
+                    <div className="flex items-center bg-surface-container-lowest dark:bg-surface-container border border-surface-container rounded-xl overflow-hidden flex-1 min-w-64">
                         <div className="flex items-center flex-1 px-3 py-2.5">
                             <span className="material-symbols-outlined text-on-surface-variant text-lg mr-2">calendar_today</span>
                             <input

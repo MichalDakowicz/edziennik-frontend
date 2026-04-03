@@ -233,7 +233,7 @@ export default function AttendancePage() {
                         <p className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-1">Wskaźnik obecności</p>
                         <h4 className="text-3xl font-black text-on-surface">{Math.round(percentage)}%</h4>
                     </div>
-                    <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
+                    <div className="w-12 h-12 bg-green-50 dark:bg-green-400/10 rounded-xl flex items-center justify-center text-green-600 dark:text-green-400">
                         <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                     </div>
                 </Card>
@@ -263,19 +263,19 @@ export default function AttendancePage() {
                     {criticalSubjects.length > 0 ? (
                         <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
                             {criticalSubjects.map((subject) => (
-                                <div key={subject.name} className="flex-shrink-0 bg-error-container/30 p-3 rounded-lg min-w-32">
+                                <div key={subject.name} className="flex-shrink-0 bg-red-50 dark:bg-red-400/10 p-3 rounded-lg min-w-32">
                                     <p className="text-xs font-bold text-on-surface truncate">{subject.name}</p>
-                                    <p className="text-lg font-black text-error">{subject.percentage}%</p>
+                                    <p className="text-lg font-black text-red-600 dark:text-red-400">{subject.percentage}%</p>
                                     <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden mt-1">
-                                        <div className="bg-error h-full rounded-full" style={{ width: `${subject.percentage}%` }} />
+                                        <div className="bg-red-500 dark:bg-red-400 h-full rounded-full" style={{ width: `${subject.percentage}%` }} />
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : (
                         <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-green-600">verified</span>
-                            <p className="text-sm font-bold text-green-600">Brak zagrożeń</p>
+                            <span className="material-symbols-outlined text-green-600 dark:text-green-400">verified</span>
+                            <p className="text-sm font-bold text-green-600 dark:text-green-400">Brak zagrożeń</p>
                         </div>
                     )}
                 </Card>

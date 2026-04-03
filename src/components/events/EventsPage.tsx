@@ -53,8 +53,8 @@ export default function EventsPage() {
           <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Terminarz</h1>
         </div>
         <div className="flex bg-surface-container-low p-1 rounded-full">
-          <button className={view === "list" ? "px-4 py-1.5 text-sm font-semibold rounded-full bg-white text-primary shadow-sm transition-all" : "px-4 py-1.5 text-sm font-semibold rounded-full text-on-surface-variant hover:text-primary transition-all"} onClick={() => setView("list")}>Lista</button>
-          <button className={view === "calendar" ? "px-4 py-1.5 text-sm font-semibold rounded-full bg-white text-primary shadow-sm transition-all" : "px-4 py-1.5 text-sm font-semibold rounded-full text-on-surface-variant hover:text-primary transition-all"} onClick={() => setView("calendar")}>Kalendarz</button>
+          <button className={view === "list" ? "px-4 py-1.5 text-sm font-semibold rounded-full bg-white dark:bg-surface-container-high text-primary shadow-sm transition-all" : "px-4 py-1.5 text-sm font-semibold rounded-full text-on-surface-variant hover:text-primary transition-all"} onClick={() => setView("list")}>Lista</button>
+          <button className={view === "calendar" ? "px-4 py-1.5 text-sm font-semibold rounded-full bg-white dark:bg-surface-container-high text-primary shadow-sm transition-all" : "px-4 py-1.5 text-sm font-semibold rounded-full text-on-surface-variant hover:text-primary transition-all"} onClick={() => setView("calendar")}>Kalendarz</button>
         </div>
       </div>
 

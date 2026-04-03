@@ -179,7 +179,7 @@ export default function MessagesPage() {
             <div className="relative">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
               <input
-                className="w-full bg-surface-container-lowest border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary focus:bg-white transition-all"
+                className="w-full bg-surface-container-lowest border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary focus:bg-surface-container transition-all"
                 placeholder="Szukaj w wiadomościach..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -216,7 +216,7 @@ export default function MessagesPage() {
           {selectedMessage ? (
             <>
               {/* Header */}
-              <div className="px-6 py-3 bg-white/50 border-b border-outline-variant/15 flex justify-between items-center">
+              <div className="px-6 py-3 bg-surface-container-low/50 border-b border-outline-variant/15 flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-surface-variant font-bold text-sm">
                     {resolveUserName(tab === "inbox" ? selectedMessage.nadawca : selectedMessage.odbiorca).charAt(0).toUpperCase()}
@@ -248,8 +248,8 @@ export default function MessagesPage() {
                 />
               </div>
               {/* Reply Input */}
-              <div className="p-4 bg-white/50 border-t border-outline-variant/15">
-                <div className="flex items-end gap-3 bg-surface-container-high rounded-2xl p-2 focus-within:ring-2 focus-within:ring-primary focus-within:bg-white transition-all">
+              <div className="p-4 bg-surface-container-low/50 border-t border-outline-variant/15">
+                <div className="flex items-end gap-3 bg-surface-container-high rounded-2xl p-2 focus-within:ring-2 focus-within:ring-primary focus-within:bg-surface-container transition-all">
                   <textarea
                     className="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2.5 px-3 resize-none max-h-24 overflow-y-auto"
                     placeholder="Napisz odpowiedź..."

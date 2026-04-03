@@ -26,6 +26,7 @@ export function checkOverlap(startA?: string, endA?: string, startB?: string, en
 export const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function getLessonsForDate(date: Date, timetable: TimetableData): LessonItem[] {
+  if (!timetable?.days || !timetable?.entries) return [];
   const dayNum = date.getDay() === 0 ? 7 : date.getDay();
   const dayRecord = timetable.days.find((d) => d.Numer === dayNum);
   if (!dayRecord) return [];
@@ -52,6 +53,7 @@ export function getEventsForDate(
   events: Event[],
   subjects: TimetableData["subjects"],
 ): EventItem[] {
+  if (!events) return [];
   return events
     .filter((e) => isSameDay(new Date(e.data), date))
     .map((e) => {
@@ -74,6 +76,7 @@ export function getHomeworkForDate(
   homework: Homework[],
   subjects: TimetableData["subjects"],
 ): HomeworkItem[] {
+  if (!homework) return [];
   return homework
     .filter((h) => isSameDay(new Date(h.termin), date))
     .map((h) => {

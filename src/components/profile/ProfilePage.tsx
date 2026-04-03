@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { getUserSettings, updateUserSettings } from "../../services/api";
+import { useQuery } from "@tanstack/react-query";
+import { getUserSettings } from "../../services/api";
 import { getCurrentUser } from "../../services/auth";
 import { keys } from "../../services/queryKeys";
+import { useTheme, type Theme } from "../ThemeProvider";
 import { ErrorState } from "../ui/ErrorState";
 import { Spinner } from "../ui/Spinner";
 import { Badge } from "../ui/Badge";
 import { cn } from "../../utils/cn";
-
-type Theme = "light" | "dark" | "oled" | "system";
 
 type NotificationPref = {
     id: string;
@@ -19,19 +17,6 @@ type NotificationPref = {
     iconBg: string;
     iconColor: string;
     enabled: boolean;
-};
-
-const applyTheme = (theme: Theme) => {
-    if (theme === "dark" || theme === "oled") {
-        document.documentElement.classList.add("dark");
-        return;
-    }
-    if (theme === "light") {
-        document.documentElement.classList.remove("dark");
-        return;
-    }
-    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.classList.toggle("dark", isDark);
 };
 
 const sections = [
@@ -47,9 +32,8 @@ const sections = [
 
 export default function ProfilePage() {
     const user = getCurrentUser();
-    const queryClient = useQueryClient();
+    const { theme: selectedTheme, setTheme: handleThemeChange } = useTheme();
     const [activeSection, setActiveSection] = useState("profil");
-    const [selectedTheme, setSelectedTheme] = useState<Theme>("light");
 
     const [notifications, setNotifications] = useState<NotificationPref[]>([
         {
@@ -57,8 +41,8 @@ export default function ProfilePage() {
             label: "Nowe oceny",
             description: "Otrzymuj alert natychmiast po wpisaniu oceny",
             icon: "grade",
-            iconBg: "#eff6ff",
-            iconColor: "#2563eb",
+            iconBg: "bg-blue-50 dark:bg-blue-400/10",
+            iconColor: "text-blue-600 dark:text-blue-400",
             enabled: true,
         },
         {
@@ -66,8 +50,8 @@ export default function ProfilePage() {
             label: "Wiadomości",
             description: "Powiadomienia o nowych wiadomościach od nauczycieli",
             icon: "mail",
-            iconBg: "#faf5ff",
-            iconColor: "#9333ea",
+            iconBg: "bg-purple-50 dark:bg-purple-400/10",
+            iconColor: "text-purple-600 dark:text-purple-400",
             enabled: true,
         },
         {
@@ -75,8 +59,8 @@ export default function ProfilePage() {
             label: "Zadania domowe",
             description: "Przypomnienia o nadchodzących terminach",
             icon: "assignment",
-            iconBg: "#fff7ed",
-            iconColor: "#ea580c",
+            iconBg: "bg-orange-50 dark:bg-orange-400/10",
+            iconColor: "text-orange-600 dark:text-orange-400",
             enabled: true,
         },
         {
@@ -84,8 +68,8 @@ export default function ProfilePage() {
             label: "Ogłoszenia szkolne",
             description: "Ważne komunikaty od dyrekcji i administracji",
             icon: "campaign",
-            iconBg: "#f0fdf4",
-            iconColor: "#16a34a",
+            iconBg: "bg-green-50 dark:bg-green-400/10",
+            iconColor: "text-green-600 dark:text-green-400",
             enabled: true,
         },
     ]);
@@ -95,40 +79,6 @@ export default function ProfilePage() {
         queryFn: () => getUserSettings(user?.id as number),
         enabled: Boolean(user),
     });
-
-    const updateMutation = useMutation({
-        mutationFn: ({
-            profileId,
-            theme,
-        }: {
-            profileId: number;
-            theme: Theme;
-        }) => updateUserSettings(profileId, { theme_preference: theme }),
-        onSuccess: () => {
-            toast.success("Zapisano preferencje");
-            if (user)
-                queryClient.invalidateQueries({
-                    queryKey: keys.userProfile(user.id),
-                });
-        },
-        onError: () => {
-            toast.error("Nie udało się zapisać preferencji");
-        },
-    });
-
-    useEffect(() => {
-        const currentTheme = profileQuery.data?.[0]?.theme_preference;
-        if (currentTheme) {
-            setSelectedTheme(currentTheme);
-            applyTheme(currentTheme);
-            if (currentTheme === "system") {
-                const mq = window.matchMedia("(prefers-color-scheme: dark)");
-                const handler = () => applyTheme("system");
-                mq.addEventListener("change", handler);
-                return () => mq.removeEventListener("change", handler);
-            }
-        }
-    }, [profileQuery.data]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -187,15 +137,6 @@ export default function ProfilePage() {
         setNotifications((prev) =>
             prev.map((n) => (n.id === id ? { ...n, enabled: !n.enabled } : n)),
         );
-    };
-
-    const handleThemeChange = (theme: Theme) => {
-        setSelectedTheme(theme);
-        applyTheme(theme);
-        const profile = profileQuery.data?.[0];
-        if (profile) {
-            updateMutation.mutate({ profileId: profile.id, theme });
-        }
     };
 
     if (!user) return <ErrorState message="Brak zalogowanego użytkownika" />;
@@ -292,7 +233,7 @@ export default function ProfilePage() {
                                         <label className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
                                             Rola
                                         </label>
-                                        <div className="px-4 py-3 bg-primary-fixed/30 text-on-primary-fixed-variant rounded-lg font-medium flex items-center gap-2">
+                                        <div className="px-4 py-3 bg-primary-fixed/30 dark:bg-primary/10 text-on-primary-fixed-variant dark:text-primary rounded-lg font-medium flex items-center gap-2">
                                             <span className="material-symbols-outlined text-sm">
                                                 school
                                             </span>
@@ -344,7 +285,7 @@ export default function ProfilePage() {
                             </h3>
                             <div className="grid grid-cols-4 gap-3">
                                 <button
-                                    onClick={() => handleThemeChange("light")}
+                                    onClick={() => handleThemeChange("light" as Theme)}
                                     className={cn(
                                         "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all",
                                         selectedTheme === "light"
@@ -358,7 +299,7 @@ export default function ProfilePage() {
                                     </span>
                                 </button>
                                 <button
-                                    onClick={() => handleThemeChange("dark")}
+                                    onClick={() => handleThemeChange("dark" as Theme)}
                                     className={cn(
                                         "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all",
                                         selectedTheme === "dark"
@@ -372,7 +313,7 @@ export default function ProfilePage() {
                                     </span>
                                 </button>
                                 <button
-                                    onClick={() => handleThemeChange("oled")}
+                                    onClick={() => handleThemeChange("oled" as Theme)}
                                     className={cn(
                                         "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all",
                                         selectedTheme === "oled"
@@ -386,7 +327,7 @@ export default function ProfilePage() {
                                     </span>
                                 </button>
                                 <button
-                                    onClick={() => handleThemeChange("system")}
+                                    onClick={() => handleThemeChange("system" as Theme)}
                                     className={cn(
                                         "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all",
                                         selectedTheme === "system"
@@ -421,11 +362,7 @@ export default function ProfilePage() {
                                 >
                                     <div className="flex gap-4 items-center">
                                         <div
-                                            className="flex items-center justify-center w-10 h-10 rounded-lg"
-                                            style={{
-                                                backgroundColor: notif.iconBg,
-                                                color: notif.iconColor,
-                                            }}
+                                            className={cn("flex items-center justify-center w-10 h-10 rounded-lg", notif.iconBg, notif.iconColor)}
                                         >
                                             <span className="material-symbols-outlined">
                                                 {notif.icon}
@@ -468,7 +405,7 @@ export default function ProfilePage() {
                         <div className="space-y-6">
                             <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                 <div className="flex gap-4 items-center">
-                                    <div className="p-3 rounded-full" style={{ backgroundColor: "#fef2f2", color: "#dc2626" }}>
+                                    <div className="p-3 rounded-full bg-red-50 dark:bg-red-400/10 text-red-600 dark:text-red-400">
                                         <span className="material-symbols-outlined">
                                             lock
                                         </span>
@@ -497,7 +434,7 @@ export default function ProfilePage() {
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
                                         <div className="flex gap-3 items-center">
-                                            <span className="material-symbols-outlined" style={{ color: "#16a34a" }}>
+                                            <span className="material-symbols-outlined text-green-600 dark:text-green-400">
                                                 check_circle
                                             </span>
                                             <div>

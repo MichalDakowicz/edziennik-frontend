@@ -117,7 +117,7 @@ export function WeekView({ date, timetable, events, homework, onItemClick }: Wee
         </div>
 
         {/* Main Grid */}
-        <div className="relative grid grid-cols-[50px_repeat(5,minmax(0,1fr))] bg-white" style={{ minHeight: `${totalMinutes}px` }}>
+        <div className="relative grid grid-cols-[50px_repeat(5,minmax(0,1fr))] bg-surface-container-lowest dark:bg-surface" style={{ minHeight: `${totalMinutes}px` }}>
           {/* Current Time Indicator */}
           {isCurrentTimeVisible && days.some(d => isSameDay(d, now)) && (
             <div 

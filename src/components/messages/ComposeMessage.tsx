@@ -68,7 +68,7 @@ export default function ComposeMessage({
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
             <input
               id="teacher-search"
-              className="w-full bg-surface-container-high border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary focus:bg-white transition-all"
+              className="w-full bg-surface-container-high border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary focus:bg-surface-container transition-all"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Np. Jan Kowalski"
@@ -80,7 +80,7 @@ export default function ComposeMessage({
           <label htmlFor="odbiorca" className="block text-sm font-semibold text-on-surface font-body mb-1.5">Odbiorca</label>
           <select
             id="odbiorca"
-            className="w-full bg-surface-container-high border-none rounded-xl py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary focus:bg-white transition-all"
+            className="w-full bg-surface-container-high border-none rounded-xl py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary focus:bg-surface-container transition-all"
             value={watch("odbiorca")}
             onChange={(event) => {
               setValue("odbiorca", Number(event.target.value));
@@ -103,7 +103,7 @@ export default function ComposeMessage({
           <label htmlFor="temat" className="block text-sm font-semibold text-on-surface font-body mb-1.5">Temat</label>
           <input
             id="temat"
-            className="w-full bg-surface-container-high border-none rounded-xl py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary focus:bg-white transition-all"
+            className="w-full bg-surface-container-high border-none rounded-xl py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary focus:bg-surface-container transition-all"
             {...register("temat")}
           />
           {errors.temat && <p className="text-error text-xs mt-1">{errors.temat}</p>}
@@ -113,7 +113,7 @@ export default function ComposeMessage({
           <label htmlFor="tresc" className="block text-sm font-semibold text-on-surface font-body mb-1.5">Treść</label>
           <textarea
             id="tresc"
-            className="w-full bg-surface-container-high border-none rounded-xl py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary focus:bg-white transition-all min-h-[120px]"
+            className="w-full bg-surface-container-high border-none rounded-xl py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary focus:bg-surface-container transition-all min-h-[120px]"
             {...register("tresc")}
           />
           {errors.tresc && <p className="text-error text-xs mt-1">{errors.tresc}</p>}

@@ -63,7 +63,7 @@ export function CalendarNavHeader({
                             className={cn(
                                 "px-4 py-1.5 text-sm font-semibold rounded-full transition-all",
                                 viewMode === v.key
-                                    ? "bg-white text-primary shadow-sm"
+                                    ? "bg-white dark:bg-surface-container-high text-primary shadow-sm"
                                     : "text-on-surface-variant hover:text-primary"
                             )}
                         >

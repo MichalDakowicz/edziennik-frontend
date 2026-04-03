@@ -18,38 +18,38 @@ export default function SubjectAttendanceCard({
             case "safe":
                 return {
                     label: "Bezpiecznie",
-                    color: "text-green-600",
-                    bgColor: "bg-green-50",
-                    barColor: "bg-green-500",
+                    color: "text-green-600 dark:text-green-400",
+                    bgColor: "bg-green-50 dark:bg-green-400/10",
+                    barColor: "bg-green-500 dark:bg-green-400",
                 };
             case "warning":
                 return {
                     label: "Uwaga",
-                    color: "text-tertiary",
-                    bgColor: "bg-tertiary-fixed/30",
-                    barColor: "bg-tertiary-fixed-dim",
+                    color: "text-amber-600 dark:text-amber-400",
+                    bgColor: "bg-amber-50 dark:bg-amber-400/10",
+                    barColor: "bg-amber-500 dark:bg-amber-400",
                 };
             case "danger":
                 return {
                     label: "Zagrożenie",
-                    color: "text-error",
-                    bgColor: "bg-error-container/30",
-                    barColor: "bg-error",
+                    color: "text-red-600 dark:text-red-400",
+                    bgColor: "bg-red-50 dark:bg-red-400/10",
+                    barColor: "bg-red-500 dark:bg-red-400",
                 };
             case "perfect":
                 return {
                     label: "Idealnie",
-                    color: "text-green-600",
-                    bgColor: "bg-green-50",
-                    barColor: "bg-green-500",
+                    color: "text-emerald-600 dark:text-emerald-400",
+                    bgColor: "bg-emerald-50 dark:bg-emerald-400/10",
+                    barColor: "bg-emerald-500 dark:bg-emerald-400",
                 };
         }
     };
 
     const getPercentageColor = () => {
-        if (percentage >= 95) return "text-green-600";
+        if (percentage >= 95) return "text-green-600 dark:text-green-400";
         if (percentage >= 90) return "text-on-surface";
-        return "text-error";
+        return "text-red-600 dark:text-red-400";
     };
 
     const getIcon = () => {
@@ -71,12 +71,12 @@ export default function SubjectAttendanceCard({
 
     const getIconColor = () => {
         const colorMap: Record<string, string> = {
-            "Matematyka": "text-blue-600 bg-blue-50",
-            "Język Polski": "text-orange-600 bg-orange-50",
-            "Język Angielski": "text-indigo-600 bg-indigo-50",
-            "Biologia": "text-emerald-600 bg-emerald-50",
-            "Geografia": "text-red-600 bg-red-50",
-            "Filozofia": "text-purple-600 bg-purple-50",
+            "Matematyka": "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-400/10",
+            "Język Polski": "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-400/10",
+            "Język Angielski": "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-400/10",
+            "Biologia": "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-400/10",
+            "Geografia": "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-400/10",
+            "Filozofia": "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-400/10",
         };
         return colorMap[name] || "text-primary bg-primary/10";
     };

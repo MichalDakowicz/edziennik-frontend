@@ -228,6 +228,22 @@ export function useStudentDashboardModel({
         return formatDate(isoDate);
     };
 
+    const attendanceDayHourToZajecia = useMemo(() => {
+        const map = new Map<string, number>();
+        const dayIdToNum = new Map((studentData.days || []).map((d: any) => [d.id, d.Numer]));
+        for (const entry of studentData.entries || []) {
+            const dayId = entry.dzien_tygodnia ?? entry.DzienTygodnia;
+            if (dayId != null) {
+                const dayNum = dayIdToNum.get(dayId);
+                if (dayNum) {
+                    const key = `${dayNum}_${entry.godzina_lekcyjna}`;
+                    map.set(key, entry.zajecia);
+                }
+            }
+        }
+        return map;
+    }, [studentData.entries, studentData.days]);
+
     const liveItems = useMemo(() => {
         const messageItems: LiveItem[] = latestInboxMessages.map((message: Message) => ({
             id: `msg-${message.id}`,
@@ -236,6 +252,8 @@ export function useStudentDashboardModel({
             label: message.przeczytana ? "Wiadomość" : "Nowa wiadomość",
             title: message.temat || "(bez tematu)",
             body: message.tresc,
+            icon: "mail",
+            isRead: Boolean(message.przeczytana),
             onClick: () => onOpenMessage(message),
             to: "/dashboard/messages",
         }));
@@ -247,6 +265,8 @@ export function useStudentDashboardModel({
             label: "Nowa ocena",
             title: `${getGradeSubjectName(grade.przedmiot)} • ${grade.wartosc}`,
             body: grade.opis || "Dodano nową ocenę cząstkową.",
+            icon: "grade",
+            isRead: true,
             onClick: undefined,
             to: "/dashboard/grades",
         }));
@@ -258,6 +278,8 @@ export function useStudentDashboardModel({
             label: "Praca domowa",
             title: getGradeSubjectName(item.przedmiot),
             body: item.opis,
+            icon: "assignment",
+            isRead: true,
             onClick: undefined,
             to: "/dashboard/homework",
         }));
@@ -271,13 +293,20 @@ export function useStudentDashboardModel({
                 ? String(statusObj.Wartosc)
                 : statusMap.get(Number(record.status)) || "Status nieznany";
 
+            const attendanceDate = new Date(record.Data);
+            const dayOfWeek = attendanceDate.getDay() === 0 ? 7 : attendanceDate.getDay();
+            const zajeciaId = attendanceDayHourToZajecia.get(`${dayOfWeek}_${record.godzina_lekcyjna}`);
+            const subjectName = zajeciaId ? getSubjectName(zajeciaId) : null;
+
             return {
                 id: `attendance-${record.id}`,
                 kind: "attendance" as const,
                 date: record.Data,
                 label: "Frekwencja",
-                title: `Lekcja ${record.godzina_lekcyjna}`,
+                title: subjectName ?? "Frekwencja",
                 body: `Status: ${statusText}`,
+                icon: "rule",
+                isRead: true,
                 onClick: undefined,
                 to: "/dashboard/attendance",
             };
@@ -292,6 +321,8 @@ export function useStudentDashboardModel({
                 label: "Zachowanie",
                 title: `Punkty: ${pointsLabel}`,
                 body: point.opis || "Zaktualizowano punkty zachowania.",
+                icon: "star",
+                isRead: true,
                 onClick: undefined,
                 to: "/dashboard/grades",
             };
@@ -304,6 +335,8 @@ export function useStudentDashboardModel({
             label: "Wydarzenie",
             title: event.tytul,
             body: event.opis,
+            icon: "event",
+            isRead: true,
             onClick: undefined,
             to: "/dashboard/events",
         }));

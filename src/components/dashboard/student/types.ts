@@ -11,6 +11,8 @@ export type LiveItem = {
     label: string;
     title: string;
     body: string;
+    icon: string;
+    isRead: boolean;
     onClick?: () => void;
     to?: string;
 };

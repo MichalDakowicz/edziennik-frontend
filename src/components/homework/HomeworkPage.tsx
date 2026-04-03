@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getHomework, getSubjects, getTeachers } from "../../services/api";
 import { keys } from "../../services/queryKeys";
@@ -9,6 +9,8 @@ import HomeworkCard from "./HomeworkCard";
 import HomeworkModal from "./HomeworkModal";
 import type { Homework, Subject } from "../../types/api";
 import { CalendarDays, ArrowRight, BookOpen, LayoutList, LayoutGrid, ChevronRight } from "lucide-react";
+
+const CAROUSEL_INTERVAL_MS = 4000;
 
 type ViewMode = "list" | "board";
 type StatusFilter = "upcoming" | "completed" | "overdue";
@@ -125,15 +127,17 @@ export default function HomeworkPage() {
   const subjects = subjectsQuery.data ?? [];
   const teachers = teachersQuery.data ?? [];
 
-  const { upcoming, past } = useMemo(() => {
+  const { upcoming, past, upcomingSoon } = useMemo(() => {
     const now = Date.now();
+    const threeDaysMs = 4 * 24 * 60 * 60 * 1000;
     const up = [...homework]
       .filter((item) => Date.parse(item.termin) >= now)
       .sort((a, b) => Date.parse(a.termin) - Date.parse(b.termin));
     const pa = [...homework]
       .filter((item) => Date.parse(item.termin) < now)
       .sort((a, b) => Date.parse(b.termin) - Date.parse(a.termin));
-    return { upcoming: up, past: pa };
+    const soon = up.filter((item) => Date.parse(item.termin) - now <= threeDaysMs);
+    return { upcoming: up, past: pa, upcomingSoon: soon };
   }, [homework]);
 
   const filteredHomework = useMemo(() => {
@@ -154,10 +158,21 @@ export default function HomeworkPage() {
     return subjectId === "all" ? items : items.filter((item) => item.przedmiot === subjectId);
   }, [upcoming, past, statusFilter, subjectId]);
 
-  const mostUrgent = upcoming.length > 0 ? upcoming[0] : null;
   const totalCount = homework.length;
   const overdueCount = past.length;
   const progressPercent = totalCount > 0 ? Math.round(((totalCount - overdueCount) / totalCount) * 100) : 0;
+
+  const [carouselIndex, setCarouselIndex] = useState(0);
+
+  const nextSlide = useCallback(() => {
+    setCarouselIndex((prev) => (prev + 1) % upcomingSoon.length);
+  }, [upcomingSoon.length]);
+
+  useEffect(() => {
+    if (upcomingSoon.length <= 1) return;
+    const timer = setInterval(nextSlide, CAROUSEL_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [upcomingSoon.length, nextSlide]);
 
   if (!classId) return <ErrorState message="Brak przypisanej klasy" />;
   if ([homeworkQuery, subjectsQuery, teachersQuery].some((q) => q.isPending)) return <Spinner />;
@@ -202,41 +217,80 @@ export default function HomeworkPage() {
 
       {/* Bento Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Most Urgent Task */}
-        {mostUrgent ? (
-          <div className="md:col-span-2 bg-primary-container p-8 rounded-xl text-white flex flex-col justify-between relative overflow-hidden group">
+        {/* Most Urgent Task / Carousel */}
+        {upcomingSoon.length > 0 ? (
+          <div className="md:col-span-2 bg-primary-container rounded-xl text-white flex flex-col justify-between relative overflow-hidden group">
             <div className="absolute -right-12 -top-12 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-500" />
-            <div className="relative z-10">
-              <span className="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest backdrop-blur-md">
-                Najbliższy termin
-              </span>
-              <h2 className="text-2xl md:text-4xl font-black mt-6 leading-tight max-w-md">
-                {mostUrgent.opis.length > 60 ? `${mostUrgent.opis.slice(0, 60)}...` : mostUrgent.opis}
-              </h2>
-              <div className="flex items-center gap-6 mt-8">
-                <div className="flex items-center gap-2">
-                  <CalendarDays size={18} className="opacity-70" />
-                  <span className="font-medium">
-                    {new Date(mostUrgent.termin).toLocaleDateString("pl-PL", { day: "numeric", month: "long" })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <BookOpen size={18} className="opacity-70" />
-                  <span className="font-medium">
-                    {subjects.find((s) => s.id === mostUrgent.przedmiot)?.nazwa ?? subjects.find((s) => s.id === mostUrgent.przedmiot)?.Nazwa ?? ""}
-                  </span>
-                </div>
+
+            {/* Carousel slides */}
+            <div className="relative z-10 overflow-hidden">
+              <div
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
+              >
+                {upcomingSoon.map((hw, idx) => {
+                  const subjectName = subjects.find((s) => s.id === hw.przedmiot)?.nazwa ?? subjects.find((s) => s.id === hw.przedmiot)?.Nazwa ?? "";
+                  return (
+                    <div key={hw.id} className="w-full flex-shrink-0 p-8">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest backdrop-blur-md">
+                          {idx === 0 ? "Najbliższy termin" : `${idx + 1}. zadanie`}
+                        </span>
+                        {upcomingSoon.length > 1 && (
+                          <span className="text-xs font-medium opacity-70">
+                            {idx + 1} / {upcomingSoon.length}
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="text-2xl md:text-4xl font-black leading-tight max-w-md">
+                        {hw.opis.length > 60 ? `${hw.opis.slice(0, 60)}...` : hw.opis}
+                      </h2>
+                      <div className="flex items-center gap-6 mt-8">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays size={18} className="opacity-70" />
+                          <span className="font-medium">
+                            {new Date(hw.termin).toLocaleDateString("pl-PL", { day: "numeric", month: "long" })}
+                          </span>
+                        </div>
+                        {subjectName && (
+                          <div className="flex items-center gap-2">
+                            <BookOpen size={18} className="opacity-70" />
+                            <span className="font-medium">{subjectName}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-8">
+                        <button
+                          onClick={() => setSelectedHomework(hw)}
+                          className="bg-white text-primary px-8 py-3 rounded-full font-bold text-sm hover:bg-slate-100 transition-colors shadow-xl flex items-center gap-2"
+                        >
+                          Przejdź do zadania
+                          <ArrowRight size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-            <div className="relative z-10 mt-8">
-              <button
-                onClick={() => setSelectedHomework(mostUrgent)}
-                className="bg-white text-primary px-8 py-3 rounded-full font-bold text-sm hover:bg-slate-100 transition-colors shadow-xl flex items-center gap-2"
-              >
-                Przejdź do zadania
-                <ArrowRight size={16} />
-              </button>
-            </div>
+
+            {/* Carousel dots */}
+            {upcomingSoon.length > 1 && (
+              <div className="relative z-10 flex items-center justify-center gap-2 pb-6">
+                {upcomingSoon.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCarouselIndex(idx)}
+                    className={`rounded-full transition-all duration-300 ${
+                      idx === carouselIndex
+                        ? "w-8 h-2 bg-white"
+                        : "w-2 h-2 bg-white/40 hover:bg-white/60"
+                    }`}
+                    aria-label={`Przejdź do slajdu ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="md:col-span-2 bg-primary-container p-8 rounded-xl text-white flex flex-col justify-center items-center text-center relative overflow-hidden">

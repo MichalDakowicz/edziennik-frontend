@@ -56,8 +56,16 @@ export default function TeacherHomeworkPage() {
   if (subjectsError) return <ErrorState message={`Błąd: ${(subjectsError as Error).message}`} />;
 
   return (
-    <div className="space-y-6 p-6">
-      <h1 className="page-title font-headline">Zarządzanie Pracami Domowymi</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Zarządzanie Pracami Domowymi</h1>
+        </div>
+        <Button onClick={() => setAddModalOpen(true)}>
+          <span className="material-symbols-outlined text-sm mr-1">add</span>
+          Dodaj pracę domową
+        </Button>
+      </div>
 
       <Card>
         <h2 className="section-title mb-4">Filtry</h2>
@@ -98,9 +106,6 @@ export default function TeacherHomeworkPage() {
       <Card>
         <div className="flex justify-between items-center mb-4">
           <h2 className="section-title">Prace Domowe</h2>
-          <Button onClick={() => setAddModalOpen(true)} className="btn-primary">
-            + Dodaj pracę
-          </Button>
         </div>
 
         {homeworkLoading ? (

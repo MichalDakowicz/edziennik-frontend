@@ -156,11 +156,13 @@ export default function NotificationsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="page-title font-headline">Powiadomienia</h1>
-                <p className="text-on-surface-variant font-body mt-1">
-                    Najnowsze aktualizacje i zmiany dotyczace Twojego konta.
-                </p>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+                <div>
+                    <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Powiadomienia</h1>
+                    <p className="text-on-surface-variant font-body text-sm mt-1">
+                        Najnowsze aktualizacje i zmiany dotyczace Twojego konta.
+                    </p>
+                </div>
             </div>
 
             <div className="bg-surface-container-lowest rounded-xl p-4 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)]">

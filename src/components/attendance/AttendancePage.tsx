@@ -210,12 +210,12 @@ export default function AttendancePage() {
     if (firstError?.isError) return <ErrorState message={firstError.error.message} />;
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             {/* Header */}
-            <div className="flex justify-between items-end">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
                 <div>
-                    <p className="text-primary font-bold text-sm tracking-wider uppercase mb-1">Moje Postępy</p>
-                    <h1 className="text-4xl font-extrabold text-on-surface tracking-tight font-headline">Frekwencja</h1>
+                    <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Frekwencja</h1>
+                    <p className="text-on-surface-variant font-body text-sm mt-1">Moje Postępy</p>
                 </div>
                 <button 
                     className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"

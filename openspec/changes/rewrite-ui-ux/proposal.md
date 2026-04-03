@@ -9,6 +9,8 @@ The current user interface (UI) and user experience (UX) need an overhaul to mov
 - Enforcement of the "No-Line Rule" to remove rigid grids and borders.
 - Tonal Layering and Glassmorphism for depth and visual hierarchy.
 - **BREAKING**: Redesigned dashboard and grading views moving from traditional tables to editorial, borderless layouts.
+- **BREAKING**: Homework page rewritten with bento-style dashboard widgets, card grid layout, view toggle (Lista/Tablica), and status filter chips.
+- **BREAKING**: Messages page rewritten with unified header, inbox/sent tabs, message list cards, compose modal, and detail modal.
 
 ## Capabilities
 
@@ -17,6 +19,8 @@ The current user interface (UI) and user experience (UX) need an overhaul to mov
 - `theme-system`: Support for light/dark modes utilizing the Material-inspired tonal surface hierarchy (`surface-container-low`, etc.).
 - `dashboard-ui`: Complete rewrite of the dashboard view using the "Digital Curator" aesthetic, glassmorphic command bars, and tonal accents.
 - `grading-interface`: Redesigned grade entry and viewing interfaces using alternating row tints and spacing instead of grid lines.
+- `homework-page`: Complete rewrite of the homework page with bento-style widgets, card grid layout, view toggle (Lista/Tablica), status filter chips, and urgency indicators.
+- `messages-page`: Complete rewrite of the messages page with unified header, inbox/sent tabs, message list cards with unread indicators, compose modal with teacher search, and detail modal.
 
 ### Modified Capabilities
 

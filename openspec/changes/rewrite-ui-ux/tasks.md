@@ -29,3 +29,20 @@
 - [x] 5.2 Implement alternating row tints (`surface` and `surface-container-low`) and vertical padding (Spacing `2`) for lists.
 - [x] 5.3 If strictly required for a11y, implement the "Ghost Border" fallback (`outline-variant` at 15% opacity).
 - [x] 5.4 Apply Status Chips (`tertiary_fixed` for Success, custom amber 10% for Warning) to grading and attendance data points.
+
+## 6. Homework Page Rewrite
+
+- [x] 6.1 Refactor HomeworkPage header: add page title with subtitle (active homework count) and view toggle (Lista/Tablica) with pill-styled buttons.
+- [x] 6.2 Implement bento dashboard widgets: "Most Urgent Task" hero card with `primary-container` background and "Weekly Progress" widget with progress bar.
+- [x] 6.3 Implement filter bar with status chips (Nadchodzące/Zakończone/Zaległe) and subject dropdown filter.
+- [x] 6.4 Rewrite homework cards as responsive grid (1/2/3 columns) with subject icon, status badge, title, due date, and details.
+- [x] 6.5 Update HomeworkModal to match new design with badges, formatted description, teacher info.
+- [x] 6.6 Add empty state "Dodaj własne zadanie" card at end of grid with dashed border and hover effect.
+
+## 7. Messages Page Rewrite
+
+- [ ] 7.1 Refactor MessagesPage header with unified style matching calendar pattern and inbox/sent tab toggle.
+- [ ] 7.2 Rewrite MessageList cards with unread indicator, subject, sender/recipient, preview, and date.
+- [ ] 7.3 Update ComposeMessage modal with teacher search, recipient dropdown, and form validation.
+- [ ] 7.4 Update MessageDetail modal with sender/recipient info, date, and full message body.
+- [ ] 7.5 Add floating compose button (FAB) with pencil icon at bottom-right corner.

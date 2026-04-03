@@ -244,10 +244,9 @@ export default function AttendanceHistoryPage() {
             </nav>
 
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
                 <div>
-                    <p className="text-primary font-bold text-sm tracking-wider uppercase mb-1">Historia</p>
-                    <h1 className="text-3xl font-extrabold text-on-surface tracking-tight font-headline">Pełna historia frekwencji</h1>
+                    <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Pełna historia frekwencji</h1>
                 </div>
             </div>
 

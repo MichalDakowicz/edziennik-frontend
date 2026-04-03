@@ -253,8 +253,12 @@ export default function TeacherAttendancePage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <h1 className="page-title font-headline">Sprawdzanie Obecności</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Sprawdzanie Obecności</h1>
+        </div>
+      </div>
 
       <Card>
         <h2 className="section-title mb-4">Ustawienia</h2>

@@ -134,11 +134,11 @@ export default function GradesPage() {
   if (firstError?.isError) return <ErrorState message={firstError.error.message} />;
 
   return (
-    <div className="space-y-8">
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-4">
+    <div className="space-y-6">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div>
-          <h1 className="display-md text-on-surface mb-1">Twoje Oceny</h1>
-          <p className="text-on-surface-variant font-body font-medium">Podsumowanie ocen z bierzącego półrocza</p>
+          <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Oceny</h1>
+          <p className="text-on-surface-variant font-body text-sm mt-1">Podsumowanie ocen z bierzącego półrocza</p>
         </div>
         <div className="flex gap-4">
           <div className="bg-surface-container-lowest p-6 rounded-xl flex flex-col items-center min-w-[140px] shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)]">

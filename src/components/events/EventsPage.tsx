@@ -47,11 +47,15 @@ export default function EventsPage() {
   if (firstError?.isError) return <ErrorState message={firstError.error.message} />;
 
   return (
-    <div className="space-y-4">
-      <h1 className="page-title font-headline">Terminarz</h1>
-      <div className="flex gap-2">
-        <button className={view === "list" ? "btn-primary" : "btn-ghost"} onClick={() => setView("list")}>Lista</button>
-        <button className={view === "calendar" ? "btn-primary" : "btn-ghost"} onClick={() => setView("calendar")}>Kalendarz</button>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Terminarz</h1>
+        </div>
+        <div className="flex bg-surface-container-low p-1 rounded-full">
+          <button className={view === "list" ? "px-4 py-1.5 text-sm font-semibold rounded-full bg-white text-primary shadow-sm transition-all" : "px-4 py-1.5 text-sm font-semibold rounded-full text-on-surface-variant hover:text-primary transition-all"} onClick={() => setView("list")}>Lista</button>
+          <button className={view === "calendar" ? "px-4 py-1.5 text-sm font-semibold rounded-full bg-white text-primary shadow-sm transition-all" : "px-4 py-1.5 text-sm font-semibold rounded-full text-on-surface-variant hover:text-primary transition-all"} onClick={() => setView("calendar")}>Kalendarz</button>
+        </div>
       </div>
 
       {view === "calendar" ? <EventCalendar events={events} /> : null}

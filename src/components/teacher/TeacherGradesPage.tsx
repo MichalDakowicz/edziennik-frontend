@@ -252,8 +252,13 @@ export default function TeacherGradesPage() {
   if (classesError) return <ErrorState message={`Błąd: ${(classesError as Error).message}`} />;
 
   return (
-    <div className="space-y-6 p-6">
-      <h1 className="page-title font-headline">Wystawianie Ocen</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Wystawianie Ocen</h1>
+          <p className="text-on-surface-variant font-body text-sm mt-1">Wybierz przedmiot i klasę, aby wystawić oceny.</p>
+        </div>
+      </div>
 
       <Card>
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-2">

@@ -104,8 +104,12 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="space-y-4">
-      <h1 className="page-title font-headline">Wiadomości</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Wiadomości</h1>
+        </div>
+      </div>
       <div className="flex gap-4 pb-2">
         <button className={tab === "inbox" ? "tab-active" : "tab-inactive"} onClick={() => setTab("inbox")}>Odebrane</button>
         <button className={tab === "sent" ? "tab-active" : "tab-inactive"} onClick={() => setTab("sent")}>Wysłane</button>

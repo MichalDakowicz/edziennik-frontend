@@ -63,9 +63,13 @@ export default function TimetablePage() {
   const classDisplay = formatClassDisplay(data.klasa);
 
   return (
-    <div className="space-y-4">
-      <h1 className="page-title font-headline">Plan lekcji</h1>
-      <p className="text-on-surface-variant font-body">Klasa: {classDisplay}</p>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Plan lekcji</h1>
+          <p className="text-on-surface-variant font-body text-sm mt-1">Klasa: {classDisplay}</p>
+        </div>
+      </div>
       <TimetableGrid days={data.days} hours={data.hours} entries={data.entries} zajecia={data.zajecia} subjects={data.subjects} />
       <div className="bg-card/50 /50 rounded-xl p-4">
         <h2 className="section-title mb-3">Dzisiaj</h2>

@@ -19,6 +19,7 @@ import {
 } from "../../services/api";
 import type { AttendanceStatus, Attendance, LessonHour } from "../../types/api";
 import { formatClassDisplay, getClassJournalNumberMap, sortStudentsAlphabetically } from "../../utils/classUtils";
+import { useTeacherClassSelector } from "../../hooks/useTeacherClassSelector";
 
 const normalizeDate = (value: string) => value.split("T")[0];
 
@@ -97,11 +98,23 @@ const getStatusConfig = (status: AttendanceStatus) => {
 
 export default function TeacherAttendancePage() {
   const queryClient = useQueryClient();
+  const { selectedClassId: hookClassId, setSelectedClassId: setHookClassId } = useTeacherClassSelector();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
-  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
+  const [selectedClassId, setSelectedClassId] = useState<number | null>(hookClassId);
   const [selectedHourId, setSelectedHourId] = useState<number | null>(null);
   const [hourManuallyChanged, setHourManuallyChanged] = useState(false);
   const [statusByStudent, setStatusByStudent] = useState<Record<number, number | null>>({});
+
+  useEffect(() => {
+    if (hookClassId !== null && hookClassId !== selectedClassId) {
+      setSelectedClassId(hookClassId);
+    }
+  }, [hookClassId]);
+
+  const handleClassChange = (id: number | null) => {
+    setSelectedClassId(id);
+    setHookClassId(id);
+  };
 
   const { data: classes, isLoading: classesLoading, error: classesError } = useQuery({
     queryKey: keys.classes?.() ?? ["classes"],
@@ -294,7 +307,7 @@ export default function TeacherAttendancePage() {
             <label className="block text-sm font-medium text-zinc-300 mb-2">Klasa</label>
             <select
               value={selectedClassId ?? ""}
-              onChange={(e) => setSelectedClassId(e.target.value ? Number(e.target.value) : null)}
+              onChange={(e) => handleClassChange(e.target.value ? Number(e.target.value) : null)}
               className="input-base"
             >
               <option value="">Wybierz klasę</option>

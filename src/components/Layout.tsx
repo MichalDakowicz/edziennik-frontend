@@ -8,14 +8,15 @@ import {
 } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "../services/auth";
-import { getInboxMessages, getLuckyNumber } from "../services/api";
+import { getClasses, getInboxMessages, getLuckyNumber } from "../services/api";
 import { keys } from "../services/queryKeys";
 import { cn } from "../utils/cn";
+import { formatClassDisplay } from "../utils/classUtils";
 
 type NavItem = {
     label: string;
     to: string;
-    icon: string; // Changed to string for material symbols
+    icon: string;
     student?: boolean;
     parent?: boolean;
     teacher?: boolean;
@@ -30,12 +31,12 @@ const navItems: NavItem[] = [
         parent: true,
         teacher: true,
     },
-    { 
-        label: "Oceny", 
-        to: "/dashboard/grades", 
-        icon: "grade", 
-        student: true, 
-        parent: true 
+    {
+        label: "Oceny",
+        to: "/dashboard/grades",
+        icon: "grade",
+        student: true,
+        parent: true
     },
     {
         label: "Frekwencja",
@@ -59,22 +60,6 @@ const navItems: NavItem[] = [
         parent: true,
     },
     {
-        label: "Wiadomości",
-        to: "/dashboard/messages",
-        icon: "mail",
-        student: true,
-        parent: true,
-        teacher: true,
-    },
-    {
-        label: "Powiadomienia",
-        to: "/dashboard/notifications",
-        icon: "notifications",
-        student: true,
-        parent: true,
-        teacher: true,
-    },
-    {
         label: "Wystawianie ocen",
         to: "/dashboard/teacher/grades",
         icon: "grade",
@@ -90,6 +75,22 @@ const navItems: NavItem[] = [
         label: "Zadania domowe",
         to: "/dashboard/teacher/homework",
         icon: "assignment",
+        teacher: true,
+    },
+    {
+        label: "Wiadomości",
+        to: "/dashboard/messages",
+        icon: "mail",
+        student: true,
+        parent: true,
+        teacher: true,
+    },
+    {
+        label: "Powiadomienia",
+        to: "/dashboard/notifications",
+        icon: "notifications",
+        student: true,
+        parent: true,
         teacher: true,
     },
 ];
@@ -171,6 +172,28 @@ export default function Layout() {
                 : Promise.resolve(null),
         enabled: Boolean(user?.role === "uczen" && user?.classId),
     });
+
+    const { data: teacherClasses } = useQuery({
+        queryKey: keys.classes(),
+        queryFn: getClasses,
+        enabled: user?.role === "nauczyciel" || user?.role === "admin",
+    });
+
+    const teacherClassId = useMemo(() => {
+        if (user?.role !== "nauczyciel" && user?.role !== "admin") return null;
+        const stored = sessionStorage.getItem("teacher:selected-class-id");
+        const id = stored ? Number(stored) : null;
+        if (id && teacherClasses?.some((c) => c.id === id)) return id;
+        return null;
+    }, [teacherClasses, user?.role]);
+
+    const setTeacherClassId = (id: number | null) => {
+        if (id === null) {
+            sessionStorage.removeItem("teacher:selected-class-id");
+        } else {
+            sessionStorage.setItem("teacher:selected-class-id", String(id));
+        }
+    };
 
     const unreadCount = useMemo(
         () => inbox?.filter((m) => !m.przeczytana).length ?? 0,
@@ -330,6 +353,25 @@ export default function Layout() {
 
                         {profileMenuOpen && (
                             <div className="absolute bottom-full left-0 right-0 mb-2 bg-surface rounded-xl shadow-lg border border-outline/10 overflow-hidden z-50">
+                                {(user.role === "nauczyciel" || user.role === "admin") && teacherClasses && teacherClasses.length > 0 && (
+                                    <div className="px-4 py-3 border-b border-outline/10">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant block mb-1.5">
+                                            Aktywna klasa
+                                        </label>
+                                        <select
+                                            value={teacherClassId ?? ""}
+                                            onChange={(e) => setTeacherClassId(e.target.value ? Number(e.target.value) : null)}
+                                            className="w-full bg-surface-container-highest border-none rounded-lg py-1.5 px-3 text-xs font-semibold focus:ring-2 focus:ring-primary/20 transition-all outline-none text-on-surface"
+                                        >
+                                            <option value="">Wybierz klasę...</option>
+                                            {teacherClasses.map((c) => (
+                                                <option key={c.id} value={c.id}>
+                                                    {formatClassDisplay(c)}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
                                 <button
                                     className="w-full flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-container transition-colors"
                                     onClick={() => {

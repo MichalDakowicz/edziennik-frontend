@@ -15,6 +15,7 @@ import { formatDateTime } from "../../utils/dateUtils";
 import { getCurrentUser } from "../../services/auth";
 import AddPeriodGradeModal from "./AddPeriodGradeModal";
 import { formatClassDisplay, getClassJournalNumberMap, sortStudentsAlphabetically } from "../../utils/classUtils";
+import { useTeacherClassSelector } from "../../hooks/useTeacherClassSelector";
 
 function RecentGradesCell({ studentId, selectedSubjectId }: { studentId: number; selectedSubjectId: number | null }) {
   const { data: grades, isLoading } = useQuery({
@@ -73,10 +74,22 @@ function BehaviorTotalCell({ studentId }: { studentId: number }) {
 }
 
 export default function TeacherGradesPage() {
+  const { selectedClassId: hookClassId, setSelectedClassId: setHookClassId } = useTeacherClassSelector();
   const [activeGradeStudentId, setActiveGradeStudentId] = useState<number | null>(null);
   const [isAddPeriodGradeModalOpen, setIsAddPeriodGradeModalOpen] = useState(false);
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
-  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
+  const [selectedClassId, setSelectedClassId] = useState<number | null>(hookClassId);
+
+  useEffect(() => {
+    if (hookClassId !== null && hookClassId !== selectedClassId) {
+      setSelectedClassId(hookClassId);
+    }
+  }, [hookClassId]);
+
+  const handleClassChange = (id: number | null) => {
+    setSelectedClassId(id);
+    setHookClassId(id);
+  };
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
   const [gradeMode, setGradeMode] = useState<'regular' | 'period' | 'behavior'>('regular');
   const [selectedWeight, setSelectedWeight] = useState<number>(1);
@@ -317,7 +330,7 @@ export default function TeacherGradesPage() {
               <label className="block text-sm font-medium text-zinc-300 mb-1.5">Klasa</label>
               <select
                 value={selectedClassId ?? ""}
-                onChange={(e) => setSelectedClassId(e.target.value ? Number(e.target.value) : null)}
+                onChange={(e) => handleClassChange(e.target.value ? Number(e.target.value) : null)}
                 className="input-base"
               >
                 <option value="">Wybierz klasę</option>

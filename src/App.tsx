@@ -16,6 +16,8 @@ import ProfilePage from "./components/profile/ProfilePage";
 import TeacherGradesPage from "./components/teacher/TeacherGradesPage";
 import TeacherAttendancePage from "./components/teacher/TeacherAttendancePage";
 import TeacherHomeworkPage from "./components/teacher/TeacherHomeworkPage";
+import HomeworkDetailPage from "./components/teacher/HomeworkDetailPage";
+import HomeworkCreatePage from "./components/teacher/HomeworkCreatePage";
 import NotificationsPage from "./components/notifications/NotificationsPage";
 
 const RoleGuard = ({ allow, children }: { allow: Role[]; children: ReactNode }) => {
@@ -47,6 +49,8 @@ export default function App() {
           <Route path="teacher/grades" element={<RoleGuard allow={["nauczyciel", "admin"]}><TeacherGradesPage /></RoleGuard>} />
           <Route path="teacher/attendance" element={<RoleGuard allow={["nauczyciel", "admin"]}><TeacherAttendancePage /></RoleGuard>} />
           <Route path="teacher/homework" element={<RoleGuard allow={["nauczyciel", "admin"]}><TeacherHomeworkPage /></RoleGuard>} />
+          <Route path="teacher/homework/:id" element={<RoleGuard allow={["nauczyciel", "admin"]}><HomeworkDetailPage /></RoleGuard>} />
+          <Route path="teacher/homework/new" element={<RoleGuard allow={["nauczyciel", "admin"]}><HomeworkCreatePage /></RoleGuard>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

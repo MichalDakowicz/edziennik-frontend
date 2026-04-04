@@ -191,79 +191,83 @@ export default function NotificationsPage() {
         enabled: Boolean(user),
     });
 
+    const markReadMutation = useMutation({
+        mutationFn: (id: number) => markMessageRead(id),
+        onSuccess: () => {
+            if (user) queryClient.invalidateQueries({ queryKey: keys.inbox(user.id) });
+        },
+        onError: () => {
+            toast.error("Nie udało się oznaczyć wiadomości jako przeczytanej");
+        },
+    });
+
+    const openMessage = (message: any) => {
+        if (!message.przeczytana) {
+            markReadMutation.mutate(message.id);
+        }
+        navigate(`/dashboard/messages/${message.id}`);
+    };
+
+    const isStudent = user?.role === "uczen" && Boolean(user?.studentId) && Boolean(user?.classId);
+
     const teachersQuery = useQuery({
         queryKey: keys.teachers(),
         queryFn: getTeachers,
-        enabled: Boolean(user),
+        enabled: isStudent,
     });
 
     const gradesQuery = useQuery({
-        queryKey:
-            user?.role === "uczen" && user?.studentId
-                ? keys.grades(user.studentId)
-                : ["grades", "na"],
-        queryFn: () => getGrades(user?.studentId as number),
-        enabled: Boolean(user?.role === "uczen" && user?.studentId),
+        queryKey: isStudent && user?.studentId ? keys.grades(user.studentId) : ["grades", "na"],
+        queryFn: () => getGrades(user!.studentId as number),
+        enabled: isStudent,
     });
 
     const homeworkQuery = useQuery({
-        queryKey:
-            user?.role === "uczen" && user?.classId
-                ? keys.homework(user.classId)
-                : ["homework", "na"],
-        queryFn: () => getHomework(user?.classId as number),
-        enabled: Boolean(user?.role === "uczen" && user?.classId),
+        queryKey: isStudent && user?.classId ? keys.homework(user.classId) : ["homework", "na"],
+        queryFn: () => getHomework(user!.classId as number),
+        enabled: isStudent,
     });
 
     const eventsQuery = useQuery({
-        queryKey:
-            user?.role === "uczen" && user?.classId
-                ? keys.events(user.classId)
-                : ["events", "na"],
-        queryFn: () => getEvents(user?.classId as number),
-        enabled: Boolean(user?.role === "uczen" && user?.classId),
+        queryKey: isStudent && user?.classId ? keys.events(user.classId) : ["events", "na"],
+        queryFn: () => getEvents(user!.classId as number),
+        enabled: isStudent,
     });
 
     const attendanceQuery = useQuery({
-        queryKey:
-            user?.role === "uczen" && user?.studentId
-                ? keys.attendance(user.studentId)
-                : ["attendance", "na"],
-        queryFn: () => getAttendance(user?.studentId as number),
-        enabled: Boolean(user?.role === "uczen" && user?.studentId),
+        queryKey: isStudent && user?.studentId ? keys.attendance(user.studentId) : ["attendance", "na"],
+        queryFn: () => getAttendance(user!.studentId as number),
+        enabled: isStudent,
     });
 
     const attendanceStatusesQuery = useQuery({
         queryKey: ["attendance-statuses"],
         queryFn: getAttendanceStatuses,
-        enabled: Boolean(user?.role === "uczen"),
+        enabled: isStudent,
     });
 
     const behaviorQuery = useQuery({
-        queryKey:
-            user?.role === "uczen" && user?.studentId
-                ? keys.behavior(user.studentId)
-                : ["behavior", "na"],
-        queryFn: () => getBehaviorPoints(user?.studentId as number),
-        enabled: Boolean(user?.role === "uczen" && user?.studentId),
+        queryKey: isStudent && user?.studentId ? keys.behavior(user.studentId) : ["behavior", "na"],
+        queryFn: () => getBehaviorPoints(user!.studentId as number),
+        enabled: isStudent,
     });
 
     const subjectsQuery = useQuery({
         queryKey: keys.subjects(),
         queryFn: getSubjects,
-        enabled: Boolean(user),
+        enabled: isStudent,
     });
 
     const zajeciaQuery = useQuery({
         queryKey: ["zajecia"],
         queryFn: getZajecia,
-        enabled: Boolean(user),
+        enabled: isStudent,
     });
 
     const timetablePlanQuery = useQuery({
         queryKey: user?.classId ? ["timetable-plan", user.classId] : ["timetable-plan", "na"],
         queryFn: () => getTimetablePlan(user!.classId as number),
-        enabled: Boolean(user?.classId),
+        enabled: isStudent && Boolean(user?.classId),
     });
 
     const timetableEntriesQuery = useQuery({
@@ -278,23 +282,13 @@ export default function NotificationsPage() {
     const daysQuery = useQuery({
         queryKey: ["days-of-week"],
         queryFn: getDaysOfWeek,
-        enabled: Boolean(user),
+        enabled: isStudent,
     });
 
     const hoursQuery = useQuery({
         queryKey: ["lesson-hours"],
         queryFn: getLessonHours,
-        enabled: Boolean(user),
-    });
-
-    const markReadMutation = useMutation({
-        mutationFn: (id: number) => markMessageRead(id),
-        onSuccess: () => {
-            if (user) queryClient.invalidateQueries({ queryKey: keys.inbox(user.id) });
-        },
-        onError: () => {
-            toast.error("Nie udało się oznaczyć wiadomości jako przeczytanej");
-        },
+        enabled: isStudent,
     });
 
     const safeStudentData = {
@@ -312,13 +306,6 @@ export default function NotificationsPage() {
         hours: hoursQuery.data ?? [],
     };
 
-    const openMessage = (message: any) => {
-        if (!message.przeczytana) {
-            markReadMutation.mutate(message.id);
-        }
-        navigate(`/dashboard/messages/${message.id}`);
-    };
-
     const model = useStudentDashboardModel({
         studentData: safeStudentData,
         teachers: teachersQuery.data ?? [],
@@ -326,28 +313,57 @@ export default function NotificationsPage() {
         maxLiveItems: 40,
     });
 
-    const loadingQueries = [
-        inboxQuery,
-        teachersQuery,
-        gradesQuery,
-        homeworkQuery,
-        eventsQuery,
-        attendanceQuery,
-        attendanceStatusesQuery,
-        behaviorQuery,
-        subjectsQuery,
-        zajeciaQuery,
-        timetablePlanQuery,
-        timetableEntriesQuery,
-        daysQuery,
-        hoursQuery,
-    ];
+    const loadingQueries = isStudent
+        ? [
+              inboxQuery,
+              teachersQuery,
+              gradesQuery,
+              homeworkQuery,
+              eventsQuery,
+              attendanceQuery,
+              attendanceStatusesQuery,
+              behaviorQuery,
+              subjectsQuery,
+              zajeciaQuery,
+              timetablePlanQuery,
+              timetableEntriesQuery,
+              daysQuery,
+              hoursQuery,
+          ]
+        : [inboxQuery];
+
+    const allNotifications = isStudent ? model.liveItems : [];
+
+    const messageItems = useMemo(() => {
+        const messages = inboxQuery.data ?? [];
+        return [...messages]
+            .sort((a, b) => Date.parse(b.data_wyslania) - Date.parse(a.data_wyslania))
+            .slice(0, 40)
+            .map((message) => ({
+                id: `msg-${message.id}`,
+                kind: "message" as const,
+                date: message.data_wyslania,
+                label: message.przeczytana ? "Wiadomość" : "Nowa wiadomość",
+                title: message.temat || "(bez tematu)",
+                body: message.tresc,
+                icon: "mail",
+                isRead: Boolean(message.przeczytana),
+                onClick: () => openMessage(message),
+                to: "/dashboard/messages",
+            }));
+    }, [inboxQuery.data]);
 
     const filteredNotifications = useMemo(() => {
-        let items = activeFilter === "all" ? model.liveItems : model.liveItems.filter((item) => item.kind === activeFilter);
+        const items: LiveItem[] = isStudent
+            ? activeFilter === "all"
+                ? allNotifications
+                : allNotifications.filter((item) => item.kind === activeFilter)
+            : activeFilter === "all" || activeFilter === "message"
+                ? messageItems
+                : [];
         if (searchQuery.trim()) {
             const q = searchQuery.toLowerCase();
-            items = items.filter(
+            return items.filter(
                 (item) =>
                     item.title.toLowerCase().includes(q) ||
                     item.body.toLowerCase().includes(q) ||
@@ -355,22 +371,23 @@ export default function NotificationsPage() {
             );
         }
         return items;
-    }, [model.liveItems, activeFilter, searchQuery]);
+    }, [allNotifications, messageItems, activeFilter, searchQuery, isStudent]);
 
     const unreadCount = useMemo(
-        () => model.liveItems.filter((item) => !item.isRead).length,
-        [model.liveItems],
+        () => (isStudent ? allNotifications.filter((item) => !item.isRead).length : inboxQuery.data?.filter((m) => !m.przeczytana).length ?? 0),
+        [allNotifications, inboxQuery.data, isStudent],
     );
 
     const groups = useMemo(() => groupByDay(filteredNotifications), [filteredNotifications]);
 
     const filterCounts = useMemo(() => {
-        const counts: Record<string, number> = { all: model.liveItems.length };
-        for (const item of model.liveItems) {
+        const items = isStudent ? allNotifications : messageItems;
+        const counts: Record<string, number> = { all: items.length };
+        for (const item of items) {
             counts[item.kind] = (counts[item.kind] || 0) + 1;
         }
         return counts;
-    }, [model.liveItems]);
+    }, [allNotifications, messageItems, isStudent]);
 
     if (!user) return <ErrorState message="Brak zalogowanego użytkownika" />;
     if (loadingQueries.some((query) => query.isPending)) return <Spinner />;
@@ -430,6 +447,7 @@ export default function NotificationsPage() {
                         {(Object.keys(filterConfig) as FilterKind[]).map((key) => {
                             const isActive = activeFilter === key;
                             const count = filterCounts[key] || 0;
+                            if (!isStudent && key !== "all" && key !== "message") return null;
                             return (
                                 <button
                                     key={key}

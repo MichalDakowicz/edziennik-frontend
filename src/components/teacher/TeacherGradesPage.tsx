@@ -16,6 +16,7 @@ import { getCurrentUser } from "../../services/auth";
 import AddPeriodGradeModal from "./AddPeriodGradeModal";
 import { formatClassDisplay, getClassJournalNumberMap, sortStudentsAlphabetically } from "../../utils/classUtils";
 import { useTeacherClassSelector } from "../../hooks/useTeacherClassSelector";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 function RecentGradesCell({ studentId, selectedSubjectId }: { studentId: number; selectedSubjectId: number | null }) {
   const { data: grades, isLoading } = useQuery({
@@ -264,8 +265,11 @@ export default function TeacherGradesPage() {
   if (subjectsError) return <ErrorState message={`Błąd: ${(subjectsError as Error).message}`} />;
   if (classesError) return <ErrorState message={`Błąd: ${(classesError as Error).message}`} />;
 
+  const breadcrumbs = useAutoBreadcrumbs({ grades: "Wystawianie ocen" });
+
   return (
     <div className="space-y-6">
+      <AutoBreadcrumbs items={breadcrumbs} />
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div>
           <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Wystawianie Ocen</h1>

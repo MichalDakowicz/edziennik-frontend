@@ -4,9 +4,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Spinner } from "../ui/Spinner";
 import { ErrorState } from "../ui/ErrorState";
-import { getHomework, getClasses, getStudents, getSubjects, updateHomework } from "../../services/api";
+import DeleteConfirmModal from "../ui/DeleteConfirmModal";
+import { getHomework, getClasses, getStudents, getSubjects, updateHomework, deleteHomework } from "../../services/api";
 import { Homework, Student } from "../../types/api";
 import { formatClassDisplay } from "../../utils/classUtils";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 function isOverdue(termin: string): boolean {
     return new Date(termin) < new Date();
@@ -50,6 +52,7 @@ export default function HomeworkDetailPage() {
 
     const [editDescription, setEditDescription] = useState("");
     const [editDeadline, setEditDeadline] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const homeworkCache = queryClient.getQueriesData<Homework[]>({ queryKey: ["homework"] });
     const cachedHomework = homeworkCache
@@ -104,6 +107,17 @@ export default function HomeworkDetailPage() {
             toast.success("Praca domowa zaktualizowana");
             queryClient.invalidateQueries({ queryKey: ["homework-detail", homeworkId] });
             queryClient.invalidateQueries({ queryKey: ["homework"] });
+        },
+        onError: (error) => {
+            toast.error(`Błąd: ${(error as Error).message}`);
+        },
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: () => deleteHomework(homeworkId!),
+        onSuccess: () => {
+            toast.success("Praca domowa usunięta");
+            navigate("/dashboard/teacher/homework");
         },
         onError: (error) => {
             toast.error(`Błąd: ${(error as Error).message}`);
@@ -198,17 +212,17 @@ export default function HomeworkDetailPage() {
     const overdue = isOverdue(homework.termin);
     const daysLeft = daysUntil(homework.termin);
 
+    const breadcrumbs = useAutoBreadcrumbs({
+        homework: "Zadania domowe",
+        [String(homeworkId)]: homework?.opis?.substring(0, 40) + (homework?.opis?.length > 40 ? "..." : "") || "Szczegóły",
+    });
+
     return (
+        <>
         <div className="space-y-10">
+            <AutoBreadcrumbs items={breadcrumbs} />
             {/* Header */}
             <section className="space-y-2">
-                <button
-                    onClick={() => navigate("/dashboard/teacher/homework")}
-                    className="flex items-center gap-2 text-primary font-semibold text-sm uppercase tracking-wider hover:underline"
-                >
-                    <span className="material-symbols-outlined text-sm">arrow_back</span>
-                    <span>Wróć do zadań</span>
-                </button>
                 <div className="flex items-center gap-3 mb-2">
                     <span className="px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider bg-primary/10 text-primary">
                         {subjectName}
@@ -271,6 +285,16 @@ export default function HomeworkDetailPage() {
                                 className="w-full bg-primary text-white py-4 rounded-full font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-50"
                             >
                                 {updateMutation.isPending ? "Zapisywanie..." : "Zapisz zmiany"}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setShowDeleteModal(true)}
+                                className="w-full py-4 rounded-full font-bold text-sm transition-all active:scale-95"
+                                style={{ backgroundColor: 'rgba(231,232,233,0.5)', color: '#424654' }}
+                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ba1a1a'; e.currentTarget.style.color = '#ffffff'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(231,232,233,0.5)'; e.currentTarget.style.color = '#424654'; }}
+                            >
+                                Usuń pracę domową
                             </button>
                         </form>
                     </div>
@@ -386,8 +410,18 @@ export default function HomeworkDetailPage() {
                             </div>
                         )}
                     </div>
-                </div>
             </div>
         </div>
+
+        <DeleteConfirmModal
+            open={showDeleteModal}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={() => deleteMutation.mutate()}
+            title="Usuń pracę domową"
+            message="Czy na pewno chcesz usunąć tę pracę domową? Tej operacji nie można cofnąć."
+            itemName={homework?.opis}
+        />
+    </div>
+    </>
     );
 }

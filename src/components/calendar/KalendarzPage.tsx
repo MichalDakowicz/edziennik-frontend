@@ -21,8 +21,10 @@ import { ThreeDayView } from "./ThreeDayView";
 import { WeekView } from "./WeekView";
 import type { TimetableData, ViewMode, DisplayItem } from "./types";
 import { Modal } from "../ui/Modal";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 export default function KalendarzPage() {
+  const breadcrumbs = useAutoBreadcrumbs({ calendar: "Kalendarz" });
   const user = getCurrentUser();
   const classId = user?.classId;
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -83,6 +85,7 @@ export default function KalendarzPage() {
 
   return (
     <div className="space-y-6">
+      <AutoBreadcrumbs items={breadcrumbs} />
       <CalendarNavHeader
         currentDate={currentDate}
         viewMode={viewMode}

@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { Spinner } from "../ui/Spinner";
 import { EmptyState } from "../ui/EmptyState";
 import { ErrorState } from "../ui/ErrorState";
+import DeleteConfirmModal from "../ui/DeleteConfirmModal";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 import { keys } from "../../services/queryKeys";
 import { getHomework, getClasses, getSubjects, deleteHomework } from "../../services/api";
 import { formatClassDisplay } from "../../utils/classUtils";
@@ -56,6 +58,8 @@ export default function TeacherHomeworkPage() {
     const [selectedClassId, setSelectedClassId] = useState<number | null>(hookClassId);
     const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
     const [activeFilter, setActiveFilter] = useState<FilterTab>("active");
+    const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+    const [deleteTargetName, setDeleteTargetName] = useState("");
 
     useEffect(() => {
         if (hookClassId !== null && hookClassId !== selectedClassId) {
@@ -143,12 +147,15 @@ export default function TeacherHomeworkPage() {
         return subject?.nazwa ?? "Przedmiot";
     };
 
+    const breadcrumbs = useAutoBreadcrumbs({ homework: "Zadania domowe" });
+
     if (classesLoading || subjectsLoading) return <Spinner />;
     if (classesError) return <ErrorState message={`Błąd: ${(classesError as Error).message}`} />;
     if (subjectsError) return <ErrorState message={`Błąd: ${(subjectsError as Error).message}`} />;
 
     return (
         <div className="space-y-8">
+            <AutoBreadcrumbs items={breadcrumbs} />
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-1">
@@ -291,11 +298,13 @@ export default function TeacherHomeworkPage() {
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    if (confirm("Czy na pewno chcesz usunąć tę pracę domową?")) {
-                                                        deleteHomeworkMutation.mutate(hw.id);
-                                                    }
+                                                    setDeleteTargetId(hw.id);
+                                                    setDeleteTargetName(hw.opis.length > 60 ? hw.opis.substring(0, 60) + "..." : hw.opis);
                                                 }}
-                                                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-container-high/50 text-on-surface-variant rounded-full text-xs font-bold hover:bg-error/10 hover:text-error transition-colors active:scale-95"
+                                                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all active:scale-95"
+                                                style={{ backgroundColor: 'rgba(231,232,233,0.5)', color: '#424654' }}
+                                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ba1a1a'; e.currentTarget.style.color = '#ffffff'; }}
+                                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(231,232,233,0.5)'; e.currentTarget.style.color = '#424654'; }}
                                             >
                                                 <span className="material-symbols-outlined text-sm">delete</span>
                                                 Usuń
@@ -411,6 +420,19 @@ export default function TeacherHomeworkPage() {
             ) : (
                 <EmptyState message="Wybierz klasę, aby zobaczyć prace domowe" />
             )}
+
+            <DeleteConfirmModal
+                open={deleteTargetId !== null}
+                onClose={() => setDeleteTargetId(null)}
+                onConfirm={() => {
+                    if (deleteTargetId) {
+                        deleteHomeworkMutation.mutate(deleteTargetId);
+                    }
+                }}
+                title="Usuń pracę domową"
+                message="Czy na pewno chcesz usunąć tę pracę domową? Tej operacji nie można cofnąć."
+                itemName={deleteTargetName}
+            />
         </div>
     );
 }

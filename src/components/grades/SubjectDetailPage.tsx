@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getGrades, getSubjects } from "../../services/api";
 import { keys } from "../../services/queryKeys";
@@ -12,6 +12,7 @@ import GradeSimulator from "./GradeSimulator";
 import type { Grade } from "../../types/api";
 import { computeWeightedAverage, formatGradeValue, getGradeColor, getGradeBorderColor, getSuggestedGrade } from "../../utils/gradeUtils";
 import { formatDate } from "../../utils/dateUtils";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 const SUBJECT_ICONS: Record<string, string> = {
   "język polski": "menu_book",
@@ -111,14 +112,11 @@ export default function SubjectDetailPage() {
     .sort((a, b) => Date.parse(b.data_wystawienia) - Date.parse(a.data_wystawienia));
 
   const icon = getSubjectIcon(subjectName);
+  const breadcrumbs = useAutoBreadcrumbs({ grades: "Oceny" });
 
   return (
     <div className="space-y-8">
-      <nav className="flex items-center gap-2 text-sm text-on-surface-variant font-body">
-        <Link to="/dashboard/grades" className="hover:text-primary transition-colors">Moje Oceny</Link>
-        <span className="material-symbols-outlined text-xs">chevron_right</span>
-        <span className="text-on-surface font-semibold">{subjectName}</span>
-      </nav>
+      <AutoBreadcrumbs items={breadcrumbs} />
 
       <section className="relative overflow-hidden rounded-3xl bg-primary p-8 md:p-12 text-on-primary shadow-2xl shadow-primary/20">
         <div className="absolute top-0 right-0 w-1/3 h-full opacity-10">

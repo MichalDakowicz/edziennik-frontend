@@ -7,6 +7,7 @@ import { getClasses, getSubjects, createHomework } from "../../services/api";
 import { formatClassDisplay } from "../../utils/classUtils";
 import { useTeacherClassSelector } from "../../hooks/useTeacherClassSelector";
 import { getCurrentUser } from "../../services/auth";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 export default function HomeworkCreatePage() {
     const navigate = useNavigate();
@@ -73,10 +74,13 @@ export default function HomeworkCreatePage() {
         });
     };
 
+    const breadcrumbs = useAutoBreadcrumbs({ homework: "Zadania domowe", new: "Nowe zadanie" });
+
     if (classesLoading || subjectsLoading) return <Spinner />;
 
     return (
         <div className="space-y-10">
+            <AutoBreadcrumbs items={breadcrumbs} />
             {/* Header */}
             <div className="mb-10">
                 <button
@@ -294,6 +298,14 @@ export default function HomeworkCreatePage() {
                             className="w-full py-4 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-50"
                         >
                             {createMutation.isPending ? "Publikowanie..." : "Opublikuj zadanie"}
+                        </button>
+                        {/* TODO: Requires Homework.is_draft field in backend */}
+                        <button
+                            type="button"
+                            onClick={() => toast.info("Szkice zostaną dodane po aktualizacji backendu")}
+                            className="w-full py-4 bg-surface-container-low text-on-surface-variant rounded-xl font-bold hover:bg-surface-container transition-all"
+                        >
+                            Zapisz jako szkic
                         </button>
                         <button
                             type="button"

@@ -26,6 +26,7 @@ import { ErrorState } from "../ui/ErrorState";
 import { Spinner } from "../ui/Spinner";
 import { useStudentDashboardModel } from "../dashboard/useStudentDashboardModel";
 import type { LiveItem } from "../dashboard/student/types";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 type FilterKind = "all" | "grade" | "homework" | "message" | "event";
 
@@ -179,6 +180,7 @@ function NotificationRow({ item }: { item: LiveItem }) {
 }
 
 export default function NotificationsPage() {
+    const breadcrumbs = useAutoBreadcrumbs({ notifications: "Powiadomienia" });
     const user = getCurrentUser();
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -396,6 +398,7 @@ export default function NotificationsPage() {
 
     return (
         <div className="space-y-8">
+            <AutoBreadcrumbs items={breadcrumbs} />
             {/* Header */}
             <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
                 <div>

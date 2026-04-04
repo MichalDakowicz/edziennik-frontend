@@ -8,6 +8,7 @@ import { ErrorState } from "../ui/ErrorState";
 import { Spinner } from "../ui/Spinner";
 import { Badge } from "../ui/Badge";
 import { cn } from "../../utils/cn";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 type NotificationPref = {
     id: string;
@@ -139,6 +140,8 @@ export default function ProfilePage() {
         );
     };
 
+    const breadcrumbs = useAutoBreadcrumbs({ profile: "Profil" });
+
     if (!user) return <ErrorState message="Brak zalogowanego użytkownika" />;
     if (profileQuery.isPending) return <Spinner />;
     if (profileQuery.isError)
@@ -146,6 +149,7 @@ export default function ProfilePage() {
 
     return (
         <div className="min-h-screen bg-background">
+            <AutoBreadcrumbs items={breadcrumbs} />
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">

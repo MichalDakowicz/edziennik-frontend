@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
     getAttendance,
@@ -16,10 +15,12 @@ import { getCurrentUser } from "../../services/auth";
 import { Spinner } from "../ui/Spinner";
 import { ErrorState } from "../ui/ErrorState";
 import { formatDate } from "../../utils/dateUtils";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 const ITEMS_PER_PAGE = 15;
 
 export default function AttendanceHistoryPage() {
+    const breadcrumbs = useAutoBreadcrumbs({ attendance: "Frekwencja", history: "Historia" });
     const user = getCurrentUser();
     const studentId = user?.studentId;
     const classId = user?.classId;
@@ -234,14 +235,7 @@ export default function AttendanceHistoryPage() {
 
     return (
         <div className="space-y-6">
-            {/* Breadcrumb Nav */}
-            <nav className="flex items-center gap-2 text-sm text-on-surface-variant font-body">
-                <Link to="/dashboard" className="hover:text-primary transition-colors">Pulpit</Link>
-                <span className="material-symbols-outlined text-xs">chevron_right</span>
-                <Link to="/dashboard/attendance" className="hover:text-primary transition-colors">Frekwencja</Link>
-                <span className="material-symbols-outlined text-xs">chevron_right</span>
-                <span className="text-on-surface font-semibold">Pełna historia</span>
-            </nav>
+            <AutoBreadcrumbs items={breadcrumbs} />
 
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">

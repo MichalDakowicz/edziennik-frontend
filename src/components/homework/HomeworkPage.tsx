@@ -9,6 +9,7 @@ import HomeworkCard from "./HomeworkCard";
 import HomeworkModal from "./HomeworkModal";
 import type { Homework, Subject } from "../../types/api";
 import { CalendarDays, ArrowRight, BookOpen, LayoutList, LayoutGrid, ChevronRight } from "lucide-react";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 const CAROUSEL_INTERVAL_MS = 4000;
 
@@ -108,6 +109,7 @@ function HomeworkListItem({
 }
 
 export default function HomeworkPage() {
+  const breadcrumbs = useAutoBreadcrumbs({ homework: "Zadania domowe" });
   const user = getCurrentUser();
   const classId = user?.classId;
   const [subjectId, setSubjectId] = useState<number | "all">("all");
@@ -181,6 +183,7 @@ export default function HomeworkPage() {
 
   return (
     <div className="space-y-6">
+      <AutoBreadcrumbs items={breadcrumbs} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div>

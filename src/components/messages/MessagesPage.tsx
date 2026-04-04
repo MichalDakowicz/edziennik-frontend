@@ -12,10 +12,12 @@ import type { Message } from "../../types/api";
 import MessageList from "./MessageList";
 import MessageDetail from "./MessageDetail";
 import ComposeMessage from "./ComposeMessage";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 type Tab = "inbox" | "sent" | "announcements";
 
 export default function MessagesPage() {
+  const breadcrumbs = useAutoBreadcrumbs({ messages: "Wiadomości" });
   const user = getCurrentUser();
   const queryClient = useQueryClient();
   const { messageId } = useParams();
@@ -121,6 +123,7 @@ export default function MessagesPage() {
 
   return (
     <div className="space-y-6">
+      <AutoBreadcrumbs items={breadcrumbs} />
       {/* Page Header */}
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div>

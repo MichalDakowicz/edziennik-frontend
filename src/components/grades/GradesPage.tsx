@@ -11,6 +11,7 @@ import PeriodGrades from "./PeriodGrades";
 import BehaviorPoints from "./BehaviorPoints";
 import type { Grade } from "../../types/api";
 import { computeWeightedAverage, formatGradeValue, getGradeColor, getGradeBorderColor } from "../../utils/gradeUtils";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 const SUBJECT_ICONS: Record<string, string> = {
   "język polski": "menu_book",
@@ -77,6 +78,7 @@ function getSubjectTonalPair(subjectName: string): { bg: string; text: string; b
 type Tab = "partial" | "period" | "behavior";
 
 export default function GradesPage() {
+  const breadcrumbs = useAutoBreadcrumbs({ grades: "Oceny" });
   const user = getCurrentUser();
   const studentId = user?.studentId;
   const [tab, setTab] = useState<Tab>("partial");
@@ -135,6 +137,7 @@ export default function GradesPage() {
 
   return (
     <div className="space-y-6">
+      <AutoBreadcrumbs items={breadcrumbs} />
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div>
           <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Oceny</h1>

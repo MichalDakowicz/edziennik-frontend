@@ -18,8 +18,10 @@ import { Card } from "../ui/Card";
 import SubjectAttendanceCard from "./SubjectAttendanceCard";
 import RecentAttendanceTable from "./RecentAttendanceTable";
 import ExcuseModal from "./ExcuseModal";
+import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 export default function AttendancePage() {
+    const breadcrumbs = useAutoBreadcrumbs({ attendance: "Frekwencja" });
     const user = getCurrentUser();
     const studentId = user?.studentId;
     const classId = user?.classId;
@@ -211,6 +213,7 @@ export default function AttendancePage() {
 
     return (
         <div className="space-y-6">
+            <AutoBreadcrumbs items={breadcrumbs} />
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
                 <div>

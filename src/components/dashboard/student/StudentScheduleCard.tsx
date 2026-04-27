@@ -71,9 +71,15 @@ export default function StudentScheduleCard({
                                 </div>
 
                                 <div className="flex-shrink-0">
-                                    {lesson.minutesToStart !== null ? (
-                                        <span className="text-xs font-semibold text-outline font-body">
-                                            za {lesson.minutesToStart} min
+                                    {lesson.timeBadge ? (
+                                        <span
+                                            className={`text-xs font-semibold font-body ${
+                                                lesson.timeBadge.kind === "to-break"
+                                                    ? "text-primary"
+                                                    : "text-outline"
+                                            }`}
+                                        >
+                                            {lesson.timeBadge.text}
                                         </span>
                                     ) : null}
                                 </div>

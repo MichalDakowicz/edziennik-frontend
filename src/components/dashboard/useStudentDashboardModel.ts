@@ -1,6 +1,11 @@
 import { useMemo } from "react";
 import { formatDate } from "../../utils/dateUtils";
 import { computeWeightedAverage } from "../../utils/gradeUtils";
+import {
+    buildLessonTimeBadge,
+    buildScheduleContext,
+    parseClockToMinutes,
+} from "../../utils/lessonTimeStatus";
 import type { Attendance, BehaviorPoint, Event, Grade, Homework, Message } from "../../types/api";
 import type { LiveItem } from "./student/types";
 
@@ -168,35 +173,33 @@ export function useStudentDashboardModel({
             .sort((a: any, b: any) => (a.hour?.Numer ?? 0) - (b.hour?.Numer ?? 0));
     }, [studentData.days, studentData.entries, studentData.hours]);
 
-    const toMinutes = (time: string | null | undefined) => {
-        if (!time) return null;
-        const [h, m] = time.split(":").map(Number);
-        if (Number.isNaN(h) || Number.isNaN(m)) return null;
-        return h * 60 + m;
-    };
-
     const lessonsWithState = useMemo(() => {
         const currentHourTime = new Date().getHours() * 60 + new Date().getMinutes();
+        const lessonsWithMinutes = todayLessons.map((lesson: any) => ({
+            ...lesson,
+            startMinutes: parseClockToMinutes(lesson.hour?.CzasOd),
+            endMinutes: parseClockToMinutes(lesson.hour?.CzasDo),
+        }));
+        const scheduleContext = buildScheduleContext(lessonsWithMinutes, currentHourTime);
 
-        return todayLessons.map((lesson: any) => {
-            const start = toMinutes(lesson.hour?.CzasOd);
-            const end = toMinutes(lesson.hour?.CzasDo);
-            const isCurrent =
-                start !== null &&
-                end !== null &&
-                start <= currentHourTime &&
-                currentHourTime < end;
-            const isPast = end !== null && currentHourTime >= end;
-            const minutesToStart =
-                start !== null && start > currentHourTime
-                    ? start - currentHourTime
-                    : null;
+        return lessonsWithMinutes.map((lesson: any) => {
+            const isCurrent = scheduleContext.activeLessonId === lesson.id;
+            const isPast = lesson.endMinutes !== null && currentHourTime >= lesson.endMinutes;
+            const timeBadge = buildLessonTimeBadge(
+                {
+                    id: lesson.id,
+                    startMinutes: lesson.startMinutes,
+                    endMinutes: lesson.endMinutes,
+                },
+                scheduleContext,
+                currentHourTime,
+            );
 
             return {
                 ...lesson,
                 isCurrent,
                 isPast,
-                minutesToStart,
+                timeBadge,
             };
         });
     }, [todayLessons]);

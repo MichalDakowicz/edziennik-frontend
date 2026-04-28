@@ -88,6 +88,12 @@ export interface GradeSolution {
   label: string;
 }
 
+const MAX_TARGET_OVERSHOOT = 0.03;
+
+function roundAverage(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 function weightPenalty(weight: number): number {
   return weight <= 3 ? 0 : (weight - 3) * 10;
 }
@@ -101,11 +107,15 @@ export function findGradeSolutions(
   targetAvg: number,
   maxGrades: number = 3,
 ): GradeSolution[] {
+  const normalizedTargetAvg = roundAverage(targetAvg);
   const valid = currentGrades.filter((g) => g.czy_do_sredniej && !Number.isNaN(parseFloat(g.wartosc)));
   const currentSumW = valid.reduce((sum, g) => sum + g.waga, 0);
   const currentSumWV = valid.reduce((sum, g) => sum + g.waga * parseFloat(g.wartosc), 0);
 
   if (currentSumW === 0) return [];
+
+  const currentAvg = roundAverage(currentSumWV / currentSumW);
+  if (currentAvg >= normalizedTargetAvg) return [];
 
   const solutions: GradeSolution[] = [];
   const seen = new Set<string>();
@@ -114,20 +124,21 @@ export function findGradeSolutions(
     const totalNewWeight = grades.reduce((s, g) => s + g.weight, 0);
     const newSumWV = grades.reduce((s, g) => s + g.value * g.weight, 0);
     const resultingAvg = (currentSumWV + newSumWV) / (currentSumW + totalNewWeight);
+    const roundedResultingAvg = roundAverage(resultingAvg);
+    const overshoot = roundedResultingAvg - normalizedTargetAvg;
+    if (overshoot < 0) return;
+    if (overshoot > MAX_TARGET_OVERSHOOT) return;
     const key = grades.map((g) => `${g.value}_${g.weight}`).sort().join(",");
     if (seen.has(key)) return;
     seen.add(key);
     const label = grades.map((g) => `${formatGradeValue(g.value)} (waga ${g.weight})`).join(" + ");
-    solutions.push({ grades, resultingAvg, label });
+    solutions.push({ grades, resultingAvg: roundedResultingAvg, label });
   }
 
   if (maxGrades >= 1) {
     for (const weight of POSSIBLE_WEIGHTS) {
-      const neededValue = (targetAvg * (currentSumW + weight) - currentSumWV) / weight;
       for (const grade of POLISH_GRADES) {
-        if (Math.abs(grade - neededValue) < 0.01) {
-          addSolution([{ value: grade, weight }]);
-        }
+        addSolution([{ value: grade, weight }]);
       }
     }
   }
@@ -137,17 +148,12 @@ export function findGradeSolutions(
       for (let j = i; j < POSSIBLE_WEIGHTS.length; j++) {
         const w1 = POSSIBLE_WEIGHTS[i];
         const w2 = POSSIBLE_WEIGHTS[j];
-        const totalNewWeight = w1 + w2;
-        const neededSum = targetAvg * (currentSumW + totalNewWeight) - currentSumWV;
         for (const g1 of POLISH_GRADES) {
-          const neededG2 = (neededSum - g1 * w1) / w2;
           for (const g2 of POLISH_GRADES) {
-            if (Math.abs(g2 - neededG2) < 0.01) {
-              addSolution([
-                { value: g1, weight: w1 },
-                { value: g2, weight: w2 },
-              ]);
-            }
+            addSolution([
+              { value: g1, weight: w1 },
+              { value: g2, weight: w2 },
+            ]);
           }
         }
       }
@@ -161,20 +167,14 @@ export function findGradeSolutions(
           const w1 = POSSIBLE_WEIGHTS[i];
           const w2 = POSSIBLE_WEIGHTS[j];
           const w3 = POSSIBLE_WEIGHTS[k];
-          const totalNewWeight = w1 + w2 + w3;
-          const neededSum = targetAvg * (currentSumW + totalNewWeight) - currentSumWV;
           for (const g1 of POLISH_GRADES) {
-            const remaining = neededSum - g1 * w1;
             for (const g2 of POLISH_GRADES) {
-              const neededG3 = (remaining - g2 * w2) / w3;
               for (const g3 of POLISH_GRADES) {
-                if (Math.abs(g3 - neededG3) < 0.01) {
-                  addSolution([
-                    { value: g1, weight: w1 },
-                    { value: g2, weight: w2 },
-                    { value: g3, weight: w3 },
-                  ]);
-                }
+                addSolution([
+                  { value: g1, weight: w1 },
+                  { value: g2, weight: w2 },
+                  { value: g3, weight: w3 },
+                ]);
               }
             }
           }
@@ -187,6 +187,9 @@ export function findGradeSolutions(
     const aCount = a.grades.length;
     const bCount = b.grades.length;
     if (aCount !== bCount) return aCount - bCount;
+    const aOvershoot = roundAverage(a.resultingAvg - normalizedTargetAvg);
+    const bOvershoot = roundAverage(b.resultingAvg - normalizedTargetAvg);
+    if (aOvershoot !== bOvershoot) return aOvershoot - bOvershoot;
     const aPenalty = solutionPenalty(a);
     const bPenalty = solutionPenalty(b);
     if (aPenalty !== bPenalty) return aPenalty - bPenalty;

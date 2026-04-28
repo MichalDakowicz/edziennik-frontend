@@ -1,5 +1,6 @@
 import {
   computeWeightedAverage,
+  findGradeSolutions,
   formatGradeValue,
   getGradeColor,
   getPercentageColor,
@@ -62,5 +63,52 @@ describe("gradeUtils", () => {
     expect(getSuggestedGrade(3.0)).toBe(3);
     expect(getSuggestedGrade(2.0)).toBe(2);
     expect(getSuggestedGrade(1.0)).toBe(1);
+  });
+
+  it("zwraca rozwiązania osiągające target lub wyższe, nawet gdy brak idealnego trafienia", () => {
+    const grades = [{ wartosc: "4", waga: 1, czy_do_sredniej: true }];
+
+    const solutions = findGradeSolutions(grades, 4.23, 1);
+
+    expect(solutions.length).toBeGreaterThan(0);
+    expect(solutions.every((solution) => solution.resultingAvg >= 4.23)).toBe(true);
+    expect(solutions[0]).toMatchObject({
+      grades: [{ value: 4.5, weight: 1 }],
+    });
+    expect(solutions[0].resultingAvg).toBeCloseTo(4.25, 2);
+  });
+
+  it("nie zwraca rozwiązań niższych po zaokrągleniu do dwóch miejsc", () => {
+    const grades = [{ wartosc: "4", waga: 2, czy_do_sredniej: true }];
+
+    const solutions = findGradeSolutions(grades, 4.34, 1);
+
+    expect(solutions.every((solution) => solution.resultingAvg >= 4.34)).toBe(true);
+  });
+
+  it("nie dopuszcza rozwiązań z nadwyżką większą niż 0.03", () => {
+    const grades = [{ wartosc: "4", waga: 1, czy_do_sredniej: true }];
+
+    const solutions = findGradeSolutions(grades, 4.2, 1);
+
+    expect(solutions.every((solution) => solution.resultingAvg - 4.2 <= 0.03)).toBe(true);
+  });
+
+  it("nie zwraca dodatkowych ocen, gdy target jest już osiągnięty", () => {
+    const grades = [
+      { wartosc: "5", waga: 1, czy_do_sredniej: true },
+      { wartosc: "4", waga: 1, czy_do_sredniej: true },
+    ];
+
+    expect(findGradeSolutions(grades, 4.5, 2)).toEqual([]);
+  });
+
+  it("normalizuje target do dwóch miejsc po przecinku", () => {
+    const grades = [{ wartosc: "4", waga: 1, czy_do_sredniej: true }];
+
+    const solutions = findGradeSolutions(grades, 4.231, 1);
+
+    expect(solutions.length).toBeGreaterThan(0);
+    expect(solutions.every((solution) => solution.resultingAvg >= 4.23)).toBe(true);
   });
 });

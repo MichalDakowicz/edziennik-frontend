@@ -11,12 +11,18 @@ export default function GradeSimulator({ grades }: GradeSimulatorProps) {
   const [showSolutions, setShowSolutions] = useState(false);
 
   const currentAvg = useMemo(() => computeWeightedAverage(grades), [grades]);
+  const parsedTarget = useMemo(() => parseFloat(targetAvg), [targetAvg]);
+  const normalizedTarget = useMemo(
+    () => (isNaN(parsedTarget) ? null : Math.round(parsedTarget * 100) / 100),
+    [parsedTarget],
+  );
+  const targetAlreadyReached = normalizedTarget !== null && currentAvg > 0 && currentAvg >= normalizedTarget;
 
   const solutions = useMemo(() => {
-    const target = parseFloat(targetAvg);
-    if (isNaN(target) || target < 1 || target > 6) return [];
+    const target = normalizedTarget;
+    if (target === null || target < 1 || target > 6) return [];
     return findGradeSolutions(grades, target, 2);
-  }, [grades, targetAvg]);
+  }, [grades, normalizedTarget]);
 
   const handleCalculate = () => {
     setShowSolutions(true);
@@ -26,7 +32,7 @@ export default function GradeSimulator({ grades }: GradeSimulatorProps) {
     <section className="bg-surface-container-high rounded-3xl p-8 relative overflow-hidden">
       <div className="relative z-10">
         <h3 className="text-2xl font-black text-on-surface font-headline mb-2">Symulator Ocen</h3>
-        <p className="text-sm text-on-surface-variant mb-8 font-body">Podaj docelową średnią, a powiemy Ci jakie oceny musisz uzyskać.</p>
+        <p className="text-sm text-on-surface-variant mb-8 font-body">Podaj docelową średnią, a powiemy Ci jakie oceny musisz uzyskać, aby ją osiągnąć lub przekroczyć.</p>
 
         <div className="space-y-6">
           <div className="space-y-2">
@@ -49,7 +55,7 @@ export default function GradeSimulator({ grades }: GradeSimulatorProps) {
           <button
             className="w-full py-4 bg-on-surface text-background rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 active:scale-[0.98] transition-all font-headline"
             onClick={handleCalculate}
-            disabled={!targetAvg || isNaN(parseFloat(targetAvg))}
+            disabled={!targetAvg || normalizedTarget === null}
           >
             <span className="material-symbols-outlined">auto_graph</span>
             Oblicz Wymagane Oceny
@@ -63,7 +69,15 @@ export default function GradeSimulator({ grades }: GradeSimulatorProps) {
           </div>
         )}
 
-        {showSolutions && solutions.length > 0 && (
+        {showSolutions && targetAlreadyReached && normalizedTarget !== null && (
+          <div className="mt-6 pt-6 border-t border-outline/10">
+            <p className="text-sm text-primary font-medium font-body">
+              Aktualna średnia {currentAvg.toFixed(2)} już osiąga lub przekracza cel {normalizedTarget.toFixed(2)}.
+            </p>
+          </div>
+        )}
+
+        {showSolutions && !targetAlreadyReached && solutions.length > 0 && (
           <div className="mt-6 pt-6 border-t border-outline/10">
             <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest font-body mb-4">
               Potrzebujesz {solutions.length > 1 ? "jednej z kombinacji" : "tej oceny"}:
@@ -87,10 +101,10 @@ export default function GradeSimulator({ grades }: GradeSimulatorProps) {
           </div>
         )}
 
-        {showSolutions && solutions.length === 0 && parseFloat(targetAvg) > 0 && (
+        {showSolutions && !targetAlreadyReached && solutions.length === 0 && normalizedTarget !== null && normalizedTarget > 0 && (
           <div className="mt-6 pt-6 border-t border-outline/10">
             <p className="text-sm text-error font-medium font-body">
-              Nie można osiągnąć średniej {parseFloat(targetAvg).toFixed(2)} przy obecnych ocenach.
+              Nie można osiągnąć średniej {normalizedTarget.toFixed(2)} przy obecnych ocenach.
             </p>
           </div>
         )}

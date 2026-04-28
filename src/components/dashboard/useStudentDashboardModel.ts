@@ -6,13 +6,44 @@ import {
     buildScheduleContext,
     parseClockToMinutes,
 } from "../../utils/lessonTimeStatus";
-import type { Attendance, BehaviorPoint, Event, Grade, Homework, Message } from "../../types/api";
+import type {
+    Attendance,
+    AttendanceStatus,
+    BehaviorPoint,
+    DayOfWeek,
+    Event,
+    Grade,
+    Homework,
+    LessonHour,
+    Message,
+    Subject,
+    Teacher,
+    TimetableEntry,
+    Zajecia,
+} from "../../types/api";
 import type { LiveItem } from "./student/types";
 
+export type StudentDashboardData = {
+    zajecia?: Zajecia[];
+    subjects?: Subject[];
+    grades?: Grade[];
+    attendance?: Attendance[];
+    attendanceStatuses?: AttendanceStatus[];
+    behaviorPoints?: BehaviorPoint[];
+    inbox?: Message[];
+    homework?: Homework[];
+    events?: Event[];
+    days?: DayOfWeek[];
+    entries?: TimetableEntry[];
+    hours?: LessonHour[];
+};
+
+type LessonWithHour = TimetableEntry & { hour?: LessonHour };
+
 type UseStudentDashboardModelArgs = {
-    studentData: any;
-    teachers: any[];
-    onOpenMessage: (message: any) => void;
+    studentData: StudentDashboardData;
+    teachers: Teacher[];
+    onOpenMessage: (message: Message) => void;
     maxLiveItems?: number;
 };
 
@@ -23,41 +54,38 @@ export function useStudentDashboardModel({
     maxLiveItems = 10,
 }: UseStudentDashboardModelArgs) {
     const zajeciaMap = useMemo(
-        () => new Map((studentData.zajecia || []).map((z: any) => [z.id, z])),
+        () => new Map((studentData.zajecia || []).map((zajecia) => [zajecia.id, zajecia])),
         [studentData.zajecia],
     );
 
     const przedmiotMap = useMemo(
-        () =>
-            new Map((studentData.subjects || []).map((s: any) => [s.id, s])),
+        () => new Map((studentData.subjects || []).map((subject) => [subject.id, subject])),
         [studentData.subjects],
     );
 
     const nauczycielMap = useMemo(
         () =>
-            new Map(
-                (teachers || []).map((teacher: any) => [
-                    teacher.id,
-                    `${teacher.user.first_name} ${teacher.user.last_name}`,
-                ]),
-            ),
+            new Map(teachers.map((teacher) => [teacher.id, `${teacher.user.first_name} ${teacher.user.last_name}`])),
         [teachers],
     );
+
+    const getSubjectLabel = (subject: Subject | undefined) =>
+        subject?.nazwa ?? subject?.Nazwa ?? "Nieznany przedmiot";
 
     const getSubjectName = (zajeciaId: number) => {
         const zajecia = zajeciaMap.get(zajeciaId);
         if (!zajecia) return "Nieznany przedmiot";
-        const subject = przedmiotMap.get((zajecia as any).przedmiot);
-        return subject ? (subject as any).nazwa : "Nieznany przedmiot";
+        const subject = przedmiotMap.get(zajecia.przedmiot);
+        return getSubjectLabel(subject);
     };
 
     const getGradeSubjectName = (subjectId: number) => {
         const subject = przedmiotMap.get(subjectId);
-        return subject ? (subject as any).nazwa : "Nieznany przedmiot";
+        return getSubjectLabel(subject);
     };
 
     const getTeacherNameForLesson = (zajeciaId: number) => {
-        const zajecia = zajeciaMap.get(zajeciaId) as any;
+        const zajecia = zajeciaMap.get(zajeciaId);
         if (!zajecia?.nauczyciel) return "Nauczyciel";
         return nauczycielMap.get(zajecia.nauczyciel) ?? "Nauczyciel";
     };
@@ -77,30 +105,22 @@ export function useStudentDashboardModel({
     const recentAttendance = useMemo(
         () =>
             [...(studentData.attendance || [])]
-                .filter((record: any) => Boolean(record?.Data))
-                .sort((a: any, b: any) => Date.parse(b.Data) - Date.parse(a.Data))
+                .filter((record) => Boolean(record?.Data))
+                .sort((a, b) => Date.parse(b.Data) - Date.parse(a.Data))
                 .slice(0, 5),
         [studentData.attendance],
     );
 
     const statusMap = useMemo(
         () =>
-            new Map(
-                (studentData.attendanceStatuses || []).map((status: any) => [
-                    status.id,
-                    String(status.Wartosc || "").trim(),
-                ]),
-            ),
+            new Map((studentData.attendanceStatuses || []).map((status) => [status.id, String(status.Wartosc || "").trim()])),
         [studentData.attendanceStatuses],
     );
 
     const recentBehaviorPoints = useMemo(
         () =>
             [...(studentData.behaviorPoints || [])]
-                .sort(
-                    (a: any, b: any) =>
-                        Date.parse(b.data_wpisu) - Date.parse(a.data_wpisu),
-                )
+                .sort((a, b) => Date.parse(b.data_wpisu) - Date.parse(a.data_wpisu))
                 .slice(0, 4),
         [studentData.behaviorPoints],
     );
@@ -111,20 +131,14 @@ export function useStudentDashboardModel({
     );
 
     const unreadMessages = useMemo(
-        () =>
-            studentData.inbox?.filter((message: any) => !message.przeczytana) ||
-            [],
+        () => studentData.inbox?.filter((message) => !message.przeczytana) || [],
         [studentData.inbox],
     );
 
     const latestInboxMessages = useMemo(
         () =>
             [...(studentData.inbox || [])]
-                .sort(
-                    (a: any, b: any) =>
-                        Date.parse(b.data_wyslania) -
-                        Date.parse(a.data_wyslania),
-                )
+                .sort((a, b) => Date.parse(b.data_wyslania) - Date.parse(a.data_wyslania))
                 .slice(0, 8),
         [studentData.inbox],
     );
@@ -132,11 +146,8 @@ export function useStudentDashboardModel({
     const upcomingHomework = useMemo(
         () =>
             [...(studentData.homework || [])]
-                .filter((item: any) => Date.parse(item.termin) >= Date.now())
-                .sort(
-                    (a: any, b: any) =>
-                        Date.parse(a.termin) - Date.parse(b.termin),
-                )
+                .filter((item) => Date.parse(item.termin) >= Date.now())
+                .sort((a, b) => Date.parse(a.termin) - Date.parse(b.termin))
                 .slice(0, 3),
         [studentData.homework],
     );
@@ -144,7 +155,7 @@ export function useStudentDashboardModel({
     const recentEvents = useMemo(
         () =>
             [...(studentData.events || [])]
-                .sort((a: any, b: any) => Date.parse(b.data) - Date.parse(a.data))
+                .sort((a, b) => Date.parse(b.data) - Date.parse(a.data))
                 .slice(0, 6),
         [studentData.events],
     );
@@ -154,35 +165,36 @@ export function useStudentDashboardModel({
         const todayDayOfWeek = today.getDay();
         const jsDayToDbNumer = todayDayOfWeek === 0 ? 7 : todayDayOfWeek;
         const targetDayObj = (studentData.days || []).find(
-            (day: any) => day.Numer === jsDayToDbNumer,
+            (day) => day.Numer === jsDayToDbNumer,
         );
         const targetDayId = targetDayObj ? targetDayObj.id : null;
 
         return (studentData.entries || [])
             .filter(
-                (entry: any) =>
+                (entry) =>
                     targetDayId &&
                     (entry.dzien_tygodnia ?? entry.DzienTygodnia) === targetDayId,
             )
-            .map((entry: any) => {
+            .map((entry) => {
                 const hour = (studentData.hours || []).find(
-                    (h: any) => h.id === entry.godzina_lekcyjna,
+                    (hourItem) => hourItem.id === entry.godzina_lekcyjna,
                 );
                 return { ...entry, hour };
             })
-            .sort((a: any, b: any) => (a.hour?.Numer ?? 0) - (b.hour?.Numer ?? 0));
+            .sort((a, b) => (a.hour?.Numer ?? 0) - (b.hour?.Numer ?? 0));
     }, [studentData.days, studentData.entries, studentData.hours]);
 
     const lessonsWithState = useMemo(() => {
-        const currentHourTime = new Date().getHours() * 60 + new Date().getMinutes();
-        const lessonsWithMinutes = todayLessons.map((lesson: any) => ({
+        const now = new Date();
+        const currentHourTime = now.getHours() * 60 + now.getMinutes();
+        const lessonsWithMinutes = todayLessons.map((lesson: LessonWithHour) => ({
             ...lesson,
             startMinutes: parseClockToMinutes(lesson.hour?.CzasOd),
             endMinutes: parseClockToMinutes(lesson.hour?.CzasDo),
         }));
         const scheduleContext = buildScheduleContext(lessonsWithMinutes, currentHourTime);
 
-        return lessonsWithMinutes.map((lesson: any) => {
+        return lessonsWithMinutes.map((lesson) => {
             const isCurrent = scheduleContext.activeLessonId === lesson.id;
             const isPast = lesson.endMinutes !== null && currentHourTime >= lesson.endMinutes;
             const timeBadge = buildLessonTimeBadge(
@@ -233,7 +245,7 @@ export function useStudentDashboardModel({
 
     const attendanceDayHourToZajecia = useMemo(() => {
         const map = new Map<string, number>();
-        const dayIdToNum = new Map((studentData.days || []).map((d: any) => [d.id, d.Numer]));
+        const dayIdToNum = new Map((studentData.days || []).map((day) => [day.id, day.Numer]));
         for (const entry of studentData.entries || []) {
             const dayId = entry.dzien_tygodnia ?? entry.DzienTygodnia;
             if (dayId != null) {

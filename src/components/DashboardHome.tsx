@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { getTeachers, markMessageRead } from "../services/api";
 import { getCurrentUser } from "../services/auth";
+import type { Message, Teacher } from "../types/api";
 import { keys } from "../services/queryKeys";
 import { formatDate } from "../utils/dateUtils";
 import StudentDashboard from "./dashboard/StudentDashboard";
@@ -19,7 +20,7 @@ import { Spinner } from "./ui/Spinner";
 export default function DashboardHome() {
     const user = getCurrentUser();
     const queryClient = useQueryClient();
-    const [selectedMessage, setSelectedMessage] = useState<any | null>(null);
+    const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
 
     const markReadMutation = useMutation({
         mutationFn: (id: number) => markMessageRead(id),
@@ -50,10 +51,10 @@ export default function DashboardHome() {
     });
 
     const query = useDashboardHomeData(user);
-    const inboxData = (query.data as any)?.inbox ?? [];
+    const inboxData = (query.data as { inbox?: Message[] } | null)?.inbox ?? [];
     const usersQuery = useMessageUsersMap(inboxData, selectedMessage);
 
-    const handleOpenMessage = (message: any) => {
+    const handleOpenMessage = (message: Message) => {
         setSelectedMessage(message);
         if (!message.przeczytana) {
             markReadMutation.mutate(message.id);
@@ -62,8 +63,8 @@ export default function DashboardHome() {
 
     const studentModel = useStudentDashboardModel({
         studentData:
-            user?.role === "uczen" ? ((query.data as any) ?? {}) : {},
-        teachers: teachersQuery.data || [],
+            user?.role === "uczen" ? ((query.data as { inbox?: Message[] } | null) ?? {}) : {},
+        teachers: (teachersQuery.data || []) as Teacher[],
         onOpenMessage: handleOpenMessage,
     });
 
@@ -81,9 +82,7 @@ export default function DashboardHome() {
         const fromInboxCache = usersQuery.data?.get(id);
         if (fromInboxCache) return fromInboxCache;
 
-        const teacher = (teachersQuery.data || []).find(
-            (item: any) => item.user?.id === id,
-        );
+        const teacher = (teachersQuery.data || []).find((item: Teacher) => item.user?.id === id);
         if (teacher) {
             return `${teacher.user.first_name} ${teacher.user.last_name}`;
         }
@@ -92,15 +91,10 @@ export default function DashboardHome() {
     };
 
     if (user.role !== "uczen") {
-        const unread =
-            data.inbox?.filter((message: any) => !message.przeczytana).length ??
-            0;
+        const unread = data.inbox?.filter((message: Message) => !message.przeczytana).length ?? 0;
         const unreadInbox = [...(data.inbox ?? [])]
-            .filter((message: any) => !message.przeczytana)
-            .sort(
-                (a: any, b: any) =>
-                    Date.parse(b.data_wyslania) - Date.parse(a.data_wyslania),
-            );
+            .filter((message: Message) => !message.przeczytana)
+            .sort((a: Message, b: Message) => Date.parse(b.data_wyslania) - Date.parse(a.data_wyslania));
 
         if (user.role === "nauczyciel" || user.role === "admin") {
             return (

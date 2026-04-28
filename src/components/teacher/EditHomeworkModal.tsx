@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Modal } from "../ui/Modal";
 import { Spinner } from "../ui/Spinner";
 import { updateHomework } from "../../services/api";
-import { Homework } from "../../types/api";
+import type { Homework, Subject } from "../../types/api";
 
 const homeworkSchema = z.object({
   opis: z.string().min(1, "Opis jest wymagany"),
@@ -78,8 +78,8 @@ export default function EditHomeworkModal({ open, onClose, homework }: EditHomew
             Przedmiot
           </label>
           <div className="px-3 py-2 bg-zinc-900 border border-zinc-800 rounded text-zinc-400">
-            {typeof homework?.przedmiot === 'object' && homework?.przedmiot && 'nazwa' in homework.przedmiot 
-              ? (homework.przedmiot as any).nazwa 
+            {typeof homework?.przedmiot === "object" && homework?.przedmiot && "nazwa" in homework.przedmiot
+              ? (homework.przedmiot as Subject).nazwa ?? "N/A"
               : "N/A"}
           </div>
         </div>

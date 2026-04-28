@@ -7,6 +7,7 @@ import { getClasses, getSubjects, createHomework } from "../../services/api";
 import { formatClassDisplay } from "../../utils/classUtils";
 import { useTeacherClassSelector } from "../../hooks/useTeacherClassSelector";
 import { getCurrentUser } from "../../services/auth";
+import type { Homework } from "../../types/api";
 import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 export default function HomeworkCreatePage() {
@@ -34,8 +35,7 @@ export default function HomeworkCreatePage() {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: any) =>
-            createHomework(data),
+        mutationFn: (data: Omit<Homework, "id">) => createHomework(data),
         onSuccess: () => {
             toast.success("Praca domowa opublikowana");
             queryClient.invalidateQueries({ queryKey: ["homework"] });

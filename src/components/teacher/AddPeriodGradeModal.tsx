@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { createPeriodGrade } from "../../services/api";
 import { getCurrentUser } from "../../services/auth";
+import type { Student, Subject } from "../../types/api";
 
 type Modifier = "+" | "-" | "";
 
@@ -46,8 +47,8 @@ interface AddPeriodGradeModalProps {
   onClose: () => void;
   studentId?: number;
   subjectId?: number;
-  students: any[];
-  subjects: any[];
+  students: Student[];
+  subjects: Subject[];
 }
 
 export default function AddPeriodGradeModal({
@@ -152,15 +153,15 @@ export default function AddPeriodGradeModal({
         okres: parseInt(data.okres),
         wartosc: data.wartosc,
         nauczyciel: user?.teacherId ?? null,
-      } as any),
+      }),
     onSuccess: () => {
       toast.success("Ocena okresowa dodana");
       queryClient.invalidateQueries({ queryKey: ["period-grades"] });
       reset();
       onClose();
     },
-    onError: (err: any) => {
-      toast.error(err.message || "Błąd przy dodawaniu oceny okresowej");
+    onError: (err: unknown) => {
+      toast.error(err instanceof Error ? err.message : "Błąd przy dodawaniu oceny okresowej");
     },
   });
 
@@ -222,7 +223,7 @@ export default function AddPeriodGradeModal({
                 className="input-base"
               >
                 <option value="">Wybierz ucznia</option>
-                {students?.map((s) => (
+                {students?.map((s: Student) => (
                   <option key={s.id} value={s.id}>
                     {s.user?.first_name} {s.user?.last_name}
                   </option>
@@ -251,7 +252,7 @@ export default function AddPeriodGradeModal({
                 className="input-base max-w-xs"
               >
                 <option value="">Wybierz przedmiot</option>
-                {subjects?.map((s) => (
+                {subjects?.map((s: Subject) => (
                   <option key={s.id} value={s.id}>
                     {s.nazwa}
                   </option>

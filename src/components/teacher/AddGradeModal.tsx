@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { createGrade } from "../../services/api";
 import { getCurrentUser } from "../../services/auth";
+import type { Student, Subject } from "../../types/api";
 
 type Modifier = "+" | "-" | "";
 
@@ -55,8 +56,8 @@ interface AddGradeModalProps {
   doSredniej?: boolean;
   punkty?: boolean;
   opisowa?: boolean;
-  students: any[];
-  subjects: any[];
+  students: Student[];
+  subjects: Subject[];
 }
 
 export default function AddGradeModal({
@@ -190,7 +191,7 @@ export default function AddGradeModal({
         czy_punkty: data.czy_punkty,
         czy_opisowa: data.czy_opisowa,
         nauczyciel: user?.teacherId ?? null,
-      } as any),
+      }),
     onSuccess: () => {
       toast.success("Ocena dodana");
       queryClient.invalidateQueries({ queryKey: ["grades"] });
@@ -199,8 +200,8 @@ export default function AddGradeModal({
       setModifier('');
       onClose();
     },
-    onError: (err: any) => {
-      toast.error(err.message || "Błąd przy dodawaniu oceny");
+    onError: (err: unknown) => {
+      toast.error(err instanceof Error ? err.message : "Błąd przy dodawaniu oceny");
     },
   });
 
@@ -236,7 +237,7 @@ export default function AddGradeModal({
     setGradeValue(baseGrade, next);
   };
 
-  const selectedStudent = students.find((s) => s.id === studentId);
+  const selectedStudent = students.find((s: Student) => s.id === studentId);
 
   const onSubmit = (data: GradeFormData) => {
     createGradeMutation.mutate(data);
@@ -272,7 +273,7 @@ export default function AddGradeModal({
                   className="input-base max-w-xs"
                 >
                   <option value="">Wybierz ucznia</option>
-                  {students?.map((s) => (
+                  {students?.map((s: Student) => (
                     <option key={s.id} value={s.id}>
                       {s.user?.first_name} {s.user?.last_name}
                     </option>

@@ -36,7 +36,9 @@ import {
 import { useTeacherClassSelector } from "../../hooks/useTeacherClassSelector";
 import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 import { getPeriodGrades } from "../../services/api";
-import type { PeriodGrade } from "../../types/api";
+import type { PeriodGrade, Grade, BehaviorPoint, Student } from "../../types/api";
+
+type GradeCreatePayload = Omit<Grade, 'id' | 'data_wystawienia' | 'nauczyciel'>;
 
 function RecentGradesCell({
     studentId,
@@ -210,11 +212,11 @@ export default function TeacherGradesPage() {
     >({});
     const [periodGradesLoading, setPeriodGradesLoading] = useState(false);
     const [gradesByStudent, setGradesByStudent] = useState<
-        Record<number, any[]>
+        Record<number, Grade[]>
     >({});
     const [gradesByStudentLoading, setGradesByStudentLoading] = useState(false);
     const [behaviorByStudent, setBehaviorByStudent] = useState<
-        Record<number, any[]>
+        Record<number, BehaviorPoint[]>
     >({});
     const queryClient = useQueryClient();
     const currentUser = getCurrentUser();
@@ -222,11 +224,11 @@ export default function TeacherGradesPage() {
     const gradeButtonRef = useRef<HTMLButtonElement | null>(null);
 
     const createGradeMutation = useMutation({
-        mutationFn: (payload: any) =>
+        mutationFn: (payload: GradeCreatePayload) =>
             createGrade({
                 ...payload,
                 nauczyciel: currentUser?.teacherId ?? null,
-            } as any),
+            }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["grades"] });
         },
@@ -340,7 +342,7 @@ export default function TeacherGradesPage() {
         if (!students) return [];
         if (!selectedClassId) return [];
         return sortStudentsAlphabetically(
-            students.filter((s: any) => s.klasa === selectedClassId),
+            students.filter((s: Student) => s.klasa === selectedClassId),
         );
     }, [students, selectedClassId]);
 
@@ -359,7 +361,7 @@ export default function TeacherGradesPage() {
 
         setPeriodGradesLoading(true);
         setGradesByStudentLoading(true);
-        const studentIds = filteredStudents.map((s: any) => s.id);
+        const studentIds = filteredStudents.map((s: Student) => s.id);
         Promise.all([
             Promise.all(
                 studentIds.map(async (id: number) => {
@@ -381,7 +383,7 @@ export default function TeacherGradesPage() {
                           return {
                               studentId: id,
                               grades: grades.filter(
-                                  (g: any) => g.przedmiot === selectedSubjectId,
+                                  (g: Grade) => g.przedmiot === selectedSubjectId,
                               ),
                           };
                       }),
@@ -404,13 +406,13 @@ export default function TeacherGradesPage() {
             setPeriodGradesLoading(false);
 
             if (gradeMode === "period") {
-                const gradeMap: Record<number, any[]> = {};
+                const gradeMap: Record<number, Grade[]> = {};
                 gradeResults.forEach((r) => {
                     gradeMap[r.studentId] = r.grades;
                 });
                 setGradesByStudent(gradeMap);
             } else if (gradeMode === "behavior") {
-                const behaviorMap: Record<number, any[]> = {};
+                const behaviorMap: Record<number, BehaviorPoint[]> = {};
                 behaviorResults.forEach((r) => {
                     behaviorMap[r.studentId] = r.behavior;
                 });
@@ -855,7 +857,7 @@ export default function TeacherGradesPage() {
                                     </thead>
                                     <tbody className="divide-y-0">
                                         {filteredStudents.map(
-                                            (student: any, index: number) => {
+                                            (student: Student, index: number) => {
                                                 const studentGrades =
                                                     gradeMode === "period"
                                                         ? (
@@ -864,8 +866,8 @@ export default function TeacherGradesPage() {
                                                               ] || []
                                                           ).sort(
                                                               (
-                                                                  a: any,
-                                                                  b: any,
+                                                                  a: Grade,
+                                                                  b: Grade,
                                                               ) =>
                                                                   new Date(
                                                                       b.data_wystawienia,
@@ -883,7 +885,7 @@ export default function TeacherGradesPage() {
                                                         : [];
                                                 const validGrades =
                                                     studentGrades.filter(
-                                                        (g: any) =>
+                                                        (g: Grade) =>
                                                             g.czy_do_sredniej &&
                                                             !Number.isNaN(
                                                                 parseFloat(
@@ -902,7 +904,7 @@ export default function TeacherGradesPage() {
                                                         validGrades.reduce(
                                                             (
                                                                 sum: number,
-                                                                g: any,
+                                                                g: Grade,
                                                             ) => sum + g.waga,
                                                             0,
                                                         );
@@ -910,7 +912,7 @@ export default function TeacherGradesPage() {
                                                         validGrades.reduce(
                                                             (
                                                                 sum: number,
-                                                                g: any,
+                                                                g: Grade,
                                                             ) =>
                                                                 sum +
                                                                 parseFloat(
@@ -930,7 +932,7 @@ export default function TeacherGradesPage() {
                                                         _behavior.reduce(
                                                             (
                                                                 s: number,
-                                                                b: any,
+                                                                b: BehaviorPoint,
                                                             ) => s + b.punkty,
                                                             0,
                                                         );
@@ -1095,7 +1097,7 @@ export default function TeacherGradesPage() {
                                                                             )
                                                                             .map(
                                                                                 (
-                                                                                    g: any,
+                                                                                    g: Grade,
                                                                                 ) => (
                                                                                     <span
                                                                                         key={
@@ -1292,7 +1294,7 @@ export default function TeacherGradesPage() {
                                                             filteredStudents.reduce(
                                                                 (
                                                                     sum: number,
-                                                                    s: any,
+                                                                    s: Student,
                                                                 ) =>
                                                                     sum +
                                                                     (
@@ -1302,7 +1304,7 @@ export default function TeacherGradesPage() {
                                                                     ).reduce(
                                                                         (
                                                                             s2: number,
-                                                                            b: any,
+                                                                            b: BehaviorPoint,
                                                                         ) =>
                                                                             s2 +
                                                                             b.punkty,
@@ -1320,13 +1322,13 @@ export default function TeacherGradesPage() {
                                                     }
                                                     const avgs =
                                                         filteredStudents
-                                                            .map((s: any) => {
+                                                            .map((s: Student) => {
                                                                 const g = (
                                                                     gradesByStudent[
                                                                         s.id
                                                                     ] || []
                                                                 ).filter(
-                                                                    (x: any) =>
+                                                                    (x: Grade) =>
                                                                         x.czy_do_sredniej &&
                                                                         !Number.isNaN(
                                                                             parseFloat(
@@ -1343,7 +1345,7 @@ export default function TeacherGradesPage() {
                                                                     g.reduce(
                                                                         (
                                                                             sum: number,
-                                                                            x: any,
+                                                                            x: Grade,
                                                                         ) =>
                                                                             sum +
                                                                             x.waga,
@@ -1353,7 +1355,7 @@ export default function TeacherGradesPage() {
                                                                     g.reduce(
                                                                         (
                                                                             sum: number,
-                                                                            x: any,
+                                                                            x: Grade,
                                                                         ) =>
                                                                             sum +
                                                                             parseFloat(
@@ -1574,7 +1576,7 @@ export default function TeacherGradesPage() {
                                 </thead>
                                 <tbody className="divide-y-0">
                                     {filteredStudents.map(
-                                        (student: any, index: number) => (
+                                        (student: Student, index: number) => (
                                             <tr
                                                 key={student.id}
                                                 className={`hover:bg-blue-50/30 dark:hover:bg-primary/5 transition-colors group ${index % 2 === 1 ? "bg-surface-container-low/20" : ""}`}

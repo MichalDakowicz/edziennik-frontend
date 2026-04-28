@@ -103,6 +103,17 @@ export default function SubjectDetailPage() {
     return recent.length > 0 ? computeWeightedAverage(recent) : null;
   }, [grades]);
 
+  const breadcrumbs = useMemo(() => {
+    const autoBreadcrumbs = useAutoBreadcrumbs({ grades: "Oceny" });
+    if (!autoBreadcrumbs.length) return autoBreadcrumbs;
+
+    return autoBreadcrumbs.map((item, index) =>
+      index === autoBreadcrumbs.length - 1
+        ? { ...item, label: subjectName }
+        : item,
+    );
+  }, [subjectName]);
+
   if ([gradesQuery, subjectsQuery].some((q) => q.isPending)) return <Spinner />;
   const firstError = [gradesQuery, subjectsQuery].find((q) => q.isError);
   if (firstError?.isError) return <ErrorState message={firstError.error.message} />;
@@ -112,7 +123,6 @@ export default function SubjectDetailPage() {
     .sort((a, b) => Date.parse(b.data_wystawienia) - Date.parse(a.data_wystawienia));
 
   const icon = getSubjectIcon(subjectName);
-  const breadcrumbs = useAutoBreadcrumbs({ grades: "Oceny" });
 
   return (
     <div className="space-y-8">

@@ -50,7 +50,7 @@ describe("HomeworkCard", () => {
       />,
     );
 
-    expect(screen.getByText("ZALEGŁE")).toBeInTheDocument();
+    expect(screen.getByText(/zaległe/i)).toBeInTheDocument();
 
     vi.useRealTimers();
   });

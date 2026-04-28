@@ -186,9 +186,9 @@ export default function AttendanceHistoryPage() {
     const getStatusBadge = (statusName: string) => {
         const s = statusName.toLowerCase();
         let style = "bg-surface-container text-on-surface-variant";
-        if (s.includes("nieobecn")) style = "bg-error-container text-on-error-container";
-        else if (s.includes("usprawiedliw")) style = "bg-green-50 dark:bg-green-400/10 text-green-700 dark:text-green-300 border border-green-100 dark:border-green-400/20";
-        else if (s.includes("spóźn") || s.includes("spozn")) style = "bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary-fixed-dim";
+        if (s.includes("nieobecn")) style = "bg-red-600/20 text-red-500 dark:text-red-400";
+        else if (s.includes("usprawiedliw")) style = "bg-green-400/20 dark:bg-green-400/20 text-green-500 dark:text-green-400";
+        else if (s.includes("spóźn") || s.includes("spozn")) style = "bg-yellow-500/25 text-yellow-500";
         else if (s.includes("zwoln")) style = "bg-primary/10 text-primary";
         
         return (

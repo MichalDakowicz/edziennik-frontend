@@ -233,7 +233,7 @@ export default function SubjectDetailPage() {
                         <span>{labels[grade]}</span>
                         <span>{percentage}%</span>
                       </div>
-                      <div className="w-full h-2 bg-white rounded-full overflow-hidden">
+                      <div className="w-full h-2 bg- rounded-full overflow-hidden">
                         <div className={`h-full ${barColors[grade]} rounded-full transition-all`} style={{ width: `${percentage}%` }}></div>
                       </div>
                     </div>

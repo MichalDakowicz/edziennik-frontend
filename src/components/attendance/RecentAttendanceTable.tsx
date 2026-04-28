@@ -125,11 +125,11 @@ export default function RecentAttendanceTable({
         const getStatusStyle = () => {
             switch (variant) {
                 case "danger":
-                    return "bg-error-container text-on-error-container";
+                    return "bg-red-600/20 text-red-500 font-medium";
                 case "success":
-                    return "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-100 dark:border-green-800/30";
+                    return "bg-green-400/20 dark:bg-green-400/20 text-green-500 dark:text-green-400";
                 case "warning":
-                    return "bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary-fixed-dim";
+                    return "bg-yellow-500/25 text-yellow-500";
                 case "info":
                     return "bg-primary/10 text-primary";
                 default:

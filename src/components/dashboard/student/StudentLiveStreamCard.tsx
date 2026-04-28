@@ -60,10 +60,10 @@ export default function StudentLiveStreamCard({
                             return (
                                 <div
                                     key={item.id}
-                                    className="flex items-start gap-3"
+                                    className="flex items-start gap-3 items-center"
                                 >
                                     <span
-                                        className={`mt-1.5 w-2.5 h-2.5 rounded-full ${dotClass}`}
+                                        className={`w-2.5 h-2.5 rounded-full ${dotClass}`}
                                     ></span>
 
                                     {item.to ? (

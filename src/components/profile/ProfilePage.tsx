@@ -210,7 +210,7 @@ export default function ProfilePage() {
                         <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm">
                             <div className="flex flex-col md:flex-row gap-8 items-start">
                                 <div className="relative group">
-                                    <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center ring-4 ring-primary/10">
+                                    <div className="w-32 h-32 rounded-full bg-surface-container flex items-center justify-center">
                                         <span className="material-symbols-outlined text-6xl text-primary">
                                             person
                                         </span>
@@ -231,21 +231,6 @@ export default function ProfilePage() {
                                         </label>
                                         <div className="px-4 py-3 bg-surface-container-low rounded-lg text-on-surface font-medium">
                                             {user.lastName}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-                                            Rola
-                                        </label>
-                                        <div className="px-4 py-3 bg-primary-fixed/30 dark:bg-primary/10 text-on-primary-fixed-variant dark:text-primary rounded-lg font-medium flex items-center gap-2">
-                                            <span className="material-symbols-outlined text-sm">
-                                                school
-                                            </span>
-                                            {user.role === "uczen"
-                                                ? "Uczeń"
-                                                : user.role === "rodzic"
-                                                  ? "Rodzic"
-                                                  : "Nauczyciel"}
                                         </div>
                                     </div>
                                     <div className="space-y-1 md:col-span-2">
@@ -311,7 +296,7 @@ export default function ProfilePage() {
                                             : "border-transparent bg-surface-container hover:bg-surface-container-high",
                                     )}
                                 >
-                                    <div className="w-full h-12 bg-[#1e1e2e] rounded shadow-inner mb-1 ring-1 ring-white/10"></div>
+                                    <div className="w-full h-12 bg-background rounded shadow-inner mb-1 ring-1 ring-white/10"></div>
                                     <span className="text-xs font-semibold">
                                         Ciemny
                                     </span>
@@ -339,7 +324,7 @@ export default function ProfilePage() {
                                             : "border-transparent bg-surface-container hover:bg-surface-container-high",
                                     )}
                                 >
-                                    <div className="w-full h-12 rounded shadow-inner mb-1 bg-gradient-to-r from-surface-container-lowest to-slate-800"></div>
+                                    <div className="w-full h-12 rounded shadow-inner mb-1 bg-gradient-to-r from-slate-500 to-background"></div>
                                     <span className="text-xs font-semibold">
                                         Systemowy
                                     </span>

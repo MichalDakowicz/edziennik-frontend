@@ -236,7 +236,7 @@ export default function AttendancePage() {
                         <p className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-1">Wskaźnik obecności</p>
                         <h4 className="text-3xl font-black text-on-surface">{Math.round(percentage)}%</h4>
                     </div>
-                    <div className="w-12 h-12 bg-green-50 dark:bg-green-400/10 rounded-xl flex items-center justify-center text-green-600 dark:text-green-400">
+                    <div className="w-12 h-12 bg-green-400/20 text-green-400 rounded-xl flex items-center justify-center ">
                         <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                     </div>
                 </Card>
@@ -246,7 +246,7 @@ export default function AttendancePage() {
                         <p className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-1">Nieobecności</p>
                         <h4 className="text-3xl font-black text-on-surface">{absences}</h4>
                     </div>
-                    <div className="w-12 h-12 bg-error-container/30 rounded-xl flex items-center justify-center text-error">
+                    <div className="w-12 h-12 bg-red-500/30 text-red-500 rounded-xl flex items-center justify-center text-error">
                         <span className="material-symbols-outlined text-2xl">block</span>
                     </div>
                 </Card>
@@ -256,7 +256,7 @@ export default function AttendancePage() {
                         <p className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-1">Spóźnienia</p>
                         <h4 className="text-3xl font-black text-on-surface">{lates}</h4>
                     </div>
-                    <div className="w-12 h-12 bg-tertiary-fixed/30 rounded-xl flex items-center justify-center text-tertiary">
+                    <div className="w-12 h-12 bg-yellow-500/25 text-yellow-500 rounded-xl flex items-center justify-center text-tertiary">
                         <span className="material-symbols-outlined text-2xl">schedule</span>
                     </div>
                 </Card>
@@ -277,8 +277,8 @@ export default function AttendancePage() {
                         </div>
                     ) : (
                         <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-green-600 dark:text-green-400">verified</span>
-                            <p className="text-sm font-bold text-green-600 dark:text-green-400">Brak zagrożeń</p>
+                            <span className="material-symbols-outlined text-green-400 dark:text-green-400">verified</span>
+                            <p className="text-sm font-bold text-green-400 dark:text-green-400">Brak zagrożeń</p>
                         </div>
                     )}
                 </Card>

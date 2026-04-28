@@ -12,6 +12,7 @@ import { getClasses, getInboxMessages, getLuckyNumber } from "../services/api";
 import { keys } from "../services/queryKeys";
 import { cn } from "../utils/cn";
 import { formatClassDisplay } from "../utils/classUtils";
+import logo from "../assets/logo_example.svg";
 
 type NavItem = {
     label: string;
@@ -227,7 +228,7 @@ export default function Layout() {
                 <div className={cn("flex items-center justify-between", sidebarCollapsed && "pt-0 px-0 justify-center")}>
                     <div className={cn("flex items-center gap-3", sidebarCollapsed && "justify-center")}>
                         <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shrink-0">
-                            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>school</span>
+                            <img src={logo} alt="Logo" className="w-6 h-6 object-contain brightness-0 invert" />
                         </div>
                         {!sidebarCollapsed && (
                             <div>

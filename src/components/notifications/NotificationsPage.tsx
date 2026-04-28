@@ -148,9 +148,9 @@ function NotificationRow({ item }: { item: LiveItem }) {
         <div
             className={`flex items-center gap-5 p-5 rounded-[1.25rem] border transition-all duration-200 ${
                 item.isRead
-                    ? "bg-surface-container-lowest/60 dark:bg-surface-container/40 border-outline-variant/10 dark:border-outline-variant/5"
-                    : "bg-surface-container-lowest/80 dark:bg-surface-container-high/60 border-outline-variant/20 dark:border-outline-variant/10"
-            } hover:shadow-md hover:shadow-primary/5 dark:hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.5)]`}
+                    ? "bg-surface-container-lowest/60 dark:bg-surface-container-lowest border-outline-variant/10 dark:border-outline-variant/5"
+                    : "bg-surface-container-lowest/80 dark:bg-surface-container-lowest border-outline-variant/20 dark:border-outline-variant/10"
+            }`}
         >
             <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${cfg.bg}`}>
                 <span className={`material-symbols-outlined text-xl ${cfg.iconColor}`}>
@@ -442,11 +442,8 @@ export default function NotificationsPage() {
                         </button>
                     )}
                 </div>
-                <div className="bg-surface-container-lowest/80 dark:bg-surface-container/50 backdrop-blur-xl rounded-2xl p-2 flex items-center shadow-sm border border-outline-variant/10 dark:border-outline-variant/5">
-                    <div className="pl-4 pr-3 border-r border-outline-variant/20 dark:border-outline-variant/10 hidden sm:block">
-                        <span className="text-primary dark:text-primary font-bold text-xs">Co chcesz zobaczyć?</span>
-                    </div>
-                    <div className="flex-1 flex items-center gap-1 overflow-x-auto no-scrollbar px-2">
+                <div className="bg-surface-container-lowest/80 dark:bg-surface-container-low rounded-2xl p-2 flex items-center shadow-sm">
+                    <div className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar">
                         {(Object.keys(filterConfig) as FilterKind[]).map((key) => {
                             const isActive = activeFilter === key;
                             const count = filterCounts[key] || 0;
@@ -478,12 +475,12 @@ export default function NotificationsPage() {
             {filteredNotifications.length > 0 ? (
                 <div className="space-y-10">
                     {groups.map((group) => (
-                        <section key={group.day}>
+                        <section className="gap-2" key={group.day}>
                             <div className="flex items-center gap-4 mb-5">
                                 <h2 className="text-lg font-bold text-on-surface dark:text-on-surface font-headline">
                                     {group.day}
                                 </h2>
-                                <div className="h-px flex-1 bg-gradient-to-r from-outline-variant/40 dark:from-outline-variant/10 to-transparent" />
+                                <div className="h-px flex-1"/>
                                 <span className="text-xs font-medium text-outline dark:text-outline-variant">
                                     {group.items.length}
                                 </span>

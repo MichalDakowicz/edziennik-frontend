@@ -145,7 +145,7 @@ export default function GradesPage() {
         </div>
         <div className="flex gap-4">
           <div className="bg-surface-container-lowest p-6 rounded-xl flex flex-col items-center min-w-[140px] shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)]">
-            <span className="text-primary font-headline text-3xl font-black italic">
+            <span className="text-primary font-headline text-3xl font-black">
               {overallAvg > 0 ? overallAvg.toFixed(2) : "—"}
             </span>
             <span className="text-[10px] uppercase tracking-widest text-outline font-bold mt-1">Średnia</span>
@@ -157,7 +157,7 @@ export default function GradesPage() {
         </div>
       </header>
 
-      <div className="flex gap-4 pb-2">
+      <div className="flex gap-4 pb-6">
         <button className={tab === "partial" ? "tab-active" : "tab-inactive"} onClick={() => setTab("partial")}>Oceny cząstkowe</button>
         <button className={tab === "period" ? "tab-active" : "tab-inactive"} onClick={() => setTab("period")}>Oceny okresowe</button>
         <button className={tab === "behavior" ? "tab-active" : "tab-inactive"} onClick={() => setTab("behavior")}>Zachowanie</button>
@@ -168,7 +168,7 @@ export default function GradesPage() {
           <section className="col-span-12 lg:col-span-8 space-y-4">
             <h3 className="text-xl font-bold text-on-surface-variant font-headline mb-2 px-2">Przedmioty</h3>
 
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-4 mb-4">
               <input
                 className="input-base flex-1 bg-surface-container-highest border-0 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary transition-all"
                 placeholder="Filtruj przedmiot..."

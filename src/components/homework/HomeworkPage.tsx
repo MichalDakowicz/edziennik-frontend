@@ -114,7 +114,7 @@ export default function HomeworkPage() {
   const classId = user?.classId;
   const [subjectId, setSubjectId] = useState<number | "all">("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("upcoming");
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [viewMode, setViewMode] = useState<ViewMode>("board");
   const [selectedHomework, setSelectedHomework] = useState<Homework | null>(null);
 
   const homeworkQuery = useQuery({
@@ -192,28 +192,28 @@ export default function HomeworkPage() {
             Masz {upcoming.length} aktywn{upcoming.length === 1 ? "e" : upcoming.length < 5 ? "e" : "ych"} zadani{upcoming.length === 1 ? "e" : "a"} na ten tydzień.
           </p>
         </div>
-        <div className="flex bg-surface-container-low p-1 rounded-full">
-          <button
-            onClick={() => setViewMode("list")}
-            className={`px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2 transition-all ${
-              viewMode === "list"
-                ? "bg-surface-container-lowest text-primary shadow-sm"
-                : "text-slate-500 hover:text-primary"
-            }`}
-          >
-            <LayoutList size={16} />
-            Lista
-          </button>
+        <div className="flex bg-surface-container-high p-1 gap-1 rounded-full">
           <button
             onClick={() => setViewMode("board")}
             className={`px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2 transition-all ${
               viewMode === "board"
-                ? "bg-surface-container-lowest text-primary shadow-sm"
+                ? "bg-surface-container-lowest text-secondary shadow-sm"
+                : "text-slate-500 hover:text-primary"
+            }`}
+          >
+            <LayoutList size={16} />
+            Tablica
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            className={`px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2 transition-all ${
+              viewMode === "list"
+                ? "bg-surface-container-lowest text-secondary shadow-sm"
                 : "text-slate-500 hover:text-primary"
             }`}
           >
             <LayoutGrid size={16} />
-            Tablica
+            Lista
           </button>
         </div>
       </div>
@@ -311,7 +311,7 @@ export default function HomeworkPage() {
             <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6 font-body">Postęp tygodnia</p>
             <div className="flex items-end justify-between mb-2">
               <span className="text-5xl font-black text-primary font-headline">{progressPercent}%</span>
-              <span className="text-sm font-medium text-slate-400 mb-2 font-body">
+              <span className="text-sm font-medium text-slate-400 font-body">
                 {totalCount - overdueCount}/{totalCount} zadań
               </span>
             </div>

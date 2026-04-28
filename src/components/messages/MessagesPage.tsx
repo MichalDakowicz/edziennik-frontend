@@ -146,7 +146,7 @@ export default function MessagesPage() {
         {/* Left Pane: Thread List */}
         <section className="w-full md:w-[380px] flex flex-col bg-surface border-r border-outline-variant/15">
           {/* Tabs + Search */}
-          <div className="p-4 pb-2 space-y-3">
+          <div className="p-4 space-y-3">
             <div className="flex gap-2">
               <button
                 className={`flex-1 py-2 px-4 rounded-full text-sm font-bold transition-all ${
@@ -197,7 +197,7 @@ export default function MessagesPage() {
           </div>
 
           {/* Message List */}
-          <div className="flex-1 overflow-y-auto px-3 space-y-1.5 pb-4">
+          <div className="flex-1 overflow-y-auto px-4 space-y-1.5 pb-4">
             {tab === "announcements" ? (
               <div className="flex flex-col items-center justify-center h-full text-on-surface-variant">
                 <span className="material-symbols-outlined text-4xl mb-2 text-outline">campaign</span>

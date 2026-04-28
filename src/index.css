@@ -75,33 +75,33 @@
   .dark {
     --background: 12 19 36;
     --foreground: 220 225 251;
-    --card: 21 27 45;
+    --card: 29 38 63;
     --card-foreground: 220 225 251;
-    --popover: 35 41 60;
+    --popover: 49 57 84;
     --popover-foreground: 220 225 251;
-    --primary: 0 64 161;
+    --primary: 51 69 255;
     --primary-foreground: 255 255 255;
     --secondary: 173 198 255;
     --secondary-foreground: 12 19 36;
-    --muted: 35 41 60;
+    --muted: 49 57 84;
     --muted-foreground: 194 198 214;
-    --accent: 35 41 60;
+    --accent: 49 57 84;
     --accent-foreground: 220 225 251;
     --destructive: 255 110 110;
     --destructive-foreground: 12 19 36;
-    --border: 35 41 60;
-    --input: 35 41 60;
+    --border: 49 57 84;
+    --input: 49 57 84;
     --ring: 0 64 161;
 
     --surface: 12 19 36;
-    --surface-container: 21 27 45;
-    --surface-container-lowest: 7 13 31;
-    --surface-container-low: 21 27 45;
-    --surface-container-high: 35 41 60;
-    --surface-container-highest: 50 56 78;
-    --surface-bright: 21 27 45;
+    --surface-container: 35 47 70;
+    --surface-container-lowest: 20 30 46;
+    --surface-container-low: 29 38 63;
+    --surface-container-high: 49 57 84;
+    --surface-container-highest: 70 78 109;
+    --surface-bright: 29 38 63;
     --surface-dim: 7 13 31;
-    --surface-variant: 35 41 60;
+    --surface-variant: 49 57 84;
     --surface-tint: 77 142 255;
 
     --on-background: 220 225 251;
@@ -143,7 +143,7 @@
   .oled {
     --background: 0 0 0;
     --foreground: 220 225 251;
-    --card: 10 10 10;
+    --card: 14 14 14;
     --card-foreground: 220 225 251;
     --popover: 0 0 0;
     --popover-foreground: 220 225 251;
@@ -151,25 +151,25 @@
     --primary-foreground: 255 255 255;
     --secondary: 173 198 255;
     --secondary-foreground: 0 0 0;
-    --muted: 15 15 15;
+    --muted: 21 21 21;
     --muted-foreground: 194 198 214;
-    --accent: 20 20 20;
+    --accent: 28 28 28;
     --accent-foreground: 220 225 251;
     --destructive: 255 110 110;
     --destructive-foreground: 0 0 0;
-    --border: 20 20 20;
-    --input: 15 15 15;
+    --border: 28 28 28;
+    --input: 21 21 21;
     --ring: 0 64 161;
 
     --surface: 0 0 0;
-    --surface-container: 15 15 15;
-    --surface-container-lowest: 10 10 10;
-    --surface-container-low: 12 12 12;
-    --surface-container-high: 20 20 20;
-    --surface-container-highest: 30 30 30;
-    --surface-bright: 5 5 5;
+    --surface-container: 21 21 21;
+    --surface-container-lowest: 14 14 14;
+    --surface-container-low: 17 17 17;
+    --surface-container-high: 28 28 28;
+    --surface-container-highest: 42 42 42;
+    --surface-bright: 7 7 7;
     --surface-dim: 0 0 0;
-    --surface-variant: 15 15 15;
+    --surface-variant: 21 21 21;
     --surface-tint: 77 142 255;
 
     --on-background: 220 225 251;

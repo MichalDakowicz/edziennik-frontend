@@ -23,8 +23,8 @@ export default function MessageList({
             key={message.id}
             className={`w-full text-left p-4 rounded-xl transition-all cursor-pointer ${
               isSelected
-                ? "bg-surface-container-lowest shadow-sm border-l-4 border-primary"
-                : "hover:bg-surface-container-low border-l-4 border-transparent"
+                ? "bg-surface-container-lowest"
+                : "hover:bg-surface-container-low"
             }`}
             onClick={() => onOpen(message)}
           >

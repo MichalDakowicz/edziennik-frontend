@@ -1,3 +1,9 @@
+function getBaseGrade(val: number): number {
+  if (val % 1 === 0.5) return Math.floor(val);
+  if (val % 1 === 0.75) return Math.ceil(val);
+  return Math.round(val);
+}
+
 export function formatGradeValue(value: string | number): string {
   const val = typeof value === "string" ? parseFloat(value) : value;
   if (Number.isNaN(val)) return String(value);
@@ -8,40 +14,33 @@ export function formatGradeValue(value: string | number): string {
 
 /** Tailwind classes for grade blocks: use with flex items-center justify-center w-8 h-8 rounded-md font-medium tabular-nums text-sm */
 export function getGradeColor(value: string | number): string {
-  const val = typeof value === "string" ? parseFloat(value) : value;
+  let val = typeof value === "string" ? parseFloat(value) : value;
   if (Number.isNaN(val)) return "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300";
-  if (val >= 5.0) return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400";
-  if (val >= 4.0) return "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400";
-  if (val >= 3.0) return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400";
-  if (val >= 2.0) return "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400";
-  return "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400";
+  val = getBaseGrade(val);
+  if (val >= 6.0) return "bg-blue-100 text-blue-700 dark:bg-blue-900/80 dark:text-blue-400";
+  if (val >= 5.0) return "bg-green-100 text-green-700 dark:bg-green-900/80 dark:text-green-400";
+  if (val >= 4.0) return "bg-lime-100 text-lime-700 dark:bg-lime-900/80 dark:text-lime-400";
+  if (val >= 3.0) return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/80 dark:text-yellow-400";
+  if (val >= 2.0) return "bg-orange-100 text-orange-700 dark:bg-orange-900/80 dark:text-orange-400";
+  return "bg-red-100 text-red-700 dark:bg-red-900/80 dark:text-red-400";
 }
 
 /** Border-bottom color matching grade value */
 export function getGradeBorderColor(value: string | number): string {
-  const val = typeof value === "string" ? parseFloat(value) : value;
+  let val = typeof value === "string" ? parseFloat(value) : value;
   if (Number.isNaN(val)) return "border-b-zinc-300";
-  if (val >= 5.0) return "border-b-emerald-500";
-  if (val >= 4.0) return "border-b-green-500";
+  val = getBaseGrade(val);
+  if (val >= 6.0) return "border-b-blue-500";
+  if (val >= 5.0) return "border-b-green-500";
+  if (val >= 4.0) return "border-b-lime-500";
   if (val >= 3.0) return "border-b-yellow-500";
   if (val >= 2.0) return "border-b-orange-500";
   return "border-b-red-500";
 }
 
-/** Shadow value for inline style matching grade color */
-export function getGradeShadow(value: string | number): string {
-  const val = typeof value === "string" ? parseFloat(value) : value;
-  if (Number.isNaN(val)) return "0 4px 12px -2px rgba(0,0,0,0.06)";
-  if (val >= 5.0) return "0 4px 12px -2px rgba(16,185,129,0.25)";
-  if (val >= 4.0) return "0 4px 12px -2px rgba(34,197,94,0.25)";
-  if (val >= 3.0) return "0 4px 12px -2px rgba(234,179,8,0.25)";
-  if (val >= 2.0) return "0 4px 12px -2px rgba(249,115,22,0.25)";
-  return "0 4px 12px -2px rgba(239,68,68,0.25)";
-}
-
 /** Tailwind classes for percentage text (attendance rates, test scores). Apply tabular-nums to parent. */
 export function getPercentageColor(pct: number): string {
-  if (pct >= 90) return "text-emerald-600 dark:text-emerald-400 font-semibold";
+  if (pct >= 90) return "text-green-600 dark:text-green-400 font-semibold";
   if (pct >= 75) return "text-yellow-600 dark:text-yellow-400 font-medium";
   return "text-red-600 dark:text-red-400 font-medium";
 }

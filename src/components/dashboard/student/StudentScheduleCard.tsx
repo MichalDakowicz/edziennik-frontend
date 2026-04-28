@@ -36,9 +36,9 @@ export default function StudentScheduleCard({
                 {lessonsWithState.length > 0 ? (
                     lessonsWithState.map((lesson: any) => {
                         const wrapperClass = lesson.isCurrent
-                            ? "bg-primary-fixed/30 relative overflow-hidden"
+                            ? "bg-surface-container-high/80 relative overflow-hidden"
                             : lesson.isPast
-                              ? "bg-surface-container-low/40 opacity-70"
+                              ? "bg-surface-container-low opacity-70"
                               : "hover:bg-surface-container-low";
 
                         return (
@@ -47,7 +47,7 @@ export default function StudentScheduleCard({
                                 className={`flex items-center gap-4 p-4 rounded-xl transition-colors ${wrapperClass}`}
                             >
                                 {lesson.isCurrent ? (
-                                    <div className="absolute right-0 top-0 h-full w-1 bg-primary"></div>
+                                    <div className="absolute right-0 top-0 h-full w-1 bg-secondary"></div>
                                 ) : null}
 
                                 <div className="flex-shrink-0 w-16 text-center">
@@ -75,7 +75,7 @@ export default function StudentScheduleCard({
                                         <span
                                             className={`text-xs font-semibold font-body ${
                                                 lesson.timeBadge.kind === "to-break"
-                                                    ? "text-primary"
+                                                    ? "text-on-surface"
                                                     : "text-outline"
                                             }`}
                                         >

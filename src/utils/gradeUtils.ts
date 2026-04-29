@@ -55,6 +55,74 @@ export function computeWeightedAverage(
   return valid.reduce((sum, grade) => sum + parseFloat(grade.wartosc) * grade.waga, 0) / sumW;
 }
 
+export function computeWeightedAverageWithOverrides(
+  grades: { id: number; wartosc: string; waga: number; czy_do_sredniej: boolean }[],
+  overrides: Map<number, string>,
+): number {
+  const withOverrides = grades.map((g) =>
+    overrides.has(g.id) ? { ...g, wartosc: overrides.get(g.id)! } : g,
+  );
+  return computeWeightedAverage(withOverrides);
+}
+
+export interface GradeImprovementSuggestion {
+  gradeId: number;
+  opis: string | null;
+  date: string;
+  originalValue: string;
+  targetValue: string;
+  weight: number;
+  resultingAvg: number;
+  deltaAvg: number;
+}
+
+export function suggestGradeImprovements(
+  grades: { id: number; wartosc: string; waga: number; czy_do_sredniej: boolean; opis: string | null; data_wystawienia: string }[],
+): GradeImprovementSuggestion[] {
+  const currentAvg = computeWeightedAverage(grades);
+  if (currentAvg === 0) return [];
+
+  const suggestions: GradeImprovementSuggestion[] = [];
+
+  for (const g of grades) {
+    if (!g.czy_do_sredniej) continue;
+    const val = parseFloat(g.wartosc);
+    // tylko oceny poniżej 4- (3.75) — od 4- wzwyż nie sugerujemy poprawy
+    if (Number.isNaN(val) || val >= 3.75) continue;
+
+    // szukamy targetu dającego maksymalny przyrost (zawsze najwyższy możliwy)
+    let best: GradeImprovementSuggestion | null = null;
+    for (const target of POLISH_GRADES) {
+      if (target <= val) continue;
+
+      const targetValue = String(target);
+      const overrides = new Map([[g.id, targetValue]]);
+      const resultingAvg = computeWeightedAverageWithOverrides(grades, overrides);
+      const deltaAvg = resultingAvg - currentAvg;
+
+      if (!best || deltaAvg > best.deltaAvg) {
+        best = {
+          gradeId: g.id,
+          opis: g.opis,
+          date: g.data_wystawienia,
+          originalValue: g.wartosc,
+          targetValue,
+          weight: g.waga,
+          resultingAvg,
+          deltaAvg,
+        };
+      }
+    }
+
+    // pomijamy poprawy które praktycznie nic nie dają
+    if (best && best.deltaAvg >= 0.04) {
+      suggestions.push(best);
+    }
+  }
+
+  return suggestions.sort((a, b) => b.deltaAvg - a.deltaAvg).slice(0, 5);
+}
+
 export function simulateGradeNeeded(
   grades: { wartosc: string; waga: number; czy_do_sredniej: boolean }[],
   targetAvg: number,

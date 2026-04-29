@@ -230,16 +230,10 @@ export default function SubjectDetailPage() {
                 return (
                   <div key={grade.id} className="relative">
                     <button
-                      onClick={() => {
-                        if (sim.simulationActive) {
-                          setOpenPickerGradeId(isPickerOpen ? null : grade.id);
-                        } else {
-                          setSelectedGrade(grade);
-                        }
-                      }}
+                      onClick={() => setSelectedGrade(grade)}
                       className={`group bg-surface-container-lowest p-5 rounded-xl flex items-center justify-between hover:shadow-lg transition-all duration-300 text-left w-full ${
                         sim.simulationActive && isOverridden ? "ring-2 ring-primary/40" : ""
-                      } ${sim.simulationActive ? "cursor-pointer" : ""}`}
+                      } ${sim.simulationActive ? "pr-14" : ""}`}
                     >
                       <div className="flex items-center gap-5">
                         <div className="relative">
@@ -268,10 +262,26 @@ export default function SubjectDetailPage() {
                           </p>
                         </div>
                       </div>
-                      <span className="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">
-                        {sim.simulationActive ? "edit" : "more_vert"}
-                      </span>
+                      {!sim.simulationActive && (
+                        <span className="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">more_vert</span>
+                      )}
                     </button>
+
+                    {sim.simulationActive && (
+                      <button
+                        onClick={() => setOpenPickerGradeId(isPickerOpen ? null : grade.id)}
+                        className={`absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                          isPickerOpen
+                            ? "bg-primary text-on-primary"
+                            : isOverridden
+                            ? "bg-primary/15 text-primary hover:bg-primary/25"
+                            : "bg-surface-container text-outline hover:bg-surface-container-high"
+                        }`}
+                        title="Podmień ocenę w symulacji"
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>edit</span>
+                      </button>
+                    )}
 
                     {sim.simulationActive && isPickerOpen && (
                       <SimulationOverridePicker
@@ -301,6 +311,10 @@ export default function SubjectDetailPage() {
               onApplyOverride={(gradeId, value) => {
                 sim.activateSimulation();
                 sim.setOverride(gradeId, value);
+              }}
+              onViewGrade={(gradeId) => {
+                const grade = grades.find((g) => g.id === gradeId);
+                if (grade) setSelectedGrade(grade);
               }}
             />
 

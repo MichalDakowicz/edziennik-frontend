@@ -12,9 +12,10 @@ import { formatDate } from "../../utils/dateUtils";
 interface GradeSimulatorProps {
   grades: Grade[];
   onApplyOverride?: (gradeId: number, value: string) => void;
+  onViewGrade?: (gradeId: number) => void;
 }
 
-export default function GradeSimulator({ grades, onApplyOverride }: GradeSimulatorProps) {
+export default function GradeSimulator({ grades, onApplyOverride, onViewGrade }: GradeSimulatorProps) {
   const [targetAvg, setTargetAvg] = useState("");
   const [showSolutions, setShowSolutions] = useState(false);
 
@@ -131,7 +132,11 @@ export default function GradeSimulator({ grades, onApplyOverride }: GradeSimulat
                   key={s.gradeId}
                   className="bg-surface-container-lowest rounded-xl p-4 flex items-center justify-between gap-3"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <button
+                    onClick={() => onViewGrade?.(s.gradeId)}
+                    disabled={!onViewGrade}
+                    className="flex items-center gap-3 min-w-0 text-left flex-1 hover:opacity-80 transition-opacity disabled:cursor-default"
+                  >
                     <div className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center font-bold shrink-0 ${getGradeColor(s.originalValue)}`}>
                       <span className="text-lg font-black font-headline leading-none">{formatGradeValue(s.originalValue)}</span>
                       <span className="text-[9px] font-bold opacity-60 mt-0.5">WAGA {s.weight}</span>
@@ -144,10 +149,10 @@ export default function GradeSimulator({ grades, onApplyOverride }: GradeSimulat
                         {formatDate(s.date)}
                       </p>
                     </div>
-                  </div>
+                  </button>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full font-body">
-                      +{s.deltaAvg.toFixed(2)}
+                      do +{s.deltaAvg.toFixed(2)}
                     </span>
                     {onApplyOverride && (
                       <button

@@ -36,3 +36,7 @@ edziennik-archive
 .github
 .kiro
 .opencode
+
+.agents 
+.claude
+skills-lock.json

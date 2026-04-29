@@ -9,10 +9,13 @@ import { ErrorState } from "../ui/ErrorState";
 import { EmptyState } from "../ui/EmptyState";
 import GradeModal from "./GradeModal";
 import GradeSimulator from "./GradeSimulator";
+import GradeSimulationBanner from "./GradeSimulationBanner";
+import SimulationOverridePicker from "./SimulationOverridePicker";
 import type { Grade } from "../../types/api";
 import { computeWeightedAverage, formatGradeValue, getGradeColor, getGradeBorderColor, getSuggestedGrade } from "../../utils/gradeUtils";
 import { formatDate } from "../../utils/dateUtils";
 import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
+import { useGradeSimulation } from "../../hooks/useGradeSimulation";
 
 const SUBJECT_ICONS: Record<string, string> = {
   "język polski": "menu_book",
@@ -52,6 +55,7 @@ export default function SubjectDetailPage() {
   const studentId = user?.studentId;
   const [selectedGrade, setSelectedGrade] = useState<Grade | null>(null);
   const [showOnlyAverage, setShowOnlyAverage] = useState(false);
+  const [openPickerGradeId, setOpenPickerGradeId] = useState<number | null>(null);
 
   const gradesQuery = useQuery({
     queryKey: studentId ? keys.grades(studentId) : ["grades", "na"],
@@ -67,8 +71,10 @@ export default function SubjectDetailPage() {
   const subject = subjects.find((s) => String(s.id) === subjectId);
   const subjectName = subject?.nazwa ?? subject?.Nazwa ?? `#${subjectId}`;
 
+  const sim = useGradeSimulation(grades);
   const avg = computeWeightedAverage(grades);
-  const suggested = getSuggestedGrade(avg);
+  const displayAvg = sim.simulationActive ? sim.simulatedAvg : avg;
+  const suggested = getSuggestedGrade(displayAvg);
 
   const distribution = useMemo(() => {
     const counts: Record<number, number> = { 6: 0, 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
@@ -103,16 +109,15 @@ export default function SubjectDetailPage() {
     return recent.length > 0 ? computeWeightedAverage(recent) : null;
   }, [grades]);
 
+  const autoBreadcrumbs = useAutoBreadcrumbs({ grades: "Oceny" });
   const breadcrumbs = useMemo(() => {
-    const autoBreadcrumbs = useAutoBreadcrumbs({ grades: "Oceny" });
     if (!autoBreadcrumbs.length) return autoBreadcrumbs;
-
     return autoBreadcrumbs.map((item, index) =>
       index === autoBreadcrumbs.length - 1
         ? { ...item, label: subjectName }
         : item,
     );
-  }, [subjectName]);
+  }, [autoBreadcrumbs, subjectName]);
 
   if ([gradesQuery, subjectsQuery].some((q) => q.isPending)) return <Spinner />;
   const firstError = [gradesQuery, subjectsQuery].find((q) => q.isError);
@@ -139,8 +144,10 @@ export default function SubjectDetailPage() {
           {grades.length > 0 && (
             <div className="grid grid-cols-3 gap-4 md:gap-8 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
               <div className="text-center">
-                <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">Średnia</p>
-                <p className="text-3xl font-black font-headline">{avg.toFixed(2)}</p>
+                <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">
+                  {sim.simulationActive ? "Symulowana" : "Średnia"}
+                </p>
+                <p className="text-3xl font-black font-headline">{displayAvg.toFixed(2)}</p>
               </div>
               <div className="text-center">
                 <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">Propozycja</p>
@@ -183,36 +190,119 @@ export default function SubjectDetailPage() {
                 >
                   Do średniej
                 </button>
+                <button
+                  onClick={() => {
+                    sim.toggleSimulation();
+                    setOpenPickerGradeId(null);
+                  }}
+                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    sim.simulationActive
+                      ? "bg-primary text-on-primary"
+                      : "bg-transparent text-slate-400 hover:bg-surface-container"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-sm">
+                    {sim.simulationActive ? "close" : "edit_note"}
+                  </span>
+                  {sim.simulationActive ? "Wyjdź" : "Symuluj"}
+                </button>
               </div>
             </div>
 
+            {sim.simulationActive && (
+              <GradeSimulationBanner
+                realAvg={sim.realAvg}
+                simulatedAvg={sim.simulatedAvg}
+                deltaAvg={sim.deltaAvg}
+                overrideCount={sim.overrides.size}
+                onReset={sim.resetAll}
+              />
+            )}
+
             <div className="space-y-3">
-              {sorted.map((grade) => (
-                <button
-                  key={grade.id}
-                  onClick={() => setSelectedGrade(grade)}
-                  className="group bg-surface-container-lowest p-5 rounded-xl flex items-center justify-between hover:shadow-lg transition-all duration-300 text-left w-full"
-                >
-                  <div className="flex items-center gap-5">
-                    <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center ${getGradeColor(grade.wartosc)} ${getGradeBorderColor(grade.wartosc)}`}>
-                      <span className="text-2xl font-black font-headline">{formatGradeValue(grade.wartosc)}</span>
-                      <span className="text-[10px] font-bold opacity-60">WAGA {grade.waga}</span>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-lg font-headline group-hover:text-primary transition-colors">
-                        {grade.opis || "Ocena cząstkowa"}
-                      </h4>
-                      <p className="text-sm text-slate-500 font-label">{formatDate(grade.data_wystawienia)}{!grade.czy_do_sredniej && " • (nie do średniej)"}</p>
-                    </div>
+              {sorted.map((grade) => {
+                const isOverridden = sim.overrides.has(grade.id);
+                const displayValue = sim.simulationActive && isOverridden
+                  ? sim.overrides.get(grade.id)!
+                  : grade.wartosc;
+                const isPickerOpen = openPickerGradeId === grade.id;
+
+                return (
+                  <div key={grade.id} className="relative">
+                    <button
+                      onClick={() => {
+                        if (sim.simulationActive) {
+                          setOpenPickerGradeId(isPickerOpen ? null : grade.id);
+                        } else {
+                          setSelectedGrade(grade);
+                        }
+                      }}
+                      className={`group bg-surface-container-lowest p-5 rounded-xl flex items-center justify-between hover:shadow-lg transition-all duration-300 text-left w-full ${
+                        sim.simulationActive && isOverridden ? "ring-2 ring-primary/40" : ""
+                      } ${sim.simulationActive ? "cursor-pointer" : ""}`}
+                    >
+                      <div className="flex items-center gap-5">
+                        <div className="relative">
+                          <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center ${getGradeColor(displayValue)} ${getGradeBorderColor(displayValue)}`}>
+                            <span className="text-2xl font-black font-headline">{formatGradeValue(displayValue)}</span>
+                            <span className="text-[10px] font-bold opacity-60">WAGA {grade.waga}</span>
+                          </div>
+                          {sim.simulationActive && isOverridden && (
+                            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                              <span className="material-symbols-outlined text-on-primary" style={{ fontSize: "12px" }}>edit</span>
+                            </span>
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-lg font-headline group-hover:text-primary transition-colors">
+                            {grade.opis || "Ocena cząstkowa"}
+                          </h4>
+                          <p className="text-sm text-slate-500 font-label">
+                            {formatDate(grade.data_wystawienia)}
+                            {!grade.czy_do_sredniej && " • (nie do średniej)"}
+                            {sim.simulationActive && isOverridden && (
+                              <span className="ml-2 text-primary font-bold">
+                                oryginał: {formatGradeValue(grade.wartosc)}
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">
+                        {sim.simulationActive ? "edit" : "more_vert"}
+                      </span>
+                    </button>
+
+                    {sim.simulationActive && isPickerOpen && (
+                      <SimulationOverridePicker
+                        currentValue={displayValue}
+                        originalValue={grade.wartosc}
+                        isOverridden={isOverridden}
+                        onSelect={(val) => {
+                          sim.setOverride(grade.id, val);
+                          setOpenPickerGradeId(null);
+                        }}
+                        onClear={() => {
+                          sim.clearOverride(grade.id);
+                          setOpenPickerGradeId(null);
+                        }}
+                        onClose={() => setOpenPickerGradeId(null)}
+                      />
+                    )}
                   </div>
-                  <span className="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">more_vert</span>
-                </button>
-              ))}
+                );
+              })}
             </div>
           </div>
 
           <div className="space-y-8">
-            <GradeSimulator grades={grades} />
+            <GradeSimulator
+              grades={grades}
+              onApplyOverride={(gradeId, value) => {
+                sim.activateSimulation();
+                sim.setOverride(gradeId, value);
+              }}
+            />
 
             <div className="bg-surface-container-low rounded-3xl p-6">
               <h3 className="text-lg font-bold font-headline mb-6 flex items-center gap-2">

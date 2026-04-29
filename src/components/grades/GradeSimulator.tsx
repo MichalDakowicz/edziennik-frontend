@@ -1,12 +1,20 @@
 import { useMemo, useState } from "react";
 import type { Grade } from "../../types/api";
-import { computeWeightedAverage, findGradeSolutions, formatGradeValue, getGradeColor, getGradeBorderColor } from "../../utils/gradeUtils";
+import {
+  computeWeightedAverage,
+  findGradeSolutions,
+  formatGradeValue,
+  getGradeColor,
+  suggestGradeImprovements,
+} from "../../utils/gradeUtils";
+import { formatDate } from "../../utils/dateUtils";
 
 interface GradeSimulatorProps {
   grades: Grade[];
+  onApplyOverride?: (gradeId: number, value: string) => void;
 }
 
-export default function GradeSimulator({ grades }: GradeSimulatorProps) {
+export default function GradeSimulator({ grades, onApplyOverride }: GradeSimulatorProps) {
   const [targetAvg, setTargetAvg] = useState("");
   const [showSolutions, setShowSolutions] = useState(false);
 
@@ -23,6 +31,8 @@ export default function GradeSimulator({ grades }: GradeSimulatorProps) {
     if (target === null || target < 1 || target > 6) return [];
     return findGradeSolutions(grades, target, 2);
   }, [grades, normalizedTarget]);
+
+  const improvements = useMemo(() => suggestGradeImprovements(grades), [grades]);
 
   const handleCalculate = () => {
     setShowSolutions(true);
@@ -87,8 +97,9 @@ export default function GradeSimulator({ grades }: GradeSimulatorProps) {
                 <div key={idx} className="bg-surface-container-lowest rounded-xl p-4">
                   <div className="flex flex-wrap gap-2 mb-2">
                     {solution.grades.map((g, i) => (
-                      <div key={i} className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold border-b-2 ${getGradeColor(g.value)} ${getGradeBorderColor(g.value)}`}>
-                        {formatGradeValue(g.value)}
+                      <div key={i} className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center font-bold ${getGradeColor(g.value)}`}>
+                        <span className="text-lg font-black font-headline leading-none">{formatGradeValue(g.value)}</span>
+                        <span className="text-[9px] font-bold opacity-60 mt-0.5">WAGA {g.weight}</span>
                       </div>
                     ))}
                   </div>
@@ -106,6 +117,51 @@ export default function GradeSimulator({ grades }: GradeSimulatorProps) {
             <p className="text-sm text-error font-medium font-body">
               Nie można osiągnąć średniej {normalizedTarget.toFixed(2)} przy obecnych ocenach.
             </p>
+          </div>
+        )}
+
+        {improvements.length > 0 && (
+          <div className="mt-6 pt-6 border-t border-outline/10">
+            <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest font-body mb-4">
+              Co warto poprawić?
+            </p>
+            <div className="space-y-3">
+              {improvements.map((s) => (
+                <div
+                  key={s.gradeId}
+                  className="bg-surface-container-lowest rounded-xl p-4 flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center font-bold shrink-0 ${getGradeColor(s.originalValue)}`}>
+                      <span className="text-lg font-black font-headline leading-none">{formatGradeValue(s.originalValue)}</span>
+                      <span className="text-[9px] font-bold opacity-60 mt-0.5">WAGA {s.weight}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-on-surface font-body truncate">
+                        {s.opis || "Ocena cząstkowa"}
+                      </p>
+                      <p className="text-[10px] text-outline font-body">
+                        {formatDate(s.date)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full font-body">
+                      +{s.deltaAvg.toFixed(2)}
+                    </span>
+                    {onApplyOverride && (
+                      <button
+                        onClick={() => onApplyOverride(s.gradeId, s.targetValue)}
+                        className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
+                        title="Zastosuj w symulatorze"
+                      >
+                        <span className="material-symbols-outlined text-primary" style={{ fontSize: "14px" }}>science</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

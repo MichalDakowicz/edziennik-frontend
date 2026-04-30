@@ -13,6 +13,20 @@ import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
 const CAROUSEL_INTERVAL_MS = 4000;
 
+function plZadanie(n: number): string {
+    if (n === 1) return "zadanie";
+    if (n % 100 >= 11 && n % 100 <= 14) return "zadań";
+    if (n % 10 >= 2 && n % 10 <= 4) return "zadania";
+    return "zadań";
+}
+
+function plAktywne(n: number): string {
+    if (n === 1) return "aktywne";
+    if (n % 100 >= 11 && n % 100 <= 14) return "aktywnych";
+    if (n % 10 >= 2 && n % 10 <= 4) return "aktywne";
+    return "aktywnych";
+}
+
 type ViewMode = "list" | "board";
 type StatusFilter = "upcoming" | "completed" | "overdue";
 
@@ -189,7 +203,7 @@ export default function HomeworkPage() {
         <div>
           <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Zadania domowe</h1>
           <p className="text-on-surface-variant font-body text-sm mt-1">
-            Masz {upcoming.length} aktywn{upcoming.length === 1 ? "e" : upcoming.length < 5 ? "e" : "ych"} zadani{upcoming.length === 1 ? "e" : "a"} na ten tydzień.
+            Masz {upcoming.length} {plAktywne(upcoming.length)} {plZadanie(upcoming.length)} na ten tydzień.
           </p>
         </div>
         <div className="flex bg-surface-container-low p-1 rounded-full">

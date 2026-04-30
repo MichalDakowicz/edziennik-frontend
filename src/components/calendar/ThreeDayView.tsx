@@ -132,9 +132,9 @@ export function ThreeDayView({ date, timetable, events, homework, onItemClick }:
           {/* Hours Column */}
           <div className="flex flex-col border-r border-outline-variant/10">
             {Array.from({ length: END_HOUR - START_HOUR + 1 }).map((_, i) => (
-              <div 
-                key={`hour-${i}`} 
-                className="flex items-center justify-center text-sm text-outline font-label border-b border-outline-variant/5"
+              <div
+                key={`hour-${i}`}
+                className="flex items-start justify-center text-sm text-outline font-label border-b border-outline-variant/5 pt-1"
                 style={{ height: `${MIN_PER_HOUR}px` }}
               >
                 {String(START_HOUR + i).padStart(2, '0')}:00

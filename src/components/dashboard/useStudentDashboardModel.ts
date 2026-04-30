@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatDate } from "../../utils/dateUtils";
 import { computeWeightedAverage } from "../../utils/gradeUtils";
 import {
@@ -53,6 +53,12 @@ export function useStudentDashboardModel({
     onOpenMessage,
     maxLiveItems = 10,
 }: UseStudentDashboardModelArgs) {
+    const [now, setNow] = useState(() => new Date());
+    useEffect(() => {
+        const id = setInterval(() => setNow(new Date()), 60_000);
+        return () => clearInterval(id);
+    }, []);
+
     const zajeciaMap = useMemo(
         () => new Map((studentData.zajecia || []).map((zajecia) => [zajecia.id, zajecia])),
         [studentData.zajecia],
@@ -161,8 +167,7 @@ export function useStudentDashboardModel({
     );
 
     const todayLessons = useMemo(() => {
-        const today = new Date();
-        const todayDayOfWeek = today.getDay();
+        const todayDayOfWeek = now.getDay();
         const jsDayToDbNumer = todayDayOfWeek === 0 ? 7 : todayDayOfWeek;
         const targetDayObj = (studentData.days || []).find(
             (day) => day.Numer === jsDayToDbNumer,
@@ -172,20 +177,19 @@ export function useStudentDashboardModel({
         return (studentData.entries || [])
             .filter(
                 (entry) =>
-                    targetDayId &&
-                    (entry.dzien_tygodnia ?? entry.DzienTygodnia) === targetDayId,
+                    targetDayId !== null &&
+                    Number(entry.dzien_tygodnia ?? entry.DzienTygodnia) === Number(targetDayId),
             )
             .map((entry) => {
                 const hour = (studentData.hours || []).find(
-                    (hourItem) => hourItem.id === entry.godzina_lekcyjna,
+                    (hourItem) => Number(hourItem.id) === Number(entry.godzina_lekcyjna),
                 );
                 return { ...entry, hour };
             })
             .sort((a, b) => (a.hour?.Numer ?? 0) - (b.hour?.Numer ?? 0));
-    }, [studentData.days, studentData.entries, studentData.hours]);
+    }, [now, studentData.days, studentData.entries, studentData.hours]);
 
     const lessonsWithState = useMemo(() => {
-        const now = new Date();
         const currentHourTime = now.getHours() * 60 + now.getMinutes();
         const lessonsWithMinutes = todayLessons.map((lesson: LessonWithHour) => ({
             ...lesson,
@@ -214,7 +218,7 @@ export function useStudentDashboardModel({
                 timeBadge,
             };
         });
-    }, [todayLessons]);
+    }, [now, todayLessons]);
 
     const formatHour = (value: string | null | undefined) =>
         value ? value.substring(0, 5) : "--:--";

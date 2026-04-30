@@ -31,11 +31,11 @@ export function getLessonsForDate(date: Date, timetable: TimetableData): LessonI
   const dayRecord = timetable.days.find((d) => d.Numer === dayNum);
   if (!dayRecord) return [];
   return timetable.entries
-    .filter((e) => (e.dzien_tygodnia ?? e.DzienTygodnia) === dayRecord.id)
+    .filter((e) => Number(e.dzien_tygodnia ?? e.DzienTygodnia) === Number(dayRecord.id))
     .map((entry) => {
-      const hour = timetable.hours.find((h) => h.id === entry.godzina_lekcyjna);
-      const zajecia = timetable.zajecia.find((z) => z.id === entry.zajecia);
-      const subject = timetable.subjects.find((s) => s.id === zajecia?.przedmiot);
+      const hour = timetable.hours.find((h) => Number(h.id) === Number(entry.godzina_lekcyjna));
+      const zajecia = timetable.zajecia.find((z) => Number(z.id) === Number(entry.zajecia));
+      const subject = timetable.subjects.find((s) => Number(s.id) === Number(zajecia?.przedmiot));
       return {
         kind: "lesson" as const,
         id: `lesson-${entry.id}`,

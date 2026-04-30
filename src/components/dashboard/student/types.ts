@@ -3,6 +3,7 @@ import type {
     Homework,
     LessonHour,
     Grade,
+    Subject,
     TimetableEntry,
 } from "../../../types/api";
 
@@ -39,6 +40,7 @@ export type StudentDashboardProps = {
     unreadCount: number;
     lessonsWithState: StudentLessonState[];
     recentGrades: Grade[];
+    subjects: Subject[];
     upcomingHomework: Homework[];
     liveItems: LiveItem[];
     getSubjectName: (zajeciaId: number) => string;
@@ -46,4 +48,5 @@ export type StudentDashboardProps = {
     getTeacherNameForLesson: (zajeciaId: number) => string;
     formatHour: (value: string | null | undefined) => string;
     formatRelativeDay: (value: string) => string;
+    onGradeClick: (grade: Grade) => void;
 };

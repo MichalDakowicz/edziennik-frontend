@@ -6,12 +6,14 @@ type StudentRecentGradesCardProps = {
     recentGrades: Grade[];
     getGradeSubjectName: (subjectId: number) => string;
     formatRelativeDay: (value: string) => string;
+    onGradeClick: (grade: Grade) => void;
 };
 
 export default function StudentRecentGradesCard({
     recentGrades,
     getGradeSubjectName,
     formatRelativeDay,
+    onGradeClick,
 }: StudentRecentGradesCardProps) {
     return (
         <div className="bg-surface-container-lowest rounded-xl p-6 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)]">
@@ -30,7 +32,11 @@ export default function StudentRecentGradesCard({
             <div className="space-y-4">
                 {recentGrades.length > 0 ? (
                     recentGrades.map((grade) => (
-                        <div key={grade.id} className="flex items-center justify-between">
+                        <button
+                            key={grade.id}
+                            onClick={() => onGradeClick(grade)}
+                            className="flex items-center justify-between w-full text-left rounded-lg px-2 py-1 -mx-2 hover:bg-surface-container-low transition-colors cursor-pointer"
+                        >
                             <div className="flex items-center gap-3 min-w-0">
                                 <div
                                     className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm shadow-[0_8px_24px_-6px_rgba(25,28,29,0.14)] ${getGradeColor(grade.wartosc)}`}
@@ -49,7 +55,7 @@ export default function StudentRecentGradesCard({
                             <span className="text-[10px] text-outline font-medium font-body">
                                 {formatRelativeDay(grade.data_wystawienia)}
                             </span>
-                        </div>
+                        </button>
                     ))
                 ) : (
                     <p className="text-sm text-on-surface-variant font-body">

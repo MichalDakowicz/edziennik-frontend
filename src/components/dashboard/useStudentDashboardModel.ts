@@ -390,6 +390,7 @@ export function useStudentDashboardModel({
         recentGrades,
         upcomingHomework,
         liveItems,
+        subjects: studentData.subjects || [],
         getSubjectName,
         getGradeSubjectName,
         getTeacherNameForLesson,

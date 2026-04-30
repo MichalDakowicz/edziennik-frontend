@@ -11,6 +11,7 @@ export default function StudentDashboard({
     unreadCount,
     lessonsWithState,
     recentGrades,
+    subjects,
     upcomingHomework,
     liveItems,
     getSubjectName,
@@ -18,6 +19,7 @@ export default function StudentDashboard({
     getTeacherNameForLesson,
     formatHour,
     formatRelativeDay,
+    onGradeClick,
 }: StudentDashboardProps) {
     return (
         <div className="space-y-8">
@@ -41,6 +43,7 @@ export default function StudentDashboard({
                             recentGrades={recentGrades}
                             getGradeSubjectName={getGradeSubjectName}
                             formatRelativeDay={formatRelativeDay}
+                            onGradeClick={onGradeClick}
                         />
 
                         <StudentHomeworkCard

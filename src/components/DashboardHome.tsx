@@ -4,11 +4,12 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { getTeachers, markMessageRead } from "../services/api";
 import { getCurrentUser } from "../services/auth";
-import type { Message, Teacher } from "../types/api";
+import type { Grade, Message, Teacher } from "../types/api";
 import { keys } from "../services/queryKeys";
 import { formatDate } from "../utils/dateUtils";
 import StudentDashboard from "./dashboard/StudentDashboard";
 import TeacherDashboard from "./dashboard/TeacherDashboard";
+import GradeModal from "./grades/GradeModal";
 import { useDashboardHomeData } from "./dashboard/useDashboardHomeData";
 import { useMessageUsersMap } from "./dashboard/useMessageUsersMap";
 import { useStudentDashboardModel } from "./dashboard/useStudentDashboardModel";
@@ -21,6 +22,7 @@ export default function DashboardHome() {
     const user = getCurrentUser();
     const queryClient = useQueryClient();
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+    const [selectedGrade, setSelectedGrade] = useState<Grade | null>(null);
 
     const markReadMutation = useMutation({
         mutationFn: (id: number) => markMessageRead(id),
@@ -143,6 +145,7 @@ export default function DashboardHome() {
                 unreadCount={studentModel.unreadMessages.length}
                 lessonsWithState={studentModel.lessonsWithState}
                 recentGrades={studentModel.recentGrades}
+                subjects={studentModel.subjects}
                 upcomingHomework={studentModel.upcomingHomework}
                 liveItems={studentModel.liveItems}
                 getSubjectName={studentModel.getSubjectName}
@@ -150,12 +153,19 @@ export default function DashboardHome() {
                 getTeacherNameForLesson={studentModel.getTeacherNameForLesson}
                 formatHour={studentModel.formatHour}
                 formatRelativeDay={studentModel.formatRelativeDay}
+                onGradeClick={setSelectedGrade}
             />
             <MessageDetail
                 message={selectedMessage}
                 open={Boolean(selectedMessage)}
                 onClose={() => setSelectedMessage(null)}
                 resolveUserName={resolveUserName}
+            />
+            <GradeModal
+                open={Boolean(selectedGrade)}
+                onClose={() => setSelectedGrade(null)}
+                grade={selectedGrade}
+                subjects={studentModel.subjects}
             />
         </>
     );

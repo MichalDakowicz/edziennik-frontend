@@ -138,23 +138,9 @@ export default function GradesPage() {
   return (
     <div className="space-y-6">
       <AutoBreadcrumbs items={breadcrumbs} />
-      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Oceny</h1>
-          <p className="text-on-surface-variant font-body text-sm mt-1">Podsumowanie ocen z bierzącego półrocza</p>
-        </div>
-        <div className="flex gap-4">
-          <div className="bg-surface-container-lowest p-6 rounded-xl flex flex-col items-center min-w-[140px] shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)]">
-            <span className="text-primary font-headline text-3xl font-black">
-              {overallAvg > 0 ? overallAvg.toFixed(2) : "—"}
-            </span>
-            <span className="text-[10px] uppercase tracking-widest text-outline font-bold mt-1">Średnia</span>
-          </div>
-          <div className="bg-surface-container-lowest p-6 rounded-xl flex flex-col items-center min-w-[140px] shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)]">
-            <span className="text-tertiary-container font-headline text-3xl font-black">{behaviorTotal}</span>
-            <span className="text-[10px] uppercase tracking-widest text-outline font-bold mt-1">Zachowanie</span>
-          </div>
-        </div>
+      <header className="pb-4">
+        <h1 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">Oceny</h1>
+        <p className="text-on-surface-variant font-body text-sm mt-1">Podsumowanie ocen z bierzącego półrocza</p>
       </header>
 
       <div className="flex gap-4 pb-6">
@@ -164,7 +150,7 @@ export default function GradesPage() {
       </div>
 
       {tab === "partial" && (
-        <div className="grid grid-cols-12 gap-6">
+        <div className="grid grid-cols-12 gap-4">
           <section className="col-span-12 lg:col-span-8 space-y-4">
             <h3 className="text-xl font-bold text-on-surface-variant font-headline mb-2 px-2">Przedmioty</h3>
 
@@ -257,7 +243,19 @@ export default function GradesPage() {
             {!grouped.size ? <EmptyState message="Brak ocen" /> : null}
           </section>
 
-          <aside className="col-span-12 lg:col-span-4 space-y-6">
+          <aside className="col-span-12 lg:col-span-4 space-y-4">
+            <div className="flex gap-4">
+              <div className="flex-1 bg-surface-container-lowest p-6 rounded-xl flex flex-col items-center shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)]">
+                <span className="text-primary font-headline text-3xl font-black">
+                  {overallAvg > 0 ? overallAvg.toFixed(2) : "—"}
+                </span>
+                <span className="text-[10px] uppercase tracking-widest text-outline font-bold mt-1">Średnia</span>
+              </div>
+              <div className="flex-1 bg-surface-container-lowest p-6 rounded-xl flex flex-col items-center shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)]">
+                <span className="text-tertiary-container font-headline text-3xl font-black">{behaviorTotal}</span>
+                <span className="text-[10px] uppercase tracking-widest text-outline font-bold mt-1">Zachowanie</span>
+              </div>
+            </div>
             <section className="bg-surface-container-lowest rounded-xl p-6 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)]">
               <h4 className="font-headline font-bold mb-4 flex items-center gap-2 text-on-surface">
                 <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>insights</span>

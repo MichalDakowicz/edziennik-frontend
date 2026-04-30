@@ -20,7 +20,7 @@ export function useStudentDashboardModel({
     studentData,
     teachers,
     onOpenMessage,
-    maxLiveItems = 10,
+    maxLiveItems = 7,
 }: UseStudentDashboardModelArgs) {
     const zajeciaMap = useMemo(
         () => new Map((studentData.zajecia || []).map((z: any) => [z.id, z])),

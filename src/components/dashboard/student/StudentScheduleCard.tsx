@@ -36,11 +36,10 @@ export default function StudentScheduleCard({
                 {lessonsWithState.length > 0 ? (
                     lessonsWithState.map((lesson: any) => {
                         const wrapperClass = lesson.isCurrent
-                            ? "bg-surface-container-high/80 relative overflow-hidden"
+                            ? "bg-surface-container relative overflow-hidden"
                             : lesson.isPast
-                              ? "bg-surface-container-low opacity-70"
-                              : "hover:bg-surface-container-low";
-
+                                ? "opacity-50"
+                                : "bg-surface-container-low/50";
                         return (
                             <div
                                 key={lesson.id}

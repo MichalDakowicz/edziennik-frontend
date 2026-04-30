@@ -19,37 +19,20 @@ export default function StudentLiveStreamCard({
         behavior: "Zachowanie",
     };
 
-    const dotClassMap: Record<LiveItem["kind"], string> = {
-        message: "bg-primary",
-        grade: "bg-tertiary-container",
-        homework: "bg-tertiary-fixed-dim",
-        attendance: "bg-on-secondary-container",
-        event: "bg-outline",
-        behavior: "bg-secondary",
-    };
 
     return (
-        <aside className="lg:col-span-4">
-            <div className="bg-surface-container-lowest rounded-xl p-6 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] h-full flex flex-col">
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-2">
-                        <span className="relative flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75" style={{ animationDuration: "2s" }}></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
-                        </span>
-                        <h2 className="text-lg font-bold font-headline text-on-surface">
-                            Ostatnie
-                        </h2>
-                    </div>
-                    <span className="text-xs text-outline font-medium font-body">
-                        Dla Ciebie
-                    </span>
+        <aside className="h-full">
+            <div className="bg-surface-container-lowest rounded-xl p-8 gap-3 shadow-[0_8px_32px_-4px_rgba(25,28,29,0.06)] h-full flex flex-col">
+                <div className="flex justify-center mb-6">
+                    <h2 className="text-2xl font-bold font-headline text-on-surface">
+                        Ostatnie Wiadomości
+                    </h2>
                 </div>
 
-                <div className="space-y-3 flex-grow overflow-y-auto pr-2">
+                <div className="space-y-3">
                     {liveItems.length > 0 ? (
                         liveItems.map((item) => {
-                            const dotClass = dotClassMap[item.kind];
+                            const dotClass = item.isRead ? "bg-outline" : "bg-primary";
                             const isClickable = Boolean(
                                 item.onClick || item.to,
                             );
@@ -58,20 +41,14 @@ export default function StudentLiveStreamCard({
                                 : "";
 
                             return (
-                                <div
-                                    key={item.id}
-                                    className="flex items-start gap-3 items-center"
-                                >
-                                    <span
-                                        className={`w-2.5 h-2.5 rounded-full ${dotClass}`}
-                                    ></span>
-
+                                <div key={item.id}>
                                     {item.to ? (
                                         <Link
                                             to={item.to}
                                             onClick={item.onClick}
-                                            className={`flex-1 p-3 rounded-xl bg-surface-container-low ${hoverClass}`}
+                                            className={`relative block p-3 rounded-xl bg-surface-container-low ${hoverClass}`}
                                         >
+                                            <span className={`absolute top-3 right-3 w-2.5 h-2.5 rounded-full ${dotClass}`}></span>
                                             <p className="text-[10px] text-outline font-bold uppercase tracking-wider mb-1 font-body">
                                                 {item.label ||
                                                     kindLabelMap[
@@ -88,9 +65,10 @@ export default function StudentLiveStreamCard({
                                         </Link>
                                     ) : (
                                         <div
-                                            className={`flex-1 p-3 rounded-xl bg-surface-container-low ${hoverClass}`}
+                                            className={`relative p-3 rounded-xl bg-surface-container-low ${hoverClass}`}
                                             onClick={item.onClick}
                                         >
+                                            <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full ${dotClass}`}></span>
                                             <p className="text-[10px] text-outline font-bold uppercase tracking-wider mb-1 font-body">
                                                 {item.label ||
                                                     kindLabelMap[
@@ -118,9 +96,9 @@ export default function StudentLiveStreamCard({
 
                 <Link
                     to="/dashboard/notifications"
-                    className="mt-6 w-full py-2 text-sm font-bold text-primary bg-primary-fixed/30 rounded-xl hover:bg-primary-fixed/50 transition-all text-center font-body"
+                    className="flex-1 flex items-center justify-center w-full text-sm font-bold text-primary bg-surface-container-low rounded-xl hover:bg-surface-container-high transition-all text-center font-body"
                 >
-                    Zobacz wszystkie powiadomienia
+                Zobacz wszystkie powiadomienia
                 </Link>
             </div>
         </aside>

@@ -6,7 +6,7 @@ import {
     useLocation,
     useNavigate,
 } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "../services/auth";
 import { getClasses, getInboxMessages, getLuckyNumber } from "../services/api";
 import { keys } from "../services/queryKeys";
@@ -107,6 +107,7 @@ const isRoleAllowed = (role: string, item: NavItem): boolean => {
 export default function Layout() {
     const user = getCurrentUser();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const location = useLocation();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -237,6 +238,7 @@ export default function Layout() {
 
     const handleLogout = () => {
         logout();
+        queryClient.clear();
         navigate("/");
     };
 

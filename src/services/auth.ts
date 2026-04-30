@@ -58,6 +58,7 @@ export const logout = (): void => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_KEY);
   localStorage.removeItem(USER_KEY);
+  sessionStorage.clear();
   void firebaseLogout();
 };
 

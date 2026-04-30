@@ -7,3 +7,5 @@ dist
 .kiro
 .opencode
 .github
+.agents
+.claude

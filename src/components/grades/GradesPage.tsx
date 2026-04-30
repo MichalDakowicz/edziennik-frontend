@@ -10,70 +10,10 @@ import { EmptyState } from "../ui/EmptyState";
 import PeriodGrades from "./PeriodGrades";
 import BehaviorPoints from "./BehaviorPoints";
 import type { Grade } from "../../types/api";
-import { computeWeightedAverage, formatGradeValue, getGradeColor, getGradeBorderColor } from "../../utils/gradeUtils";
+import { computeWeightedAverage, formatGradeValue, getGradeColor, getGradeBorderColor, getGradeTextColor } from "../../utils/gradeUtils";
+import { getSubjectColors, getSubjectIcon } from "../../utils/subjectUtils";
 import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 
-const SUBJECT_ICONS: Record<string, string> = {
-  "język polski": "menu_book",
-  "polski": "menu_book",
-  "matematyka": "calculate",
-  "fizyka": "rocket_launch",
-  "chemia": "science",
-  "biologia": "biotech",
-  "historia": "history_edu",
-  "geografia": "public",
-  "angielski": "translate",
-  "język angielski": "translate",
-  "informatyka": "computer",
-  "wf": "sports_soccer",
-  "w-f": "sports_soccer",
-  "wychowanie fizyczne": "sports_soccer",
-  "plastyka": "palette",
-  "muzyka": "music_note",
-  "religia": "church",
-  "etyka": "balance",
-  "wos": "gavel",
-  "podstawy": "foundation",
-};
-
-const SUBJECT_TONAL_PAIRS: Record<string, { bg: string; text: string; border: string }> = {
-  "język polski": { bg: "bg-primary-fixed", text: "text-primary", border: "border-primary" },
-  "polski": { bg: "bg-primary-fixed", text: "text-primary", border: "border-primary" },
-  "matematyka": { bg: "bg-tertiary-fixed", text: "text-tertiary", border: "border-tertiary" },
-  "fizyka": { bg: "bg-secondary-fixed", text: "text-secondary", border: "border-secondary" },
-  "chemia": { bg: "bg-primary-fixed", text: "text-primary", border: "border-primary" },
-  "biologia": { bg: "bg-tertiary-fixed", text: "text-tertiary", border: "border-tertiary" },
-  "historia": { bg: "bg-secondary-fixed", text: "text-secondary", border: "border-secondary" },
-  "geografia": { bg: "bg-primary-fixed", text: "text-primary", border: "border-primary" },
-  "angielski": { bg: "bg-tertiary-fixed", text: "text-tertiary", border: "border-tertiary" },
-  "język angielski": { bg: "bg-tertiary-fixed", text: "text-tertiary", border: "border-tertiary" },
-  "informatyka": { bg: "bg-secondary-fixed", text: "text-secondary", border: "border-secondary" },
-  "wf": { bg: "bg-primary-fixed", text: "text-primary", border: "border-primary" },
-  "w-f": { bg: "bg-primary-fixed", text: "text-primary", border: "border-primary" },
-  "wychowanie fizyczne": { bg: "bg-primary-fixed", text: "text-primary", border: "border-primary" },
-  "plastyka": { bg: "bg-tertiary-fixed", text: "text-tertiary", border: "border-tertiary" },
-  "muzyka": { bg: "bg-secondary-fixed", text: "text-secondary", border: "border-secondary" },
-  "religia": { bg: "bg-primary-fixed", text: "text-primary", border: "border-primary" },
-  "etyka": { bg: "bg-secondary-fixed", text: "text-secondary", border: "border-secondary" },
-  "wos": { bg: "bg-tertiary-fixed", text: "text-tertiary", border: "border-tertiary" },
-  "podstawy": { bg: "bg-primary-fixed", text: "text-primary", border: "border-primary" },
-};
-
-function getSubjectIcon(subjectName: string): string {
-  const lower = subjectName.toLowerCase();
-  for (const [key, icon] of Object.entries(SUBJECT_ICONS)) {
-    if (lower.includes(key)) return icon;
-  }
-  return "school";
-}
-
-function getSubjectTonalPair(subjectName: string): { bg: string; text: string; border: string } {
-  const lower = subjectName.toLowerCase();
-  for (const [key, pair] of Object.entries(SUBJECT_TONAL_PAIRS)) {
-    if (lower.includes(key)) return pair;
-  }
-  return { bg: "bg-primary-fixed", text: "text-primary", border: "border-primary" };
-}
 
 type Tab = "partial" | "period" | "behavior";
 
@@ -191,7 +131,7 @@ export default function GradesPage() {
                   const subject = subjects.find((item) => item.id === subjectId);
                   const subjectName = subject?.nazwa ?? subject?.Nazwa ?? `#${subjectId}`;
                   const avg = computeWeightedAverage(subjectGrades);
-                  const tonal = getSubjectTonalPair(subjectName);
+                  const tonal = getSubjectColors(subjectName);
                   const icon = getSubjectIcon(subjectName);
                   const gradesInOrder = [...subjectGrades].sort(
                     (a, b) => Date.parse(b.data_wystawienia) - Date.parse(a.data_wystawienia)
@@ -204,15 +144,15 @@ export default function GradesPage() {
                     >
                       <div className="flex justify-between items-start mb-6">
                         <div className="flex items-center gap-4">
-                          <div className={`w-12 h-12 rounded-xl ${tonal.bg} ${tonal.text} flex items-center justify-center`}>
+                          <div className={`w-14 h-14 rounded-xl ${tonal.bg} ${tonal.text} flex items-center justify-center`}>
                             <span className="material-symbols-outlined">{icon}</span>
                           </div>
                           <div>
-                            <h4 className="font-headline font-bold text-lg text-on-surface">{subjectName}</h4>
+                            <h4 className="font-headline font-bold text-xl text-on-surface">{subjectName}</h4>
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className={`text-2xl font-black ${tonal.text}`}>
+                          <span className={`text-2xl font-black ${avg > 0 ? getGradeTextColor(avg) : "text-on-surface"}`}>
                             {avg > 0 ? avg.toFixed(2) : "—"}
                           </span>
                           <p className="text-[10px] uppercase font-bold text-outline">Średnia</p>

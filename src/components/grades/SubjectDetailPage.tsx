@@ -13,40 +13,11 @@ import GradeSimulationBanner from "./GradeSimulationBanner";
 import SimulationOverridePicker from "./SimulationOverridePicker";
 import type { Grade } from "../../types/api";
 import { computeWeightedAverage, formatGradeValue, getGradeColor, getGradeBorderColor, getSuggestedGrade } from "../../utils/gradeUtils";
+import { getSubjectIcon } from "../../utils/subjectUtils";
 import { formatDate } from "../../utils/dateUtils";
 import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
 import { useGradeSimulation } from "../../hooks/useGradeSimulation";
 
-const SUBJECT_ICONS: Record<string, string> = {
-  "język polski": "menu_book",
-  "polski": "menu_book",
-  "matematyka": "calculate",
-  "fizyka": "rocket_launch",
-  "chemia": "science",
-  "biologia": "biotech",
-  "historia": "history_edu",
-  "geografia": "public",
-  "angielski": "translate",
-  "język angielski": "translate",
-  "informatyka": "computer",
-  "wf": "sports_soccer",
-  "w-f": "sports_soccer",
-  "wychowanie fizyczne": "sports_soccer",
-  "plastyka": "palette",
-  "muzyka": "music_note",
-  "religia": "church",
-  "etyka": "balance",
-  "wos": "gavel",
-  "podstawy": "foundation",
-};
-
-function getSubjectIcon(subjectName: string): string {
-  const lower = subjectName.toLowerCase();
-  for (const [key, icon] of Object.entries(SUBJECT_ICONS)) {
-    if (lower.includes(key)) return icon;
-  }
-  return "school";
-}
 
 
 export default function SubjectDetailPage() {

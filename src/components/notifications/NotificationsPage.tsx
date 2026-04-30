@@ -22,6 +22,7 @@ import {
 import { getCurrentUser } from "../../services/auth";
 import { keys } from "../../services/queryKeys";
 import { formatDate } from "../../utils/dateUtils";
+import { getNotificationIconConfig, getSubjectIcon, getSubjectColors } from "../../utils/subjectUtils";
 import type { Message } from "../../types/api";
 import { ErrorState } from "../ui/ErrorState";
 import { Spinner } from "../ui/Spinner";
@@ -39,38 +40,6 @@ const filterConfig: Record<FilterKind, { label: string; icon?: string }> = {
     event: { label: "Ogłoszenia", icon: "campaign" },
 };
 
-const iconConfig: Record<string, { bg: string; iconColor: string; icon: string }> = {
-    message: {
-        bg: "bg-primary-fixed/80 dark:bg-primary/20",
-        iconColor: "text-primary dark:text-primary",
-        icon: "mail",
-    },
-    grade: {
-        bg: "bg-tertiary-fixed/80 dark:bg-amber-400/10",
-        iconColor: "text-tertiary dark:text-amber-400",
-        icon: "grade",
-    },
-    homework: {
-        bg: "bg-tertiary-fixed/50 dark:bg-orange-400/10",
-        iconColor: "text-on-tertiary-fixed-variant dark:text-orange-400",
-        icon: "assignment",
-    },
-    attendance: {
-        bg: "bg-secondary-fixed/80 dark:bg-blue-400/10",
-        iconColor: "text-on-secondary-fixed-variant dark:text-blue-400",
-        icon: "rule",
-    },
-    event: {
-        bg: "bg-surface-container-high dark:bg-surface-container",
-        iconColor: "text-on-surface dark:text-on-surface",
-        icon: "event",
-    },
-    behavior: {
-        bg: "bg-secondary-fixed-dim/70 dark:bg-indigo-400/10",
-        iconColor: "text-on-secondary-fixed-variant dark:text-indigo-400",
-        icon: "star",
-    },
-};
 
 function formatRelativeDay(isoDate: string): string {
     const date = new Date(isoDate);
@@ -104,65 +73,28 @@ function groupByDay(items: LiveItem[]) {
     return groups;
 }
 
-function NotificationCard({ item }: { item: LiveItem }) {
-    const cfg = iconConfig[item.kind] || iconConfig.event;
-
-    return (
-        <div
-            className={`group relative flex gap-4 p-5 rounded-[1.25rem] transition-all duration-200 ${
-                item.isRead
-                    ? "bg-surface-container-lowest dark:bg-surface-container"
-                    : "bg-surface-container-lowest dark:bg-surface-container-high"
-            } hover:shadow-lg hover:shadow-primary/5 dark:hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.5)]`}
-        >
-            {!item.isRead && (
-                <div className="absolute top-5 right-5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-primary/10 dark:ring-primary/20" />
-                </div>
-            )}
-
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${cfg.bg}`}>
-                <span className={`material-symbols-outlined text-3xl ${cfg.iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>
-                    {cfg.icon}
-                </span>
-            </div>
-
-            <div className="flex-1 min-w-0 pr-8">
-                <span className="text-[11px] font-bold uppercase tracking-widest block mb-1 text-on-surface-variant dark:text-on-surface-variant/80">
-                    {item.label}
-                </span>
-                <h3 className="font-bold text-base leading-tight mb-1 text-on-surface dark:text-on-surface">
-                    {item.title}
-                </h3>
-                <p className="text-on-surface-variant dark:text-on-surface-variant/70 text-sm line-clamp-2">
-                    {item.body}
-                </p>
-            </div>
-        </div>
-    );
-}
 
 function NotificationRow({ item }: { item: LiveItem }) {
-    const cfg = iconConfig[item.kind] || iconConfig.event;
+    const base = getNotificationIconConfig(item.kind);
+    const subjectColors = item.subject ? getSubjectColors(item.subject) : null;
+    const icon = item.subject ? getSubjectIcon(item.subject) : base.icon;
+    const iconColor = subjectColors ? subjectColors.text : base.iconColor;
+    const iconBg = subjectColors ? subjectColors.bg : base.iconBg;
 
     return (
         <div
-            className={`flex items-center gap-5 p-5 rounded-[1.25rem] border transition-all duration-200 ${
-                item.isRead
-                    ? "bg-surface-container-lowest/60 dark:bg-surface-container-lowest border-outline-variant/10 dark:border-outline-variant/5"
-                    : "bg-surface-container-lowest/80 dark:bg-surface-container-lowest border-outline-variant/20 dark:border-outline-variant/10"
-            }`}
+            className="flex items-center gap-5 p-5 rounded-3xl border border-outline-variant/10 transition-all duration-200 bg-surface-container-low hover:bg-surface-container"
         >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${cfg.bg}`}>
-                <span className={`material-symbols-outlined text-xl ${cfg.iconColor}`}>
-                    {cfg.icon}
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${iconBg}`}>
+                <span className={`material-symbols-outlined text-xl ${iconColor}`}>
+                    {icon}
                 </span>
             </div>
 
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1">
                     <h3 className="font-bold text-on-surface dark:text-on-surface">{item.title}</h3>
-                    <span className="bg-surface-container-high dark:bg-surface-container text-[10px] font-bold px-2 py-0.5 rounded text-on-surface-variant dark:text-on-surface-variant/70 uppercase">
+                    <span className="text-[10px] font-bold text-on-surface-variant dark:text-on-surface-variant/70 uppercase">
                         {item.label}
                     </span>
                 </div>
@@ -432,7 +364,7 @@ export default function NotificationsPage() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Szukaj powiadomień..."
-                        className="w-full bg-surface-container-lowest dark:bg-surface-container border border-outline-variant/20 dark:border-outline-variant/10 rounded-2xl py-3 pl-11 pr-4 text-sm text-on-surface dark:text-on-surface placeholder-outline/50 dark:placeholder-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                        className="w-full bg-surface-container-lowest dark:bg-surface-container border border-outline-variant/20 dark:border-outline-variant/10 rounded-2xl py-3 pl-11 pr-4 text-sm text-on-surface dark:text-on-surface placeholder-outline/50 dark:placeholder-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                     />
                     {searchQuery && (
                         <button
@@ -476,7 +408,7 @@ export default function NotificationsPage() {
             {filteredNotifications.length > 0 ? (
                 <div className="space-y-10">
                     {groups.map((group) => (
-                        <section className="gap-2" key={group.day}>
+                        <section key={group.day}>
                             <div className="flex items-center gap-4 mb-5">
                                 <h2 className="text-lg font-bold text-on-surface dark:text-on-surface font-headline">
                                     {group.day}
@@ -487,8 +419,8 @@ export default function NotificationsPage() {
                                 </span>
                             </div>
 
-                            <div className="space-y-3">
-                                {group.items.map((item, idx) => {
+                            <div className="flex flex-col gap-4">
+                                {group.items.map((item) => {
                                     if (item.to) {
                                         return (
                                             <Link
@@ -496,7 +428,7 @@ export default function NotificationsPage() {
                                                 to={item.to}
                                                 onClick={item.onClick}
                                             >
-                                                {idx < 3 ? <NotificationCard item={item} /> : <NotificationRow item={item} />}
+                                                <NotificationRow item={item} />
                                             </Link>
                                         );
                                     }
@@ -507,7 +439,7 @@ export default function NotificationsPage() {
                                             onClick={item.onClick}
                                             className={item.onClick ? "cursor-pointer" : ""}
                                         >
-                                            {idx < 3 ? <NotificationCard item={item} /> : <NotificationRow item={item} />}
+                                            <NotificationRow item={item} />
                                         </div>
                                     );
                                 })}

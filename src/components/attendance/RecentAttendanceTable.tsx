@@ -349,17 +349,9 @@ export default function RecentAttendanceTable({
                                             {getStatusBadge(statusName)}
                                         </td>
                                         <td className="py-5 px-4 text-right">
-                                            {statusName
-                                                .toLowerCase()
-                                                .includes("nieobecn") ? (
+                                            {statusName.toLowerCase().includes("nieobecn") && (
                                                 <button className="text-primary hover:bg-primary/5 px-4 py-1.5 rounded-full text-xs font-bold transition-all">
                                                     Usprawiedliw
-                                                </button>
-                                            ) : (
-                                                <button className="text-on-surface-variant hover:text-primary transition-colors">
-                                                    <span className="material-symbols-outlined">
-                                                        more_vert
-                                                    </span>
                                                 </button>
                                             )}
                                         </td>

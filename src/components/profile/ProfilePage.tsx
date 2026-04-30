@@ -203,8 +203,7 @@ export default function ProfilePage() {
                                 Profil
                             </h2>
                             <p className="text-on-surface-variant text-sm mt-1">
-                                Zarządzaj swoimi danymi osobowymi i tożsamością
-                                w systemie.
+                                Zobacz, co widzą inni
                             </p>
                         </div>
                         <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm">
@@ -216,39 +215,11 @@ export default function ProfilePage() {
                                         </span>
                                     </div>
                                 </div>
-                                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-                                            Imię
-                                        </label>
-                                        <div className="px-4 py-3 bg-surface-container-low rounded-lg text-on-surface font-medium">
-                                            {user.firstName}
-                                        </div>
+                                <div className="flex-1 flex flex-col gap-2 w-full">
+                                    <div className="text-2xl font-bold text-on-surface">
+                                        {user.firstName} {user.lastName}
                                     </div>
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-                                            Nazwisko
-                                        </label>
-                                        <div className="px-4 py-3 bg-surface-container-low rounded-lg text-on-surface font-medium">
-                                            {user.lastName}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1 md:col-span-2">
-                                        <label className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-                                            Adres e-mail
-                                        </label>
-                                        <div className="px-4 py-3 bg-surface-container-low rounded-lg text-on-surface font-medium">
-                                            {user.email}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1 md:col-span-2">
-                                        <label className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-                                            Nazwa użytkownika
-                                        </label>
-                                        <div className="px-4 py-3 bg-surface-container-low rounded-lg text-on-surface font-medium">
-                                            {user.username}
-                                        </div>
-                                    </div>
+                                    <span className="text-sm text-on-surface-variant font-medium">{user.email}</span>
                                 </div>
                             </div>
                         </div>
@@ -296,7 +267,7 @@ export default function ProfilePage() {
                                             : "border-transparent bg-surface-container hover:bg-surface-container-high",
                                     )}
                                 >
-                                    <div className="w-full h-12 bg-background rounded shadow-inner mb-1 ring-1 ring-white/10"></div>
+                                    <div className="w-full h-12 bg-[#18181b] rounded shadow-inner mb-1 ring-1 ring-white/10"></div>
                                     <span className="text-xs font-semibold">
                                         Ciemny
                                     </span>
@@ -324,7 +295,7 @@ export default function ProfilePage() {
                                             : "border-transparent bg-surface-container hover:bg-surface-container-high",
                                     )}
                                 >
-                                    <div className="w-full h-12 rounded shadow-inner mb-1 bg-gradient-to-r from-slate-500 to-background"></div>
+                                    <div className="w-full h-12 rounded shadow-inner mb-1 bg-[linear-gradient(to_right,#ffffff_25%,#18181b_75%)]"></div>
                                     <span className="text-xs font-semibold">
                                         Systemowy
                                     </span>
@@ -394,10 +365,8 @@ export default function ProfilePage() {
                         <div className="space-y-6">
                             <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                 <div className="flex gap-4 items-center">
-                                    <div className="p-3 rounded-full bg-red-50 dark:bg-red-400/10 text-red-600 dark:text-red-400">
-                                        <span className="material-symbols-outlined">
-                                            lock
-                                        </span>
+                                    <div className="p-3 rounded-full bg-red-50 dark:bg-red-400/10 text-red-600 dark:text-red-400 shrink-0 self-center flex items-center justify-center">
+                                        <span className="material-symbols-outlined block leading-none">lock</span>
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-on-surface">
@@ -413,50 +382,27 @@ export default function ProfilePage() {
                                     Kontakt z administratorem
                                 </Badge>
                             </div>
-                            <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm">
-                                <h3 className="font-bold text-on-surface mb-4 flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-primary">
-                                        security
-                                    </span>
-                                    Podsumowanie konta
-                                </h3>
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
-                                        <div className="flex gap-3 items-center">
-                                            <span className="material-symbols-outlined text-green-600 dark:text-green-400">
-                                                check_circle
-                                            </span>
-                                            <div>
-                                                <div className="font-semibold text-sm text-on-surface">
-                                                    Konto aktywne
-                                                </div>
-                                                <div className="text-xs text-on-surface-variant">
-                                                    Twoje konto jest w pełni
-                                                    aktywne
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="flex gap-4 items-center">
+                                    <div className="p-3 rounded-full bg-green-50 dark:bg-green-400/10 text-green-600 dark:text-green-400 shrink-0 self-center flex items-center justify-center">
+                                        <span className="material-symbols-outlined block leading-none">check_circle</span>
                                     </div>
-                                    <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
-                                        <div className="flex gap-3 items-center">
-                                            <span className="material-symbols-outlined text-primary">
-                                                person
-                                            </span>
-                                            <div>
-                                                <div className="font-semibold text-sm text-on-surface">
-                                                    Rola:{" "}
-                                                    {user.role === "uczen"
-                                                        ? "Uczeń"
-                                                        : user.role === "rodzic"
-                                                          ? "Rodzic"
-                                                          : "Nauczyciel"}
-                                                </div>
-                                                <div className="text-xs text-on-surface-variant">
-                                                    Uprawnienia do podglądu
-                                                    dziennika
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div>
+                                        <h3 className="font-bold text-on-surface">Konto aktywne</h3>
+                                        <p className="text-sm text-on-surface-variant">Twoje konto jest w pełni aktywne</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="flex gap-4 items-center">
+                                    <div className="p-3 rounded-full bg-primary/10 text-primary shrink-0 self-center flex items-center justify-center">
+                                        <span className="material-symbols-outlined block leading-none">person</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-on-surface">
+                                            {user.role === "uczen" ? "Uczeń" : user.role === "rodzic" ? "Rodzic" : "Nauczyciel"}
+                                        </h3>
+                                        <p className="text-sm text-on-surface-variant">Uprawnienia do podglądu dziennika</p>
                                     </div>
                                 </div>
                             </div>

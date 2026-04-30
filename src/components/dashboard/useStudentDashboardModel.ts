@@ -282,6 +282,7 @@ export function useStudentDashboardModel({
             body: grade.opis || "Dodano nową ocenę cząstkową.",
             icon: "grade",
             isRead: true,
+            subject: getGradeSubjectName(grade.przedmiot),
             onClick: undefined,
             to: "/dashboard/grades",
         }));
@@ -295,6 +296,7 @@ export function useStudentDashboardModel({
             body: item.opis,
             icon: "assignment",
             isRead: true,
+            subject: getGradeSubjectName(item.przedmiot),
             onClick: undefined,
             to: "/dashboard/homework",
         }));

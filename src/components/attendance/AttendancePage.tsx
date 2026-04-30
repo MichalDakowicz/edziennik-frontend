@@ -287,10 +287,10 @@ export default function AttendancePage() {
             {/* Attendance by Subject */}
             <section>
                 <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold text-on-surface font-headline">Frekwencja według przedmiotów</h3>
-                    <div className="flex gap-2">
-                        <span className="px-3 py-1 bg-surface-container-low text-[10px] font-bold text-on-surface-variant rounded-lg">Semestr 1</span>
-                        <span className="px-3 py-1 bg-primary/10 text-[10px] font-bold text-primary rounded-lg border border-primary/10">Cały rok</span>
+                    <h3 className="text-2xl font-bold text-on-surface font-headline">Frekwencja według przedmiotów</h3>
+                    <div className="flex gap-6">
+                        <span className="px-5 py-2 bg-surface-container text-l font-bold text-on-surface-variant rounded-lg">Semestr 1</span>
+                        <span className="px-5 py-2 bg-surface-container text-l font-bold text-on-surface-variant rounded-lg">Cały rok</span>
                     </div>
                 </div>
                 {subjectAttendance.length === 0 ? (

@@ -10,34 +10,13 @@ import HomeworkModal from "./HomeworkModal";
 import type { Homework, Subject } from "../../types/api";
 import { CalendarDays, ArrowRight, BookOpen, LayoutList, LayoutGrid, ChevronRight } from "lucide-react";
 import { AutoBreadcrumbs, useAutoBreadcrumbs } from "../ui/Breadcrumbs";
+import { getSubjectColors } from "../../utils/subjectUtils";
 
 const CAROUSEL_INTERVAL_MS = 4000;
 
 type ViewMode = "list" | "board";
 type StatusFilter = "upcoming" | "completed" | "overdue";
 
-const subjectIconMap: Record<string, { bg: string; color: string; badgeBg: string; badgeText: string }> = {
-  matematyka: { bg: "bg-blue-50 dark:bg-blue-400/10", color: "text-blue-600 dark:text-blue-400", badgeBg: "bg-blue-100 dark:bg-blue-400/10", badgeText: "text-blue-700 dark:text-blue-300" },
-  fizyka: { bg: "bg-amber-50 dark:bg-amber-400/10", color: "text-amber-600 dark:text-amber-400", badgeBg: "bg-amber-100 dark:bg-amber-400/10", badgeText: "text-amber-700 dark:text-amber-300" },
-  "język polski": { bg: "bg-emerald-50 dark:bg-emerald-400/10", color: "text-emerald-600 dark:text-emerald-400", badgeBg: "bg-emerald-100 dark:bg-emerald-400/10", badgeText: "text-emerald-700 dark:text-emerald-300" },
-  chemia: { bg: "bg-purple-50 dark:bg-purple-400/10", color: "text-purple-600 dark:text-purple-400", badgeBg: "bg-purple-100 dark:bg-purple-400/10", badgeText: "text-purple-700 dark:text-purple-300" },
-  "język angielski": { bg: "bg-rose-50 dark:bg-rose-400/10", color: "text-rose-600 dark:text-rose-400", badgeBg: "bg-rose-100 dark:bg-rose-400/10", badgeText: "text-rose-700 dark:text-rose-300" },
-  historia: { bg: "bg-orange-50 dark:bg-orange-400/10", color: "text-orange-600 dark:text-orange-400", badgeBg: "bg-orange-100 dark:bg-orange-400/10", badgeText: "text-orange-700 dark:text-orange-300" },
-  biologia: { bg: "bg-green-50 dark:bg-green-400/10", color: "text-green-600 dark:text-green-400", badgeBg: "bg-green-100 dark:bg-green-400/10", badgeText: "text-green-700 dark:text-green-300" },
-  geografia: { bg: "bg-teal-50 dark:bg-teal-400/10", color: "text-teal-600 dark:text-teal-400", badgeBg: "bg-teal-100 dark:bg-teal-400/10", badgeText: "text-teal-700 dark:text-teal-300" },
-  informatyka: { bg: "bg-cyan-50 dark:bg-cyan-400/10", color: "text-cyan-600 dark:text-cyan-400", badgeBg: "bg-cyan-100 dark:bg-cyan-400/10", badgeText: "text-cyan-700 dark:text-cyan-300" },
-  wf: { bg: "bg-lime-50 dark:bg-lime-400/10", color: "text-lime-600 dark:text-lime-400", badgeBg: "bg-lime-100 dark:bg-lime-400/10", badgeText: "text-lime-700 dark:text-lime-300" },
-  muzyka: { bg: "bg-pink-50 dark:bg-pink-400/10", color: "text-pink-600 dark:text-pink-400", badgeBg: "bg-pink-100 dark:bg-pink-400/10", badgeText: "text-pink-700 dark:text-pink-300" },
-  plastyka: { bg: "bg-violet-50 dark:bg-violet-400/10", color: "text-violet-600 dark:text-violet-400", badgeBg: "bg-violet-100 dark:bg-violet-400/10", badgeText: "text-violet-700 dark:text-violet-300" },
-};
-
-function getSubjectStyle(subjectName: string) {
-  const lower = subjectName.toLowerCase();
-  for (const [key, style] of Object.entries(subjectIconMap)) {
-    if (lower.includes(key)) return style;
-  }
-  return { bg: "bg-slate-50 dark:bg-slate-400/10", color: "text-slate-600 dark:text-slate-400", badgeBg: "bg-slate-100 dark:bg-slate-400/10", badgeText: "text-slate-700 dark:text-slate-300" };
-}
 
 function getStatusInfo(item: Homework) {
   const dueMs = Date.parse(item.termin);
@@ -72,7 +51,7 @@ function HomeworkListItem({
   onClick: () => void;
 }) {
   const subjectName = subject?.nazwa ?? subject?.Nazwa ?? `#${item.przedmiot}`;
-  const style = getSubjectStyle(subjectName);
+  const style = getSubjectColors(subjectName);
   const status = getStatusInfo(item);
   const dueDate = new Date(item.termin).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
 
@@ -81,7 +60,7 @@ function HomeworkListItem({
       onClick={onClick}
       className="w-full bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 hover:shadow-[0_8px_24px_-4px_rgba(25,28,29,0.06)] dark:hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.5)] transition-all group border border-transparent hover:border-primary/5 text-left"
     >
-      <div className={`w-10 h-10 ${style.bg} ${style.color} rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-sm`}>
+      <div className={`w-10 h-10 ${style.bg} ${style.text} rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-sm`}>
         {subjectName.charAt(0).toUpperCase()}
       </div>
 
@@ -95,7 +74,7 @@ function HomeworkListItem({
           </span>
         </div>
         <div className="flex items-center gap-4 mt-1">
-          <span className="text-xs font-medium" style={{ color: style.color }}>{subjectName}</span>
+          <span className={`text-xs font-medium ${style.badgeText}`}>{subjectName}</span>
           <span className="text-xs text-slate-400 font-body flex items-center gap-1">
             <CalendarDays size={12} />
             {dueDate}

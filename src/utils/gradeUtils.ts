@@ -25,6 +25,18 @@ export function getGradeColor(value: string | number): string {
   return "bg-red-100 text-red-700 dark:bg-red-900/80 dark:text-red-400";
 }
 
+export function getGradeTextColor(value: string | number): string {
+  let val = typeof value === "string" ? parseFloat(value) : value;
+  if (Number.isNaN(val)) return "text-zinc-700 dark:text-zinc-300";
+  val = getBaseGrade(val);
+  if (val >= 6.0) return "text-blue-700 dark:text-blue-400";
+  if (val >= 5.0) return "text-green-700 dark:text-green-400";
+  if (val >= 4.0) return "text-lime-700 dark:text-lime-400";
+  if (val >= 3.0) return "text-yellow-700 dark:text-yellow-400";
+  if (val >= 2.0) return "text-orange-700 dark:text-orange-400";
+  return "text-red-700 dark:text-red-400";
+}
+
 /** Border-bottom color matching grade value */
 export function getGradeBorderColor(value: string | number): string {
   let val = typeof value === "string" ? parseFloat(value) : value;

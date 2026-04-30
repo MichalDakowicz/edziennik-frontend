@@ -1,20 +1,23 @@
 import type { Homework, Subject } from "../../types/api";
 import { CalendarDays, FileText, Calculator, Rocket, BookOpen, FlaskConical, Languages } from "lucide-react";
+import { getSubjectColors } from "../../utils/subjectUtils";
 
-const subjectIconMap: Record<string, { icon: React.ElementType; bg: string; color: string; badgeBg: string; badgeText: string }> = {
-  matematyka: { icon: Calculator, bg: "bg-blue-50 dark:bg-blue-400/10", color: "text-blue-600 dark:text-blue-400", badgeBg: "bg-blue-100 dark:bg-blue-400/10", badgeText: "text-blue-700 dark:text-blue-300" },
-  fizyka: { icon: Rocket, bg: "bg-amber-50 dark:bg-amber-400/10", color: "text-amber-600 dark:text-amber-400", badgeBg: "bg-amber-100 dark:bg-amber-400/10", badgeText: "text-amber-700 dark:text-amber-300" },
-  "język polski": { icon: BookOpen, bg: "bg-emerald-50 dark:bg-emerald-400/10", color: "text-emerald-600 dark:text-emerald-400", badgeBg: "bg-emerald-100 dark:bg-emerald-400/10", badgeText: "text-emerald-700 dark:text-emerald-300" },
-  chemia: { icon: FlaskConical, bg: "bg-purple-50 dark:bg-purple-400/10", color: "text-purple-600 dark:text-purple-400", badgeBg: "bg-purple-100 dark:bg-purple-400/10", badgeText: "text-purple-700 dark:text-purple-300" },
-  "język angielski": { icon: Languages, bg: "bg-rose-50 dark:bg-rose-400/10", color: "text-rose-600 dark:text-rose-400", badgeBg: "bg-rose-100 dark:bg-rose-400/10", badgeText: "text-rose-700 dark:text-rose-300" },
+const SUBJECT_ICON_MAP: Record<string, React.ElementType> = {
+  matematyka: Calculator,
+  fizyka: Rocket,
+  "język polski": BookOpen,
+  polski: BookOpen,
+  chemia: FlaskConical,
+  "język angielski": Languages,
+  angielski: Languages,
 };
 
-function getSubjectStyle(subjectName: string) {
+function getSubjectIcon(subjectName: string): React.ElementType {
   const lower = subjectName.toLowerCase();
-  for (const [key, style] of Object.entries(subjectIconMap)) {
-    if (lower.includes(key)) return style;
+  for (const [key, icon] of Object.entries(SUBJECT_ICON_MAP)) {
+    if (lower.includes(key)) return icon;
   }
-  return { icon: BookOpen, bg: "bg-slate-50 dark:bg-slate-400/10", color: "text-slate-600 dark:text-slate-400", badgeBg: "bg-slate-100 dark:bg-slate-400/10", badgeText: "text-slate-700 dark:text-slate-300" };
+  return BookOpen;
 }
 
 function getStatusBadge(item: Homework) {
@@ -50,8 +53,8 @@ export default function HomeworkCard({
   onClick: () => void;
 }) {
   const subjectName = subject?.nazwa ?? subject?.Nazwa ?? `#${item.przedmiot}`;
-  const style = getSubjectStyle(subjectName);
-  const Icon = style.icon;
+  const colors = getSubjectColors(subjectName);
+  const Icon = getSubjectIcon(subjectName);
   const status = getStatusBadge(item);
   const dueMs = Date.parse(item.termin);
   const isOverdue = dueMs < Date.now();
@@ -63,7 +66,7 @@ export default function HomeworkCard({
       className="bg-surface-container-lowest p-6 rounded-xl hover:shadow-[0_20px_40px_-4px_rgba(25,28,29,0.06)] dark:hover:shadow-[0_20px_40px_-4px_rgba(0,0,0,0.6)] transition-all group cursor-pointer border border-transparent hover:border-primary/5 text-left"
     >
       <div className="flex justify-between items-start mb-6">
-        <div className={`w-12 h-12 ${style.bg} ${style.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+        <div className={`w-12 h-12 ${colors.bg} ${colors.text} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
           <Icon size={24} />
         </div>
         <span className={`${status.bg} ${status.text} px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider`}>
@@ -71,7 +74,7 @@ export default function HomeworkCard({
         </span>
       </div>
 
-      <p className="text-sm font-bold mb-1" style={{ color: style.color.replace("600", "700") }}>
+      <p className={`text-sm font-bold mb-1 ${colors.badgeText}`}>
         {subjectName}
       </p>
       <h3 className="text-xl font-bold text-on-surface leading-snug mb-4 font-headline line-clamp-2">

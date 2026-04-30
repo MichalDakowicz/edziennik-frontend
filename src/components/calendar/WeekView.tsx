@@ -3,6 +3,7 @@ import { addDays, format, isSameDay, startOfWeek } from "date-fns";
 import { pl } from "date-fns/locale";
 import type { Event, Homework } from "../../types/api";
 import { cn } from "../../utils/cn";
+import { getSubjectColors } from "../../utils/subjectUtils";
 import { cap, getEventsForDate, getHomeworkForDate, getLessonsForDate, timeToMinutes } from "./helpers";
 import { ItemCard } from "./ItemCard";
 import type { TimetableData, DisplayItem } from "./types";
@@ -19,35 +20,6 @@ const START_HOUR = 7;
 const END_HOUR = 18;
 const MIN_PER_HOUR = 50;
 
-const SUBJECT_COLOR_MAP: Record<string, { bg: string; border: string; text: string }> = {
-  matematyka: { bg: "bg-primary/10", border: "border-l-primary", text: "text-primary" },
-  fizyka: { bg: "bg-primary/10", border: "border-l-primary", text: "text-primary" },
-  biologia: { bg: "bg-primary/10", border: "border-l-primary", text: "text-primary" },
-  informatyka: { bg: "bg-primary/10", border: "border-l-primary", text: "text-primary" },
-  chemia: { bg: "bg-primary/10", border: "border-l-primary", text: "text-primary" },
-  "język polski": { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
-  polski: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
-  historia: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
-  angielski: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
-  niemiecki: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
-  rosyjski: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
-  hiszpański: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
-  łacina: { bg: "bg-secondary/10", border: "border-l-secondary", text: "text-secondary" },
-  muzyka: { bg: "bg-tertiary/10", border: "border-l-tertiary", text: "text-tertiary" },
-  plastyka: { bg: "bg-tertiary/10", border: "border-l-tertiary", text: "text-tertiary" },
-  wf: { bg: "bg-emerald-500/10", border: "border-l-emerald-500", text: "text-emerald-700 dark:text-emerald-300" },
-  religia: { bg: "bg-amber-500/10", border: "border-l-amber-500", text: "text-amber-700 dark:text-amber-300" },
-  etyka: { bg: "bg-amber-500/10", border: "border-l-amber-500", text: "text-amber-700 dark:text-amber-300" },
-  godzi: { bg: "bg-surface-container-highest/50", border: "border-l-outline", text: "text-on-surface-variant" },
-};
-
-function getSubjectColor(subject: string) {
-  const lower = subject.toLowerCase();
-  for (const [key, colors] of Object.entries(SUBJECT_COLOR_MAP)) {
-    if (lower.includes(key)) return colors;
-  }
-  return null;
-}
 
 export function WeekView({ date, timetable, events, homework, onItemClick }: WeekViewProps) {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
@@ -161,7 +133,7 @@ export function WeekView({ date, timetable, events, homework, onItemClick }: Wee
                 {lessons.map(lesson => {
                   const top = getTopOffset(lesson.startTime);
                   const height = getHeight(lesson.startTime, lesson.endTime);
-                  const colors = getSubjectColor(lesson.subject);
+                  const colors = getSubjectColors(lesson.subject);
 
                   const overlappingEvents = dayEvents.filter(ev => {
                     if (!ev.startTime || !ev.endTime) return false;
@@ -176,8 +148,8 @@ export function WeekView({ date, timetable, events, homework, onItemClick }: Wee
                       onClick={() => onItemClick?.(lesson)}
                       className={cn(
                         "absolute left-0 rounded-xl p-1.5 flex flex-col justify-between cursor-pointer hover:shadow-md transition-all group",
-                        colors ? colors.bg : "bg-primary/10",
-                        colors ? colors.border : "border-l-primary",
+                        colors.bg,
+                        colors.borderLeft,
                         widthClass
                       )}
                       style={{ top: `${top}px`, height: `${height}px` }}
@@ -185,7 +157,7 @@ export function WeekView({ date, timetable, events, homework, onItemClick }: Wee
                       <div className="min-w-0">
                         <h4 className={cn(
                           "font-headline font-bold text-xs leading-tight truncate",
-                          colors ? colors.text : "text-primary"
+                          colors.text
                         )}>
                           {lesson.subject}
                         </h4>
@@ -195,7 +167,7 @@ export function WeekView({ date, timetable, events, homework, onItemClick }: Wee
                       </div>
                       <span className={cn(
                         "material-symbols-outlined text-xs opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all self-end shrink-0",
-                        colors ? colors.text : "text-primary"
+                        colors.text
                       )}>
                         east
                       </span>

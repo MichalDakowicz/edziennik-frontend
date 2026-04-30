@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
+import type { Grade } from "../../../types/api";
 import { formatGradeValue, getGradeColor } from "../../../utils/gradeUtils";
 
 type StudentRecentGradesCardProps = {
-    recentGrades: any[];
+    recentGrades: Grade[];
     getGradeSubjectName: (subjectId: number) => string;
     formatRelativeDay: (value: string) => string;
 };
@@ -28,7 +29,7 @@ export default function StudentRecentGradesCard({
 
             <div className="space-y-4">
                 {recentGrades.length > 0 ? (
-                    recentGrades.map((grade: any) => (
+                    recentGrades.map((grade) => (
                         <div key={grade.id} className="flex items-center justify-between">
                             <div className="flex items-center gap-3 min-w-0">
                                 <div

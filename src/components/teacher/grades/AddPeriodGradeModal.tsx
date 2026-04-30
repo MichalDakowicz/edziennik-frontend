@@ -8,6 +8,7 @@ import { Modal } from '../../ui/Modal';
 import { createPeriodGrade } from '../../../services/api';
 import { getCurrentUser } from '../../../services/auth';
 import GradePicker from './GradePicker';
+import type { Student, Subject } from '../../../types/api';
 
 const periodGradeSchema = z.object({
   uczen: z.number({ required_error: 'Wybierz ucznia' }),
@@ -26,8 +27,8 @@ interface AddPeriodGradeModalProps {
   onClose: () => void;
   studentId?: number;
   subjectId?: number;
-  students: any[];
-  subjects: any[];
+  students: Student[];
+  subjects: Subject[];
 }
 
 export default function AddPeriodGradeModal({
@@ -82,7 +83,7 @@ export default function AddPeriodGradeModal({
         okres: parseInt(data.okres),
         wartosc: data.wartosc,
         nauczyciel: user?.teacherId ?? null,
-      } as any),
+      }),
     onSuccess: () => {
       toast.success('Ocena okresowa dodana');
       queryClient.invalidateQueries({ queryKey: ['period-grades'] });
@@ -90,8 +91,9 @@ export default function AddPeriodGradeModal({
       setGradeValue('');
       onClose();
     },
-    onError: (err: any) => {
-      toast.error(err.message || 'Błąd przy dodawaniu oceny okresowej');
+    onError: (err: unknown) => {
+      const message = err instanceof Error ? err.message : 'Błąd przy dodawaniu oceny okresowej';
+      toast.error(message || 'Błąd przy dodawaniu oceny okresowej');
     },
   });
 

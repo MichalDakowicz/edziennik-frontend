@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
+import type { StudentLessonState } from "./types";
 
 type StudentScheduleCardProps = {
-    lessonsWithState: any[];
+    lessonsWithState: StudentLessonState[];
     getSubjectName: (zajeciaId: number) => string;
     getTeacherNameForLesson: (zajeciaId: number) => string;
     formatHour: (value: string | null | undefined) => string;
@@ -34,7 +35,7 @@ export default function StudentScheduleCard({
 
             <div className="space-y-3">
                 {lessonsWithState.length > 0 ? (
-                    lessonsWithState.map((lesson: any) => {
+                    lessonsWithState.map((lesson) => {
                         const wrapperClass = lesson.isCurrent
                             ? "bg-surface-container relative overflow-hidden"
                             : lesson.isPast

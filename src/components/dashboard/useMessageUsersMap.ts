@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import type { Message } from "../../types/api";
 import { getUserProfile } from "../../services/api";
 
-export function useMessageUsersMap(inboxData: any[], selectedMessage: any | null) {
+export function useMessageUsersMap(inboxData: Message[], selectedMessage: Message | null) {
     const userIds = useMemo(() => {
-        const unread = inboxData.filter((message: any) => !message.przeczytana);
-        const ids = unread.map((message: any) => message.nadawca);
+        const unread = inboxData.filter((message) => !message.przeczytana);
+        const ids = unread.map((message) => message.nadawca);
         if (selectedMessage) {
             ids.push(selectedMessage.nadawca);
             ids.push(selectedMessage.odbiorca);
@@ -17,7 +18,7 @@ export function useMessageUsersMap(inboxData: any[], selectedMessage: any | null
         queryKey: ["message-users", userIds],
         queryFn: async () => {
             const entries = await Promise.all(
-                (userIds as number[]).map(async (id: number) => {
+                userIds.map(async (id: number) => {
                     try {
                         const profile = await getUserProfile(id);
                         return {

@@ -1,11 +1,13 @@
 import {
   computeWeightedAverage,
+  computeWeightedAverageWithOverrides,
   findGradeSolutions,
   formatGradeValue,
   getGradeColor,
   getPercentageColor,
   getSuggestedGrade,
   simulateGradeNeeded,
+  suggestGradeImprovements,
 } from "./gradeUtils";
 
 describe("gradeUtils", () => {
@@ -103,6 +105,37 @@ describe("gradeUtils", () => {
     expect(findGradeSolutions(grades, 4.5, 2)).toEqual([]);
   });
 
+  it("podmienia oceny przez overrides przy obliczaniu średniej", () => {
+    const grades = [
+      { id: 1, wartosc: "3", waga: 1, czy_do_sredniej: true },
+      { id: 2, wartosc: "4", waga: 1, czy_do_sredniej: true },
+    ];
+    const overrides = new Map([[1, "5"]]);
+    // bez override: (3+4)/2 = 3.5, z override: (5+4)/2 = 4.5
+    expect(computeWeightedAverageWithOverrides(grades, overrides)).toBeCloseTo(4.5, 2);
+  });
+
+  it("pusta mapa overrides daje tę samą średnią co computeWeightedAverage", () => {
+    const grades = [
+      { id: 1, wartosc: "5", waga: 2, czy_do_sredniej: true },
+      { id: 2, wartosc: "3", waga: 1, czy_do_sredniej: true },
+    ];
+    expect(computeWeightedAverageWithOverrides(grades, new Map())).toBeCloseTo(
+      computeWeightedAverage(grades),
+      5,
+    );
+  });
+
+  it("override nie wlicza oceny nie do średniej mimo podmiany", () => {
+    const grades = [
+      { id: 1, wartosc: "2", waga: 1, czy_do_sredniej: false },
+      { id: 2, wartosc: "4", waga: 1, czy_do_sredniej: true },
+    ];
+    const overrides = new Map([[1, "6"]]);
+    // ocena id=1 nie jest do średniej — override też nie powinien jej wliczyć
+    expect(computeWeightedAverageWithOverrides(grades, overrides)).toBeCloseTo(4, 2);
+  });
+
   it("normalizuje target do dwóch miejsc po przecinku", () => {
     const grades = [{ wartosc: "4", waga: 1, czy_do_sredniej: true }];
 
@@ -110,5 +143,68 @@ describe("gradeUtils", () => {
 
     expect(solutions.length).toBeGreaterThan(0);
     expect(solutions.every((solution) => solution.resultingAvg >= 4.23)).toBe(true);
+  });
+
+  it("sugeruje poprawy posortowane malejąco po delcie", () => {
+    const grades = [
+      { id: 1, wartosc: "2", waga: 3, czy_do_sredniej: true, opis: "Sprawdzian", data_wystawienia: "2024-01-01" },
+      { id: 2, wartosc: "3", waga: 1, czy_do_sredniej: true, opis: "Kartkówka", data_wystawienia: "2024-01-02" },
+    ];
+    const suggestions = suggestGradeImprovements(grades);
+    expect(suggestions.length).toBeGreaterThan(0);
+    expect(suggestions[0].deltaAvg).toBeGreaterThanOrEqual(suggestions[suggestions.length - 1].deltaAvg);
+    // ocena 2 z wagą 3 powinna dać większy przyrost niż 3 z wagą 1
+    expect(suggestions[0].gradeId).toBe(1);
+  });
+
+  it("nie sugeruje ocen >= 3.75 (4- i wyżej)", () => {
+    const grades = [
+      { id: 1, wartosc: "3.75", waga: 2, czy_do_sredniej: true, opis: null, data_wystawienia: "2024-01-01" },
+      { id: 2, wartosc: "4", waga: 2, czy_do_sredniej: true, opis: null, data_wystawienia: "2024-01-02" },
+      { id: 3, wartosc: "5", waga: 2, czy_do_sredniej: true, opis: null, data_wystawienia: "2024-01-03" },
+      { id: 4, wartosc: "2", waga: 2, czy_do_sredniej: true, opis: null, data_wystawienia: "2024-01-04" },
+    ];
+    const suggestions = suggestGradeImprovements(grades);
+    // tylko id=4 (wartość 2) powinna być sugerowana
+    expect(suggestions.every((s) => s.gradeId === 4)).toBe(true);
+  });
+
+  it("nie uwzględnia ocen nie do średniej w sugestiach", () => {
+    const grades = [
+      { id: 1, wartosc: "1", waga: 3, czy_do_sredniej: false, opis: null, data_wystawienia: "2024-01-01" },
+      { id: 2, wartosc: "2", waga: 1, czy_do_sredniej: true, opis: null, data_wystawienia: "2024-01-02" },
+    ];
+    const suggestions = suggestGradeImprovements(grades);
+    expect(suggestions.every((s) => s.gradeId !== 1)).toBe(true);
+  });
+
+  it("pomija sugestie z deltaAvg < 0.04", () => {
+    // jedna ocena 3 waga 1, reszta to 5 waga 20 — poprawa 3→5 da minimalny przyrost
+    const grades = [
+      { id: 1, wartosc: "3", waga: 1, czy_do_sredniej: true, opis: null, data_wystawienia: "2024-01-01" },
+      ...Array.from({ length: 20 }, (_, i) => ({
+        id: i + 10,
+        wartosc: "5",
+        waga: 1,
+        czy_do_sredniej: true,
+        opis: null,
+        data_wystawienia: "2024-01-02",
+      })),
+    ];
+    const suggestions = suggestGradeImprovements(grades);
+    expect(suggestions.every((s) => s.deltaAvg >= 0.04)).toBe(true);
+  });
+
+  it("zwraca dokładnie jedną pozycję per ocena z maksymalnym targetem", () => {
+    const grades = [
+      { id: 1, wartosc: "2", waga: 3, czy_do_sredniej: true, opis: null, data_wystawienia: "2024-01-01" },
+      { id: 2, wartosc: "3", waga: 2, czy_do_sredniej: true, opis: null, data_wystawienia: "2024-01-02" },
+    ];
+    const suggestions = suggestGradeImprovements(grades);
+    const ids = suggestions.map((s) => s.gradeId);
+    // brak duplikatów gradeId
+    expect(new Set(ids).size).toBe(ids.length);
+    // target to zawsze 6 (najwyższy możliwy = maks zysk)
+    expect(suggestions.every((s) => s.targetValue === "6")).toBe(true);
   });
 });

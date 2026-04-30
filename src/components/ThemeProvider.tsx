@@ -86,7 +86,11 @@ export function ThemeProvider({
           localStorage.setItem(storageKey, apiTheme)
           setThemeState(apiTheme)
         }
-      } catch {
+      } catch (err) {
+        // Ignore API sync errors — keep local theme as source of truth
+        // Log in debug mode for diagnostics
+        // eslint-disable-next-line no-console
+        console.debug('Theme sync failed', err)
       }
     }
 
@@ -108,7 +112,10 @@ export function ThemeProvider({
         if (profile && profile.theme_preference !== newTheme) {
           await updateUserSettings(profile.id, { theme_preference: newTheme })
         }
-      } catch {
+      } catch (err) {
+        // Best-effort update; failures are non-fatal
+        // eslint-disable-next-line no-console
+        console.debug('Theme update failed', err)
       }
     })()
   }, [storageKey])

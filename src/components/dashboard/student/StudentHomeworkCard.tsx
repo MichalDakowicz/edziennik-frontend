@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
+import type { Homework } from "../../../types/api";
 
 type StudentHomeworkCardProps = {
-    upcomingHomework: any[];
+    upcomingHomework: Homework[];
     getGradeSubjectName: (subjectId: number) => string;
     formatRelativeDay: (value: string) => string;
 };
@@ -27,7 +28,7 @@ export default function StudentHomeworkCard({
 
             <div className="space-y-3">
                 {upcomingHomework.length > 0 ? (
-                    upcomingHomework.map((item: any) => {
+                    upcomingHomework.map((item) => {
                         const dueMs = Date.parse(item.termin);
                         const diffDays = Math.floor(
                             (dueMs - Date.now()) / (24 * 60 * 60 * 1000),

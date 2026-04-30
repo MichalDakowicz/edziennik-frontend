@@ -22,6 +22,7 @@ import {
 import { getCurrentUser } from "../../services/auth";
 import { keys } from "../../services/queryKeys";
 import { formatDate } from "../../utils/dateUtils";
+import type { Message } from "../../types/api";
 import { ErrorState } from "../ui/ErrorState";
 import { Spinner } from "../ui/Spinner";
 import { useStudentDashboardModel } from "../dashboard/useStudentDashboardModel";
@@ -203,7 +204,7 @@ export default function NotificationsPage() {
         },
     });
 
-    const openMessage = (message: any) => {
+    const openMessage = (message: Message) => {
         if (!message.przeczytana) {
             markReadMutation.mutate(message.id);
         }

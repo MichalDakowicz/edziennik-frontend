@@ -63,6 +63,12 @@ export async function fetchWithAuth<T = unknown>(
       ...options,
       headers: makeHeaders(token, options.headers),
     });
+
+    if (response.status === 401) {
+      logout();
+      window.location.href = "/";
+      throw new Error("Session expired");
+    }
   }
 
   if (!response.ok) {

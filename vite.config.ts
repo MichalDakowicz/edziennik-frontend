@@ -3,6 +3,14 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    watch: {
+      usePolling: true,
+    },
+    hmr: {
+      host: "localhost",
+    },
+  },
   test: {
     environment: "jsdom",
     globals: true,

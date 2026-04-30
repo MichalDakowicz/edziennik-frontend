@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
+import type { Message } from "../../../types/api";
 
 type TeacherUnreadMessagesCardProps = {
-    unreadInbox: any[];
-    onOpenMessage: (message: any) => void;
+    unreadInbox: Message[];
+    onOpenMessage: (message: Message) => void;
     formatDateLabel: (value: string) => string;
 };
 
@@ -28,7 +29,7 @@ export default function TeacherUnreadMessagesCard({
 
                 <div className="p-4 space-y-3 flex-1 overflow-y-auto">
                     {unreadInbox.length ? (
-                        unreadInbox.map((message: any) => (
+                        unreadInbox.map((message) => (
                             <div
                                 key={message.id}
                                 onClick={() => onOpenMessage(message)}

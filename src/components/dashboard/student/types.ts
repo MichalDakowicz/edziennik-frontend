@@ -1,3 +1,11 @@
+import type { LessonTimeBadge } from "../../../utils/lessonTimeStatus";
+import type {
+    Homework,
+    LessonHour,
+    Grade,
+    TimetableEntry,
+} from "../../../types/api";
+
 export type LiveItem = {
     id: string;
     kind:
@@ -17,13 +25,21 @@ export type LiveItem = {
     to?: string;
 };
 
+export type StudentLessonState = TimetableEntry & {
+    hour?: LessonHour;
+    isCurrent: boolean;
+    isPast: boolean;
+    timeBadge: LessonTimeBadge | null;
+    sala?: string | number | null;
+};
+
 export type StudentDashboardProps = {
     firstName: string;
     weightedAverage: number;
     unreadCount: number;
-    lessonsWithState: any[];
-    recentGrades: any[];
-    upcomingHomework: any[];
+    lessonsWithState: StudentLessonState[];
+    recentGrades: Grade[];
+    upcomingHomework: Homework[];
     liveItems: LiveItem[];
     getSubjectName: (zajeciaId: number) => string;
     getGradeSubjectName: (subjectId: number) => string;

@@ -12,6 +12,8 @@ import { getClasses, getInboxMessages, getLuckyNumber } from "../services/api";
 import { keys } from "../services/queryKeys";
 import { cn } from "../utils/cn";
 import { formatClassDisplay } from "../utils/classUtils";
+import { usePageSearch } from "../hooks/usePageSearch";
+import PageSearchDropdown from "./PageSearchDropdown";
 
 type NavItem = {
     label: string;
@@ -109,6 +111,10 @@ export default function Layout() {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
     const profileMenuRef = useRef<HTMLDivElement>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchSelectedIndex, setSearchSelectedIndex] = useState(-1);
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const stored = localStorage.getItem("layout:sidebar-collapsed");
@@ -146,6 +152,23 @@ export default function Layout() {
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
     }, []);
+
+    useEffect(() => {
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.defaultPrevented) return;
+            if (!(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey) return;
+            if (event.key.toLowerCase() !== "k") return;
+            event.preventDefault();
+            if (sidebarCollapsed) {
+                setSidebarCollapsed(false);
+                setTimeout(() => searchInputRef.current?.focus(), 300);
+            } else {
+                searchInputRef.current?.focus();
+            }
+        };
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [sidebarCollapsed]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -199,6 +222,8 @@ export default function Layout() {
         () => inbox?.filter((m) => !m.przeczytana).length ?? 0,
         [inbox],
     );
+
+    const searchResults = usePageSearch(searchQuery, user?.role ?? "uczen");
 
     if (!user) {
         return (
@@ -295,10 +320,7 @@ export default function Layout() {
                             className="w-full flex items-center justify-center p-3 rounded-xl hover:bg-surface-container-high transition-colors text-on-surface-variant hover:text-primary"
                             onClick={() => {
                                 setSidebarCollapsed(false);
-                                setTimeout(() => {
-                                    const searchInput = document.querySelector('input[placeholder="Szukaj..."]') as HTMLInputElement;
-                                    searchInput?.focus();
-                                }, 300);
+                                setTimeout(() => searchInputRef.current?.focus(), 300);
                             }}
                             title="Szukaj"
                         >
@@ -307,13 +329,66 @@ export default function Layout() {
                     ) : (
                         <div className="mb-4">
                             <div className="relative w-full">
+                                {searchOpen && searchQuery.trim() && (
+                                    <PageSearchDropdown
+                                        results={searchResults}
+                                        selectedIndex={searchSelectedIndex}
+                                        query={searchQuery}
+                                        onSelect={(page) => {
+                                            navigate(page.to);
+                                            setSearchQuery("");
+                                            setSearchOpen(false);
+                                            setSearchSelectedIndex(-1);
+                                        }}
+                                    />
+                                )}
                                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                                     <span className="material-symbols-outlined text-outline text-sm">search</span>
                                 </div>
-                                <input 
-                                    className="w-full bg-surface-container-highest border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all font-body outline-none text-on-surface placeholder-outline/70" 
-                                    placeholder="Szukaj..." 
+                                <input
+                                    ref={searchInputRef}
+                                    className="w-full bg-surface-container-highest border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all font-body outline-none text-on-surface placeholder-outline/70"
+                                    placeholder="Szukaj... (Ctrl+K)"
                                     type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        setSearchSelectedIndex(-1);
+                                        setSearchOpen(true);
+                                    }}
+                                    onFocus={() => setSearchOpen(true)}
+                                    onBlur={() => {
+                                        setTimeout(() => setSearchOpen(false), 150);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (!searchOpen || !searchQuery.trim()) return;
+                                        if (e.key === "ArrowDown") {
+                                            e.preventDefault();
+                                            setSearchSelectedIndex((i) =>
+                                                Math.min(i + 1, searchResults.length - 1),
+                                            );
+                                        } else if (e.key === "ArrowUp") {
+                                            e.preventDefault();
+                                            setSearchSelectedIndex((i) => Math.max(i - 1, -1));
+                                        } else if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            const target =
+                                                searchSelectedIndex >= 0
+                                                    ? searchResults[searchSelectedIndex]
+                                                    : searchResults[0];
+                                            if (target) {
+                                                navigate(target.to);
+                                                setSearchQuery("");
+                                                setSearchOpen(false);
+                                                setSearchSelectedIndex(-1);
+                                            }
+                                        } else if (e.key === "Escape") {
+                                            setSearchOpen(false);
+                                            setSearchQuery("");
+                                            setSearchSelectedIndex(-1);
+                                            searchInputRef.current?.blur();
+                                        }
+                                    }}
                                 />
                             </div>
                         </div>

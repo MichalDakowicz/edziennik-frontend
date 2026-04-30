@@ -88,7 +88,7 @@ describe("App routes", () => {
     await renderAtPath(path as string);
 
     expect(screen.getByText("Layout shell")).toBeInTheDocument();
-    expect(screen.getByText(expectedText as string)).toBeInTheDocument();
+    expect(await screen.findByText(expectedText as string)).toBeInTheDocument();
   });
 
   it("przekierowuje niezalogowanego użytkownika z chronionej trasy", async () => {
